@@ -6,6 +6,8 @@ import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.utils.RandomUtil;
 import net.dv8tion.jda.api.Permission;
+import org.springframework.boot.web.servlet.error.ErrorAttributes;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +43,7 @@ public class FrontendController {
         } catch (Exception ignore) {}
 
         if (session != null) return new ModelAndView("redirect:http://localhost:8080/panel?id=" + identifier);
-        else return new ModelAndView("redirect:http://localhost:8080/error?typ=session");
+        else return new ModelAndView("redirect:http://localhost:8080/error");
     }
 
     @RequestMapping("/panel")
@@ -50,18 +52,39 @@ public class FrontendController {
         Session session = null;
         List<OAuth2Guild> guilds;
 
-        // TODO move the buttons around so they look good.
-
         try {
             session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
             guilds = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
             guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
             model.addAttribute("guilds", guilds);
         } catch (Exception e) {
+            if (session == null) return "main/index";
+
             model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guilds! (" + (session == null ? "0x001" : "0x002")  + ")");
+            model.addAttribute("error", "Couldn't load Guilds!");
         }
 
         return "panel/index";
+    }
+
+    @RequestMapping("/panel/social")
+    public String openPanelSocial(@RequestParam String id, @RequestParam String guildID, Model model) {
+
+        Session session = null;
+
+        // TODO add actual data getting from JDA Bot Instance.
+
+        try {
+            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+            model.addAttribute("roles", "");
+            model.addAttribute("channels", "");
+        } catch (Exception e) {
+            if (session == null) return "main/index";
+
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Guild Information! ");
+        }
+
+        return "panel/social/index";
     }
 }

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Ree6 - Panel</title>
+    <title>Ree6 - Error</title>
     <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63">
     <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63">
     <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63">
@@ -28,6 +28,7 @@
                 <li class="nav-item"></li>
                 <li class="nav-item"></li>
             </ul>
+            <span class="navbar-text actions"> <a class="btn btn-dark action-button" role="button" href="https://cp.ree6.de/auth/discord">Login</a></span>
         </div>
     </div>
 </nav>
@@ -40,24 +41,17 @@
             <hr style="background: rgba(0,0,0,0);height: 50px;">
         </div>
     </section>
-    <section id="features">
+    <section id="error">
         <div class="container">
             <hr style="background: rgba(0,0,0,0);height: 50px;">
             <!-- Start: Intro -->
             <div class="intro">
-                <h2 class="text-center" style="color: rgb(255,255,255);">Servers</h2>
+                <i class="material-icons d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" style="color: var(--bs-red);font-size: 35px;">info</i>
+                <h2 class="text-center" style="color: rgb(255,255,255);">Internal HTTP Error</h2>
                 <hr style="background: rgba(0,0,0,0);">
+                <p class="d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" style="color: #ffffff;text-align: center;">Our System ran into a problem!<br>We are really sorry about this!<br>Please try refreshing the Site and/or logging in again!<br><br>If you still have problems contact us!<br></p>
             </div>
-            <!-- End: Intro --><!-- Start: Features -->
-            <div class="row d-inline-flex features" style="margin-left: -24px;margin-right: -24px;margin-top: 15px;margin-bottom: 15px;">
-                <div th:each="guild: ${guilds}" class="col-sm-6 col-lg-4 item">
-                    <img th:src="${guild.getIconUrl()}" class="bi bi-shield-check border rounded-circle d-xl-flex mx-auto justify-content-xl-center align-items-xl-center icon" data-bss-hover-animate="pulse" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;margin-right: 5px;" />
-                    <h4 class="d-xl-flex mx-auto justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);" th:text="${guild.getName()}">Test</h4>
-                    <button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" type="button" th:text=${guild.getName()} th:href="${guild.getIconUrl()}">Manage</button>
-                    <br  />
-                </div>
-            </div>
-            <!-- End: Features -->
+            <!-- End: Intro -->
         </div>
         <hr style="background: rgba(0,0,0,0);height: 50px;">
     </section>
