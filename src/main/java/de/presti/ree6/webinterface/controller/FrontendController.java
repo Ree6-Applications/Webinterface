@@ -6,8 +6,6 @@ import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.utils.RandomUtil;
 import net.dv8tion.jda.api.Permission;
-import org.springframework.boot.web.servlet.error.ErrorAttributes;
-import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,10 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
-import java.util.Random;
 
 @Controller
 public class FrontendController {
