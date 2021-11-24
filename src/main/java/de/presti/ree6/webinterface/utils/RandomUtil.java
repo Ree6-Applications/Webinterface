@@ -8,7 +8,7 @@ public class RandomUtil {
 
     public static String getRandomBase64String() {
         Random random = ThreadLocalRandom.current();
-        byte[] randomBytes = new byte[32];
+        byte[] randomBytes = new byte[128];
         random.nextBytes(randomBytes);
         return Base64.getUrlEncoder().encodeToString(randomBytes);
     }
