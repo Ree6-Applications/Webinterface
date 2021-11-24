@@ -71,6 +71,13 @@ public class FrontendController {
 
         try {
             session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+
+            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
+            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID));
+
+            if (guildList.size() <= 0) return "error/index";
+            model.addAttribute("guild", guildList.stream().findFirst().get());
+
             model.addAttribute("roles", "");
             model.addAttribute("channels", "");
         } catch (Exception e) {
@@ -81,5 +88,63 @@ public class FrontendController {
         }
 
         return "panel/social/index";
+    }
+
+    @RequestMapping("/panel/logging")
+    public String openPanelLogging(@RequestParam String id, @RequestParam String guildID, Model model) {
+
+        Session session = null;
+
+        // TODO add actual data getting from JDA Bot Instance.
+
+        try {
+            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+
+            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
+            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID));
+
+            if (guildList.size() <= 0) return "error/index";
+            model.addAttribute("guild", guildList.stream().findFirst().get());
+
+            model.addAttribute("roles", "");
+            model.addAttribute("channels", "");
+        } catch (Exception e) {
+            if (session == null) return "main/index";
+
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Guild Information! ");
+
+            e.printStackTrace();
+        }
+
+        return "panel/logging/index";
+    }
+
+    @RequestMapping("/panel/moderation")
+    public String openPanelModeration(@RequestParam String id, @RequestParam String guildID, Model model) {
+
+        Session session = null;
+
+        // TODO add actual data getting from JDA Bot Instance.
+
+        try {
+            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+
+            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
+            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID));
+
+            if (guildList.size() <= 0) return "error/index";
+            model.addAttribute("guild", guildList.stream().findFirst().get());
+
+            model.addAttribute("roles", "");
+            model.addAttribute("channels", "");
+        } catch (Exception e) {
+            if (session == null) return "main/index";
+
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Guild Information! ");
+        }
+
+        return "panel/moderation/index";
     }
 }

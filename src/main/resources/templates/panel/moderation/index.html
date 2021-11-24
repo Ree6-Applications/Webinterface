@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
    <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
@@ -40,6 +40,14 @@
                <h1 class="display-5 d-xl-flex justify-content-xl-center align-items-xl-center" style="color: #ffffff;font-size: 20px;">The alternative to Mee6!</h1>
                <hr style="background: rgba(0,0,0,0);height: 50px;">
             </div>
+         </section>
+         <section id="server-info" style="background: #405a9d;">
+            <hr style="background: rgba(0,0,0,0);height: 50px;">
+            <div class="container" style="background: rgba(0,0,0,0);">
+               <img th:src="${guild.getIconUrl()}" class="rounded-circle img-fluid d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" loading="lazy" width="100">
+               <h1 class="d-xl-flex justify-content-xl-center align-items-xl-center" style="color: #ffffff;" th:text="${guild.getName()}">Servername</h1>
+            </div>
+            <hr style="background: rgba(0,0,0,0);height: 50px;">
          </section>
          <section id="moderation">
             <div class="container">
