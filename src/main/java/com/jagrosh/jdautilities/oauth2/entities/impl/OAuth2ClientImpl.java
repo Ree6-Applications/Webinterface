@@ -136,6 +136,34 @@ public class OAuth2ClientImpl implements OAuth2Client
     }
 
     @Override
+    public OAuth2Action<OAuth2User> joinGuild(OAuth2User oAuth2User, long guildId)
+    {
+        OAuth2URL oAuth2URL = OAuth2URL.GUILD_JOIN;
+        return new OAuth2Action<OAuth2User>(this, Method.PUT, oAuth2URL.compile(guildId, oAuth2User.getIdLong()))
+        {
+            @Override
+            protected Headers getHeaders()
+            {
+                return new Headers.Builder().add("Authorization", "Bot BOTTOKEN").add("Content-Type", "application/json").build();
+            }
+
+            @Override
+            protected RequestBody getBody() {
+                return RequestBody.create(MediaType.parse("application/json"), "access_token=" + oAuth2User.getSession().getTokenType() + " " + oAuth2User.getSession().getAccessToken());
+            }
+
+            @Override
+            protected OAuth2User handle(Response response) throws IOException
+            {
+                if(!response.isSuccessful())
+                    throw failure(response);
+
+                return oAuth2User;
+            }
+        };
+    }
+
+    @Override
     public OAuth2Action<OAuth2User> getUser(Session session)
     {
         Checks.notNull(session, "Session");

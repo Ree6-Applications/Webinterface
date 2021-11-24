@@ -81,6 +81,9 @@ public abstract class OAuth2Action<T>
             case POST:
                 builder.post(getBody());
                 break;
+            case PUT:
+                builder.put(getBody());
+                break;
             default:
                 throw new IllegalArgumentException(method.name() + " requests are not supported!");
         }
