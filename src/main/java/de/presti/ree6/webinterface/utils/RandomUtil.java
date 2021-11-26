@@ -6,6 +6,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomUtil {
 
+    /**
+     * Create a new 126 Byte Base64 String.
+     * @return {@link String} A 126 Byte Base64 String.
+     */
     public static String getRandomBase64String() {
         Random random = ThreadLocalRandom.current();
         byte[] randomBytes = new byte[128];

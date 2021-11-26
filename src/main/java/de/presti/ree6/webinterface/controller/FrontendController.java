@@ -16,31 +16,59 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
+/**
+ * Controller for the Frontend to manage what the user sees.
+ */
 @Controller
 public class FrontendController {
 
+    /**
+     * A Get Mapper for the Main Page.
+     * @return {@link String} for Thyme to the HTML Page.
+     */
     @GetMapping("/")
     public String main() {
         return "main/index";
     }
 
+    /**
+     * A Get Mapper for generation of a Discord OAuth2 Session
+     * @return {@link ModelAndView} with the redirect data.
+     */
     @GetMapping("/discord/auth")
-    public ModelAndView startDiscordAuth(HttpServletResponse httpServletResponse) {
+    public ModelAndView startDiscordAuth() {
         return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL("http://localhost:8080/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
     }
 
+    /**
+     * The Request Mapper for the Discord Auth callback.
+     * @param code the OAuth2 Code from Discord.
+     * @param state the local State of the OAuth2 Session.
+     * @return {@link ModelAndView} with the redirect data.
+     */
     @RequestMapping("/discord/auth/callback")
     public ModelAndView discordLogin(@RequestParam String code, @RequestParam String state) {
         Session session = null;
+
+        // Generate a secure Base64 String for the Identifier.
         String identifier = RandomUtil.getRandomBase64String();
+
         try {
+            // Try creating a Session.
             session = Server.getInstance().getOAuth2Client().startSession(code, state, identifier, Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN).complete();
         } catch (Exception ignore) {}
 
+        // If the given data was valid and a Session has been created redirect to the panel Site. If not redirect to error.
         if (session != null) return new ModelAndView("redirect:http://localhost:8080/panel?id=" + identifier);
         else return new ModelAndView("redirect:http://localhost:8080/error");
     }
 
+    /**
+     * Request Mapper for the Server selection Panel.
+     * @param id the Session Identifier.
+     * @param model the ViewModel.
+     * @return {@link String} for Thyme to the HTML Page.
+     */
     @RequestMapping("/panel")
     public String openPanel(@RequestParam String id, Model model) {
 
@@ -48,20 +76,37 @@ public class FrontendController {
         List<OAuth2Guild> guilds;
 
         try {
+            // Try retrieving the Session from the Identifier.
             session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+
+            // Try retrieving the Guilds of the OAuth2 User.
             guilds = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
+
+            // Remove every Guild from the List where the OAuth2 User doesn't have Administration permission.
             guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
+
+            // Add the Guilds as Attribute to the ViewModel.
             model.addAttribute("guilds", guilds);
         } catch (Exception e) {
+            // If the Session is null just return to the default Page.
             if (session == null) return "main/index";
 
+            // If the Session isn't null give the User a Notification that his Guilds couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guilds!");
         }
 
+        // Return Panel Page.
         return "panel/index";
     }
 
+    /**
+     * Request Mapper for the Social Panel Page.
+     * @param id the Session Identifier.
+     * @param guildID the ID of the selected Guild.
+     * @param model the ViewModel.
+     * @return {@link String} for Thyme to the HTML Page.
+     */
     @RequestMapping("/panel/social")
     public String openPanelSocial(@RequestParam String id, @RequestParam String guildID, Model model) {
 
@@ -70,26 +115,42 @@ public class FrontendController {
         // TODO add actual data getting from JDA Bot Instance.
 
         try {
+            // Try retrieving the Session from the Identifier.
             session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
 
+            // Try retrieving the Guild of the OAuth2 User by its ID.
             List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID));
+            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
+            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
             if (guildList.size() <= 0) return "error/index";
+
+            // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
+            // Retrieve every Role and Channel of the Guild and set them as Attribute.
             model.addAttribute("roles", "");
             model.addAttribute("channels", "");
         } catch (Exception e) {
+            // If the Session is null just return to the default Page.
             if (session == null) return "main/index";
 
+            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
         }
 
+        // Return to the Social Panel Page.
         return "panel/social/index";
     }
 
+    /**
+     * Request Mapper for the Logging Panel Page.
+     * @param id the Session Identifier.
+     * @param guildID the ID of the selected Guild.
+     * @param model the ViewModel.
+     * @return {@link String} for Thyme to the HTML Page.
+     */
     @RequestMapping("/panel/logging")
     public String openPanelLogging(@RequestParam String id, @RequestParam String guildID, Model model) {
 
@@ -98,28 +159,42 @@ public class FrontendController {
         // TODO add actual data getting from JDA Bot Instance.
 
         try {
+            // Try retrieving the Session from the Identifier.
             session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
 
+            // Try retrieving the Guild of the OAuth2 User by its ID.
             List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID));
+            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
+            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
             if (guildList.size() <= 0) return "error/index";
+
+            // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
+            // Retrieve every Role and Channel of the Guild and set them as Attribute.
             model.addAttribute("roles", "");
             model.addAttribute("channels", "");
         } catch (Exception e) {
+            // If the Session is null just return to the default Page.
             if (session == null) return "main/index";
 
+            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
-
-            e.printStackTrace();
         }
 
+        // Return to the Logging Panel Page.
         return "panel/logging/index";
     }
 
+    /**
+     * Request Mapper for the Moderation Panel Page.
+     * @param id the Session Identifier.
+     * @param guildID the ID of the selected Guild.
+     * @param model the ViewModel.
+     * @return {@link String} for Thyme to the HTML Page.
+     */
     @RequestMapping("/panel/moderation")
     public String openPanelModeration(@RequestParam String id, @RequestParam String guildID, Model model) {
 
@@ -128,23 +203,32 @@ public class FrontendController {
         // TODO add actual data getting from JDA Bot Instance.
 
         try {
+            // Try retrieving the Session from the Identifier.
             session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
 
+            // Try retrieving the Guild of the OAuth2 User by its ID.
             List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID));
+            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
+            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
             if (guildList.size() <= 0) return "error/index";
+
+            // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
+            // Retrieve every Role and Channel of the Guild and set them as Attribute.
             model.addAttribute("roles", "");
             model.addAttribute("channels", "");
         } catch (Exception e) {
+            // If the Session is null just return to the default Page.
             if (session == null) return "main/index";
 
+            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
         }
 
+        // Return to the Moderation Panel Page.
         return "panel/moderation/index";
     }
 }

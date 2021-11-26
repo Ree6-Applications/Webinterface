@@ -10,16 +10,20 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
     /**
      * Error Attributes in the Application
      */
-    private ErrorAttributes errorAttributes;
+    private final ErrorAttributes errorAttributes;
 
     /**
      * Controller for the Error Controller
-     * @param errorAttributes
+     * @param errorAttributes Attributes that give more Info about the Error.
      */
     public ErrorController(ErrorAttributes errorAttributes) {
         this.errorAttributes = errorAttributes;
     }
 
+    /**
+     * Request mapper for errors.
+     * @return {@link String} for Thyme to the HTML Page.
+     */
     @RequestMapping("/error")
     public String error() { return "error/index"; }
 }
