@@ -26,7 +26,7 @@ public class BackendController {
 
     //region API 1.0
 
-    /// region Level API
+    //region Level API
 
     /**
      * Request mapper for a getLeaderboard Request.
