@@ -4,8 +4,10 @@ import com.jagrosh.jdautilities.oauth2.Scope;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
 import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.webinterface.Server;
+import de.presti.ree6.webinterface.bot.BotInfo;
 import de.presti.ree6.webinterface.utils.RandomUtil;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -85,6 +87,9 @@ public class FrontendController {
             // Remove every Guild from the List where the OAuth2 User doesn't have Administration permission.
             guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
 
+            // Set the Identifier.
+            model.addAttribute("identifier", id);
+
             // Add the Guilds as Attribute to the ViewModel.
             model.addAttribute("guilds", guilds);
         } catch (Exception e) {
@@ -125,12 +130,15 @@ public class FrontendController {
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
             if (guildList.size() <= 0) return "error/index";
 
+            // Set the Identifier.
+            model.addAttribute("identifier", id);
+
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
             // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", "");
-            model.addAttribute("channels", "");
+            model.addAttribute("invites", 1);
+            model.addAttribute("commandstats", "");
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return "main/index";
@@ -169,12 +177,21 @@ public class FrontendController {
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
             if (guildList.size() <= 0) return "error/index";
 
+            // Retrieve the Guild by its giving ID.
+            Guild guild = BotInfo.botInstance.getGuildById(guildID);
+
+            // If the Guild couldn't be loaded redirect to Error page.
+            if (guild == null) return "error/index";
+
+            // Set the Identifier.
+            model.addAttribute("identifier", id);
+
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
             // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", "");
-            model.addAttribute("channels", "");
+            model.addAttribute("roles", guild.getRoles());
+            model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return "main/index";
@@ -213,12 +230,21 @@ public class FrontendController {
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
             if (guildList.size() <= 0) return "error/index";
 
+            // Retrieve the Guild by its giving ID.
+            Guild guild = BotInfo.botInstance.getGuildById(guildID);
+
+            // If the Guild couldn't be loaded redirect to Error page.
+            if (guild == null) return "error/index";
+
+            // Set the Identifier.
+            model.addAttribute("identifier", id);
+
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
             // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", "");
-            model.addAttribute("channels", "");
+            model.addAttribute("roles", guild.getRoles());
+            model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return "main/index";
@@ -257,12 +283,21 @@ public class FrontendController {
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
             if (guildList.size() <= 0) return "error/index";
 
+            // Retrieve the Guild by its giving ID.
+            Guild guild = BotInfo.botInstance.getGuildById(guildID);
+
+            // If the Guild couldn't be loaded redirect to Error page.
+            if (guild == null) return "error/index";
+
+            // Set the Identifier.
+            model.addAttribute("identifier", id);
+
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
             // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", "");
-            model.addAttribute("channels", "");
+            model.addAttribute("roles", guild.getRoles());
+            model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return "main/index";

@@ -86,10 +86,9 @@
                      </ul>
                      <form class="d-flex justify-content-center flex-wrap" method="get">
                         <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
-                           <option value="none" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
-                           <option value="test" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Test</option>
+                           <option th:each="role: ${roles}" th:value="${role.getId()}" th:text="${role.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
                         </select></div>
-                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Add</button></div>
                      </form>
                   </div>
                   <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="material-icons d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">border_color</i>

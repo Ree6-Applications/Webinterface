@@ -1,5 +1,7 @@
 package de.presti.ree6.webinterface.sql;
 
+import de.presti.ree6.webinterface.bot.BotInfo;
+
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -241,8 +243,13 @@ public class SQLWorker {
         // Check if there is already a Webhook set.
         if (isLogSetup(guildId)) {
 
+            // Delete the existing Webhook.
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+                    webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
+                    .forEach(webhook -> webhook.delete().queue()));
 
-
+            // Delete the entry.
+            querySQL("DELETE FROM LogWebhooks WHERE GID='" + guildId + "'");
         }
 
         // Add a new entry into the Database.
@@ -301,6 +308,347 @@ public class SQLWorker {
             querySQL("DELETE FROM LogWebhooks WHERE CID='" + webhookId + "' AND TOKEN='" + authToken + "'");
         }
 
+    }
+
+    //endregion
+
+    //region Welcome
+
+    /**
+     * Get the WelcomeWebhooks data.
+     * @param guildId the ID of the Guild.
+     * @return {@link String[]} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public String[] getWelcomeWebhook(String guildId) {
+        if (isWelcomeSetup(guildId)) {
+            // Creating a SQL Statement to get the Entry from the WelcomeWebhooks Table by the GuildID.
+            try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM WelcomeWebhooks WHERE GID='" + guildId + "'").executeQuery()) {
+
+                // Return if there was a match.
+                if (rs != null && rs.next()) {
+                    if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
+                        return new String[] { "0", "Not setuped!"};
+                    else
+                        return new String[] { rs.getString("CID"), rs.getString("TOKEN") };
+                }
+            } catch (Exception ignore) {}
+        }
+
+        return new String[] { "0", "Not setuped!"};
+    }
+
+    /**
+     * Set the WelcomeWebhooks in our Database.
+     * @param guildId the ID of the Guild.
+     * @param webhookId the ID of the Webhook.
+     * @param authToken the Auth-token to verify the access.
+     */
+    public void setWelcomeWebhook(String guildId, String webhookId, String authToken) {
+
+        // Check if there is already a Webhook set.
+        if (isWelcomeSetup(guildId)) {
+
+            // Delete the existing Webhook.
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+                            webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
+                    .forEach(webhook -> webhook.delete().queue()));
+
+            // Delete the entry.
+            querySQL("DELETE FROM WelcomeWebhooks WHERE GID='" + guildId + "'");
+        }
+
+        // Add a new entry into the Database.
+        querySQL("INSERT INTO WelcomeWebhooks (GID, CID, TOKEN) VALUES ('" + guildId + "', '" + webhookId + "', '" + authToken + "');");
+
+    }
+
+    /**
+     * Check if the Welcome Webhook has been set in our Database for this Server.
+     * @param guildId the ID of the Guild.
+     * @return {@link Boolean} if true, it has been set | if false, it hasn't been set.
+     */
+    public boolean isWelcomeSetup(String guildId) {
+
+        // Creating a SQL Statement to get the Entry from the WelcomeWebhooks Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM WelcomeWebhooks WHERE GID='" + guildId + "'").executeQuery()) {
+
+            // Return if there was a match.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {}
+
+        // Return if there wasn't a match.
+        return false;
+    }
+
+    //endregion
+
+    //region News
+
+    /**
+     * Get the NewsWebhooks data.
+     * @param guildId the ID of the Guild.
+     * @return {@link String[]} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public String[] getNewsWebhook(String guildId) {
+        if (isNewsSetup(guildId)) {
+            // Creating a SQL Statement to get the Entry from the NewsWebhooks Table by the GuildID.
+            try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM NewsWebhooks WHERE GID='" + guildId + "'").executeQuery()) {
+
+                // Return if there was a match.
+                if (rs != null && rs.next()) {
+                    if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
+                        return new String[] { "0", "Not setuped!"};
+                    else
+                        return new String[] { rs.getString("CID"), rs.getString("TOKEN") };
+                }
+            } catch (Exception ignore) {}
+        }
+
+        return new String[] { "0", "Not setuped!"};
+    }
+
+    /**
+     * Set the NewsWebhooks in our Database.
+     * @param guildId the ID of the Guild.
+     * @param webhookId the ID of the Webhook.
+     * @param authToken the Auth-token to verify the access.
+     */
+    public void setNewsWebhook(String guildId, String webhookId, String authToken) {
+
+        // Check if there is already a Webhook set.
+        if (isNewsSetup(guildId)) {
+
+            // Delete the existing Webhook.
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+                            webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
+                    .forEach(webhook -> webhook.delete().queue()));
+
+            // Delete the entry.
+            querySQL("DELETE FROM NewsWebhooks WHERE GID='" + guildId + "'");
+        }
+
+        // Add a new entry into the Database.
+        querySQL("INSERT INTO NewsWebhooks (GID, CID, TOKEN) VALUES ('" + guildId + "', '" + webhookId + "', '" + authToken + "');");
+
+    }
+
+    /**
+     * Check if the News Webhook has been set in our Database for this Server.
+     * @param guildId the ID of the Guild.
+     * @return {@link Boolean} if true, it has been set | if false, it hasn't been set.
+     */
+    public boolean isNewsSetup(String guildId) {
+
+        // Creating a SQL Statement to get the Entry from the NewsWebhooks Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM NewsWebhooks WHERE GID='" + guildId + "'").executeQuery()) {
+
+            // Return if there was a match.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {}
+
+        // Return if there wasn't a match.
+        return false;
+    }
+
+    //endregion
+
+    //region Rainbow
+
+    /**
+     * Get the RainbowWebhooks data.
+     * @param guildId the ID of the Guild.
+     * @return {@link String[]} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public String[] getRainbowWebhook(String guildId) {
+        if (isRainbowSetup(guildId)) {
+            // Creating a SQL Statement to get the Entry from the RainbowWebhooks Table by the GuildID.
+            try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM RainbowWebhooks WHERE GID='" + guildId + "'").executeQuery()) {
+
+                // Return if there was a match.
+                if (rs != null && rs.next()) {
+                    if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
+                        return new String[] { "0", "Not setuped!"};
+                    else
+                        return new String[] { rs.getString("CID"), rs.getString("TOKEN") };
+                }
+            } catch (Exception ignore) {}
+        }
+
+        return new String[] { "0", "Not setuped!"};
+    }
+
+    /**
+     * Set the RainbowWebhooks in our Database.
+     * @param guildId the ID of the Guild.
+     * @param webhookId the ID of the Webhook.
+     * @param authToken the Auth-token to verify the access.
+     */
+    public void setRainbowWebhook(String guildId, String webhookId, String authToken) {
+
+        // Check if there is already a Webhook set.
+        if (isRainbowSetup(guildId)) {
+
+            // Delete the existing Webhook.
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+                            webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
+                    .forEach(webhook -> webhook.delete().queue()));
+
+            querySQL("DELETE FROM RainbowWebhooks WHERE GID='" + guildId + "'");
+        }
+
+        // Add a new entry into the Database.
+        querySQL("INSERT INTO RainbowWebhooks (GID, CID, TOKEN) VALUES ('" + guildId + "', '" + webhookId + "', '" + authToken + "');");
+
+    }
+
+    /**
+     * Check if the Rainbow Webhook has been set in our Database for this Server.
+     * @param guildId the ID of the Guild.
+     * @return {@link Boolean} if true, it has been set | if false, it hasn't been set.
+     */
+    public boolean isRainbowSetup(String guildId) {
+
+        // Creating a SQL Statement to get the Entry from the WelcomeWebhooks Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM RainbowWebhooks WHERE GID='" + guildId + "'").executeQuery()) {
+
+            // Return if there was a match.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {}
+
+        // Return if there wasn't a match.
+        return false;
+    }
+
+    //endregion
+
+    //region Twitch Notifier
+
+    /**
+     * Get the TwitchNotify data.
+     * @param guildId the ID of the Guild.
+     * @param twitchName the Username of the Twitch User.
+     * @return {@link String[]} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public String[] getTwitchWebhook(String guildId, String twitchName) {
+        if (isTwitchSetup(guildId)) {
+            // Creating a SQL Statement to get the Entry from the RainbowWebhooks Table by the GuildID.
+            try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitchNotify WHERE GID='" + guildId + "' AND NAME='" + twitchName + "'").executeQuery()) {
+
+                // Return if there was a match.
+                if (rs != null && rs.next()) {
+                    if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
+                        return new String[] { "0", "Not setuped!"};
+                    else
+                        return new String[] { rs.getString("CID"), rs.getString("TOKEN") };
+                }
+            } catch (Exception ignore) {}
+        }
+
+        return new String[] { "0", "Not setuped!"};
+    }
+
+    /**
+     * Get the TwitchNotify data.
+     * @param twitchName the Username of the Twitch User.
+     * @return {@link ArrayList<>} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public ArrayList<String[]> getTwitchWebhooksByName(String twitchName) {
+
+        ArrayList<String[]> webhooks = new ArrayList<>();
+
+            // Creating a SQL Statement to get the Entry from the RainbowWebhooks Table by the GuildID.
+            try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitchNotify WHERE NAME='" + twitchName + "'").executeQuery()) {
+
+                // Return if there was a match.
+                while (rs != null && rs.next()) {
+                    if (!rs.getString("CID").isEmpty() && !rs.getString("TOKEN").isEmpty())
+                        webhooks.add(new String[] { rs.getString("CID"), rs.getString("TOKEN") });
+                }
+            } catch (Exception ignore) {}
+
+        return webhooks;
+    }
+
+    /**
+     * Set the TwitchNotify in our Database.
+     * @param guildId the ID of the Guild.
+     * @param webhookId the ID of the Webhook.
+     * @param authToken the Auth-token to verify the access.
+     * @param twitchName the Username of the Twitch User.
+     */
+    public void addTwitchWebhook(String guildId, String webhookId, String authToken, String twitchName) {
+
+        // Check if there is already a Webhook set.
+        if (isTwitchSetup(guildId, twitchName)) {
+
+            // Delete the existing Webhook.
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+                            webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
+                    .forEach(webhook -> webhook.delete().queue()));
+
+            // Delete the entry.
+            querySQL("DELETE FROM TwitchNotify WHERE GID='" + guildId + "' AND NAME='" + twitchName + "'");
+        }
+
+        // Add a new entry into the Database.
+        querySQL("INSERT INTO TwitchNotify (GID, NAME, CID, TOKEN) VALUES ('" + guildId + "', '" + twitchName + "', '" + webhookId + "', '" + authToken + "');");
+    }
+
+    /**
+     * Remove a Twitch Notifier entry from our Database.
+     * @param guildId the ID of the Guild.
+     * @param twitchName the Name of the Twitch User.
+     */
+    public void removeTwitchWebhook(String guildId, String twitchName) {
+
+        // Check if there is a Webhook set.
+        if (isTwitchSetup(guildId, twitchName)) {
+
+            // Delete the existing Webhook.
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+                            webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
+                    .forEach(webhook -> webhook.delete().queue()));
+
+            // Delete the entry.
+            querySQL("DELETE FROM TwitchNotify WHERE GID='" + guildId + "' AND NAME='" + twitchName + "'");
+        }
+    }
+
+    /**
+     * Check if the Twitch Webhook has been set in our Database for this Server.
+     * @param guildId the ID of the Guild.
+     * @return {@link Boolean} if true, it has been set | if false, it hasn't been set.
+     */
+    public boolean isTwitchSetup(String guildId) {
+
+        // Creating a SQL Statement to get the Entry from the WelcomeWebhooks Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitchNotify WHERE GID='" + guildId + "'").executeQuery()) {
+
+            // Return if there was a match.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {}
+
+        // Return if there wasn't a match.
+        return false;
+    }
+
+    /**
+     * Check if the Twitch Webhook has been set for the given User in our Database for this Server.
+     * @param guildId the ID of the Guild.
+     * @param twitchName the Username of the Twitch User.
+     * @return {@link Boolean} if true, it has been set | if false, it hasn't been set.
+     */
+    public boolean isTwitchSetup(String guildId, String twitchName) {
+
+        // Creating a SQL Statement to get the Entry from the WelcomeWebhooks Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitchNotify WHERE GID='" + guildId + "' AND='" + twitchName + "'").executeQuery()) {
+
+            // Return if there was a match.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {}
+
+        // Return if there wasn't a match.
+        return false;
     }
 
     //endregion
