@@ -34,6 +34,13 @@ import java.util.List;
 public interface OAuth2Guild extends ISnowflake
 {
     /**
+     * Check if the Bot is on the Guild.
+     *
+     * @return true, if the bot is on the Guild | false, if not.
+     */
+    boolean BotJoined();
+
+    /**
      * Gets the underlying {@link com.jagrosh.jdautilities.oauth2.OAuth2Client OAuth2Client}
      * that created this OAuth2Guild.
      *

@@ -233,6 +233,23 @@ public class SQLConnector {
     }
 
     /**
+     * Call to close the current Connection.
+     */
+    public void close() {
+        // Check if there is already an open Connection.
+        if (IsConnected()) {
+            try {
+                // Close if there is and notify.
+                connection.close();
+                System.out.println("Service (MariaDB) has been stopped.");
+            } catch (Exception ignore) {
+                // Notify if there was an error.
+                System.out.println("Service (MariaDB) couldn't be stopped.");
+            }
+        }
+    }
+
+    /**
      * Retrieve an Instance of the SQL-Connection.
      * @return Connection Instance of te SQL-Connection.
      */

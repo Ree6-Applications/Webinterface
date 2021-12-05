@@ -101,6 +101,50 @@ public class FrontendController {
     }
 
     /**
+     * Request Mapper for the Server Panel Page.
+     * @param id the Session Identifier.
+     * @param guildID the ID of the selected Guild.
+     * @param model the ViewModel.
+     * @return {@link String} for Thyme to the HTML Page.
+     */
+    @RequestMapping("/panel/server")
+    public String openServerPanel(@RequestParam String id, @RequestParam String guildID, Model model) {
+
+        Session session = null;
+
+        // TODO add actual data getting from JDA Bot Instance.
+
+        try {
+            // Try retrieving the Session from the Identifier.
+            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+
+            // Try retrieving the Guild of the OAuth2 User by its ID.
+            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
+            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
+
+            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
+            if (guildList.size() <= 0) return "error/index";
+
+            // If a Guild has been found set it as Attribute.
+            model.addAttribute("guild", guildList.stream().findFirst().get());
+
+            // Retrieve every Role and Channel of the Guild and set them as Attribute.
+            model.addAttribute("roles", "");
+            model.addAttribute("channels", "");
+        } catch (Exception e) {
+            // If the Session is null just return to the default Page.
+            if (session == null) return "main/index";
+
+            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Guild Information! ");
+        }
+
+        // Return to the Server Panel Page.
+        return "panel/server/index";
+    }
+
+    /**
      * Request Mapper for the Social Panel Page.
      * @param id the Session Identifier.
      * @param guildID the ID of the selected Guild.
