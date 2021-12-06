@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  * A "Connector" Class which connect with the used Database Server.
@@ -71,153 +72,45 @@ public class SQLConnector {
     /**
      * Create Tables in the Database if they aren't already set.
      */
+    @SuppressWarnings("SqlNoDataSourceInspection")
     public void createTables() {
 
         // Check if there is an open Connection if not, skip.
         if (!IsConnected()) return;
 
-        // Create Settings Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS Settings (GID VARCHAR(40), NAME VARCHAR(40), VALUE VARCHAR(50))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create Settings Table.");
+        // Creating the HashMap for the tables
+        final HashMap<String, String> valueMap = new HashMap<>();
+        // Registering the tables and types
+        valueMap.put("Settings", "(GID VARCHAR(40), NAME VARCHAR(40), VALUE VARCHAR(50)");
+        valueMap.put("CommandStats", "(COMMAND VARCHAR(40), USES VARCHAR(50))");
+        valueMap.put("GuildStats", "(GID VARCHAR(40), COMMAND VARCHAR(40), USES VARCHAR(50))");
+        valueMap.put("Webinterface", "(GID VARCHAR(40), AUTH VARCHAR(50))");
+        valueMap.put("TwitchNotify", "(GID VARCHAR(40), NAME VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        valueMap.put("LogWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        valueMap.put("WelcomeWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        valueMap.put("NewsWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        valueMap.put("RainbowWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        valueMap.put("JoinMessage", "(GID VARCHAR(40), MSG VARCHAR(250))");
+        valueMap.put("MuteRoles", "(GID VARCHAR(40), RID VARCHAR(40))");
+        valueMap.put("ChatProtector", "(GID VARCHAR(40), WORD VARCHAR(40))");
+        valueMap.put("AutoRoles", "(GID VARCHAR(40), RID VARCHAR(40))");
+        valueMap.put("Invites", "(GID VARCHAR(40), UID VARCHAR(40), USES VARCHAR(40), CODE VARCHAR(40))");
+        valueMap.put("Level", "(GID VARCHAR(40), UID VARCHAR(40), XP VARCHAR(500))");
+        valueMap.put("VCLevel", "(GID VARCHAR(40), UID VARCHAR(40), XP VARCHAR(500))");
+        valueMap.put("VCLevelAutoRoles", "(GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))");
+        valueMap.put("ChatLevelAutoRoles", "(GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))");
+
+        // Iterating through all table presets
+        for (String key : valueMap.keySet()) {
+            // Create a Table based on the key
+            try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + key + " " + valueMap.get(key))) {
+                ps.executeUpdate();
+            } catch (SQLException ignore) {
+                System.out.println("Couldn't create " + key + " Table.");
+            }
         }
 
-        // Create CommandStats Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS CommandStats (COMMAND VARCHAR(40), USES VARCHAR(50))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create CommandStats Table.");
-        }
 
-        // Create GuildStats Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS GuildStats (GID VARCHAR(40), COMMAND VARCHAR(40), USES VARCHAR(50))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create GuildStats Table.");
-        }
-
-        // Create Webinterface Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS Webinterface (GID VARCHAR(40), AUTH VARCHAR(50))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create Webinterface Table.");
-        }
-
-        // Create Twitch Notify Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS TwitchNotify (GID VARCHAR(40), NAME VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create TwitchNotify Table.");
-        }
-
-        // Create Log Webhook Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS LogWebhooks (GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create LogWebhooks Table.");
-        }
-
-        // Create Welcome Webhook Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS WelcomeWebhooks (GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create WelcomeWebhook Table.");
-        }
-
-        // Create News Webhook Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS NewsWebhooks (GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create NewsWebhook Table.");
-        }
-
-        // Create Rainbow Six Siege Webhook Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS RainbowWebhooks (GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create RainbowWebhook Table.");
-        }
-
-        // Create join Message Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS JoinMessage (GID VARCHAR(40), MSG VARCHAR(250))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create JoinMessage Table.");
-        }
-
-        // Create Mute Roles Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS MuteRoles (GID VARCHAR(40), RID VARCHAR(40))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create MuteRoles Table.");
-        }
-
-        // Create ChatProtector Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS ChatProtector (GID VARCHAR(40), WORD VARCHAR(40))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create ChatProtector Table.");
-        }
-
-        // Create auto Roles Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS AutoRoles (GID VARCHAR(40), RID VARCHAR(40))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create AutoRoles Table.");
-        }
-
-        // Create Invites Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS Invites (GID VARCHAR(40), UID VARCHAR(40), USES VARCHAR(40), CODE VARCHAR(40))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create Invites Table.");
-        }
-
-        // Create ChatLevel Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS Level (GID VARCHAR(40), UID VARCHAR(40), XP VARCHAR(500))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create Level Table.");
-        }
-
-        // Create VoiceLevel Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS VCLevel (GID VARCHAR(40), UID VARCHAR(40), XP VARCHAR(500))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create VCLevel Table.");
-        }
-
-        // Create VoiceLevel auto Roles Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS VCLevelAutoRoles (GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create VCLevelAutoRoles Table.");
-        }
-
-        // Create ChatLevel auto Roles Table in the Database.
-        try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS ChatLevelAutoRoles (GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))")) {
-            ps.executeUpdate();
-        } catch (SQLException ignore) {
-            System.out.println("Couldn't create ChatLevelAutoRoles Table.");
-        }
     }
 
     /**
