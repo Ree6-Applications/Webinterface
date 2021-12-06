@@ -7,6 +7,9 @@ import de.presti.ree6.webinterface.bot.BotVersion;
 import de.presti.ree6.webinterface.sql.SQLConnector;
 import de.presti.ree6.webinterface.utils.Config;
 
+/**
+ * The "Main" Class used to store Instance of the needed Classes.
+ */
 public class Server {
 
     // Class Instance.

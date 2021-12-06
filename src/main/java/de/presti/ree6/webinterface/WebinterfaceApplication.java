@@ -14,9 +14,10 @@ public class WebinterfaceApplication {
      * @param args {@link String[]} used as List of the Arguments given at the start of the Application.
      */
     public static void main(String[] args) {
+        // Runt the Application.
         SpringApplication.run(WebinterfaceApplication.class, args);
 
-        // Initialize the Server and creat the need Instances.
+        // Initialize the Server class to create the needed Instances.
         new Server();
     }
 
