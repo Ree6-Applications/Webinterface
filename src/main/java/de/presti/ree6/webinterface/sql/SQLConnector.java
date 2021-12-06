@@ -78,13 +78,13 @@ public class SQLConnector {
         // Check if there is an open Connection if not, skip.
         if (!IsConnected()) return;
 
-        // Creating the HashMap for the tables
+        // Creating the HashMap for the tables.
         final HashMap<String, String> valueMap = new HashMap<>();
-        // Registering the tables and types
+
+        // Registering the tables and types.
         valueMap.put("Settings", "(GID VARCHAR(40), NAME VARCHAR(40), VALUE VARCHAR(50)");
         valueMap.put("CommandStats", "(COMMAND VARCHAR(40), USES VARCHAR(50))");
         valueMap.put("GuildStats", "(GID VARCHAR(40), COMMAND VARCHAR(40), USES VARCHAR(50))");
-        valueMap.put("Webinterface", "(GID VARCHAR(40), AUTH VARCHAR(50))");
         valueMap.put("TwitchNotify", "(GID VARCHAR(40), NAME VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
         valueMap.put("LogWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
         valueMap.put("WelcomeWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
@@ -100,12 +100,15 @@ public class SQLConnector {
         valueMap.put("VCLevelAutoRoles", "(GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))");
         valueMap.put("ChatLevelAutoRoles", "(GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))");
 
-        // Iterating through all table presets
+        // Iterating through all table presets.
         for (String key : valueMap.keySet()) {
-            // Create a Table based on the key
+
+            // Create a Table based on the key.
             try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + key + " " + valueMap.get(key))) {
                 ps.executeUpdate();
             } catch (SQLException ignore) {
+
+                // Notify if there was an error.
                 System.out.println("Couldn't create " + key + " Table.");
             }
         }
