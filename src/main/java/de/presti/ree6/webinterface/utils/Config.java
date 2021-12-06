@@ -31,6 +31,7 @@ public class Config {
             cfg.addDefault("discord.bot.tokens.dev", "DevTokenhere");
             cfg.addDefault("discord.client.id", 0L);
             cfg.addDefault("discord.client.secret", "yourDiscordClientSecrethere");
+            cfg.addDefault("raygun.apitoken", "yourRaygunApiToken");
 
             try {
                 cfg.save(getFile());

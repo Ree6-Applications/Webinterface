@@ -1,7 +1,7 @@
 package de.presti.ree6.webinterface;
 
+import com.mindscapehq.raygun4java.core.RaygunClient;
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
-import de.presti.ree6.webinterface.bot.BotInfo;
 import de.presti.ree6.webinterface.bot.BotUtil;
 import de.presti.ree6.webinterface.bot.BotVersion;
 import de.presti.ree6.webinterface.sql.SQLConnector;
@@ -42,6 +42,9 @@ public class Server {
 
         // Initialize the Config.
         config.init();
+
+        // Add Raygun for external Exceptions Information.
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> new RaygunClient(config.getConfig().getString("raygun.apitoken")).send(e));
 
         // Create a new JDA Session.
         try {

@@ -130,6 +130,12 @@ public class FrontendController {
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
             if (guildList.size() <= 0) return "error/index";
 
+            // Retrieve the Guild by its giving ID.
+            Guild guild = BotInfo.botInstance.getGuildById(guildID);
+
+            // If the Guild couldn't be loaded redirect to Error page.
+            if (guild == null) return "error/index";
+
             // Set the Identifier.
             model.addAttribute("identifier", id);
 
@@ -137,7 +143,7 @@ public class FrontendController {
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
             // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("invites", 1);
+            model.addAttribute("invites", Server.getInstance().getSqlConnector().getSqlWorker().getInvites(guild.getId()));
             model.addAttribute("commandstats", "");
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
