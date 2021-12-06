@@ -12,6 +12,7 @@ import java.util.HashMap;
  * A Class to actually handle the SQL data.
  * Used to provide Data from the Database and to save Data into the Database.
  */
+@SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve"})
 public class SQLWorker {
 
     // Instance of the SQL Connector to actually access the SQL Database.

@@ -10,6 +10,7 @@ import java.util.HashMap;
  * A "Connector" Class which connect with the used Database Server.
  * Used to manage the connection between Server and Client.
  */
+@SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve"})
 public class SQLConnector {
 
     // Various String that keep connection information to use for a connection.
@@ -22,7 +23,7 @@ public class SQLConnector {
     private Connection connection;
 
     // An Instance of the SQL-Worker which works with the Data in the Database.
-    private SQLWorker sqlWorker;
+    private final SQLWorker sqlWorker;
 
     /**
      * Constructor with the needed data to open an SQL connection.
@@ -40,6 +41,8 @@ public class SQLConnector {
         this.databaseServerPort = databaseServerPort;
         connectToSQLServer();
         createTables();
+
+        sqlWorker = new SQLWorker(this);
     }
 
     /**
@@ -72,7 +75,6 @@ public class SQLConnector {
     /**
      * Create Tables in the Database if they aren't already set.
      */
-    @SuppressWarnings("SqlNoDataSourceInspection")
     public void createTables() {
 
         // Check if there is an open Connection if not, skip.
