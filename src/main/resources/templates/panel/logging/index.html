@@ -68,10 +68,13 @@
                         <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
                      </form>
                   </div>
-                  <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="material-icons d-flex d-lg-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">border_color</i>
-                     <h3 class="d-flex d-lg-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center name" style="color: #ffffff;">Logs</h3>
-                     <form>
+                  <div th:each="log: ${logs}" class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="material-icons d-flex d-lg-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">border_color</i>
+                     <h3 class="d-flex d-lg-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center name" style="color: #ffffff;" th:text="${log.getName()}">Logs</h3>
+                     <form th:if="${!log.isActiv()}">
                         <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-blue);" title="Activate"><i class="fas fa-check"></i></button></div>
+                     </form>
+                     <form th:if="${log.isActiv()}">
+                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-blue);" title="Deactivate"><i class="fas fa-times"></i></button></div>
                      </form>
                   </div>
                </div><!-- End: Features -->

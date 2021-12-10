@@ -84,7 +84,7 @@ public class SQLConnector {
         final HashMap<String, String> valueMap = new HashMap<>();
 
         // Registering the tables and types.
-        valueMap.put("Settings", "(GID VARCHAR(40), NAME VARCHAR(40), VALUE VARCHAR(50)");
+        valueMap.put("Settings", "(GID VARCHAR(40), NAME VARCHAR(40), VALUE VARCHAR(50))");
         valueMap.put("CommandStats", "(COMMAND VARCHAR(40), USES VARCHAR(50))");
         valueMap.put("GuildStats", "(GID VARCHAR(40), COMMAND VARCHAR(40), USES VARCHAR(50))");
         valueMap.put("TwitchNotify", "(GID VARCHAR(40), NAME VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");

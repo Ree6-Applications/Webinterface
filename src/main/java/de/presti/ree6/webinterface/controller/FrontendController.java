@@ -248,8 +248,8 @@ public class FrontendController {
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
-            // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", guild.getRoles());
+            // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
+            model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker());
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
