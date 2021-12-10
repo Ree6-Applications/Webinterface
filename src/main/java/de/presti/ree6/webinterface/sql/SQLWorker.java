@@ -2,6 +2,7 @@ package de.presti.ree6.webinterface.sql;
 
 import de.presti.ree6.webinterface.bot.BotInfo;
 import de.presti.ree6.webinterface.invite.InviteContainer;
+import de.presti.ree6.webinterface.utils.Setting;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -12,7 +13,7 @@ import java.util.HashMap;
  * A Class to actually handle the SQL data.
  * Used to provide Data from the Database and to save Data into the Database.
  */
-@SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve"})
+@SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve", "unused", "DuplicatedCode"})
 public class SQLWorker {
 
     // Instance of the SQL Connector to actually access the SQL Database.
@@ -241,7 +242,7 @@ public class SQLWorker {
                 // Return if there was a match.
                 if (rs != null && rs.next()) {
                     if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
-                        return new String[]{"0", "Not setuped!"};
+                        return new String[]{"0", "No setup!"};
                     else
                         return new String[]{rs.getString("CID"), rs.getString("TOKEN")};
                 }
@@ -249,7 +250,7 @@ public class SQLWorker {
             }
         }
 
-        return new String[]{"0", "Not setuped!"};
+        return new String[]{"0", "No setup!"};
     }
 
     /**
@@ -265,7 +266,7 @@ public class SQLWorker {
         if (isLogSetup(guildId)) {
 
             // Delete the existing Webhook.
-            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
                             webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
                     .forEach(webhook -> webhook.delete().queue()));
 
@@ -354,7 +355,7 @@ public class SQLWorker {
                 // Return if there was a match.
                 if (rs != null && rs.next()) {
                     if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
-                        return new String[]{"0", "Not setuped!"};
+                        return new String[]{"0", "No setup!"};
                     else
                         return new String[]{rs.getString("CID"), rs.getString("TOKEN")};
                 }
@@ -362,7 +363,7 @@ public class SQLWorker {
             }
         }
 
-        return new String[]{"0", "Not setuped!"};
+        return new String[]{"0", "No setup!"};
     }
 
     /**
@@ -378,7 +379,7 @@ public class SQLWorker {
         if (isWelcomeSetup(guildId)) {
 
             // Delete the existing Webhook.
-            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
                             webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
                     .forEach(webhook -> webhook.delete().queue()));
 
@@ -429,7 +430,7 @@ public class SQLWorker {
                 // Return if there was a match.
                 if (rs != null && rs.next()) {
                     if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
-                        return new String[]{"0", "Not setuped!"};
+                        return new String[]{"0", "No setup!"};
                     else
                         return new String[]{rs.getString("CID"), rs.getString("TOKEN")};
                 }
@@ -437,7 +438,7 @@ public class SQLWorker {
             }
         }
 
-        return new String[]{"0", "Not setuped!"};
+        return new String[]{"0", "No setup!"};
     }
 
     /**
@@ -453,7 +454,7 @@ public class SQLWorker {
         if (isNewsSetup(guildId)) {
 
             // Delete the existing Webhook.
-            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook -> webhook.getToken() != null).filter(webhook ->
                             webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
                     .forEach(webhook -> webhook.delete().queue()));
 
@@ -504,7 +505,7 @@ public class SQLWorker {
                 // Return if there was a match.
                 if (rs != null && rs.next()) {
                     if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
-                        return new String[]{"0", "Not setuped!"};
+                        return new String[]{"0", "No setup!"};
                     else
                         return new String[]{rs.getString("CID"), rs.getString("TOKEN")};
                 }
@@ -512,7 +513,7 @@ public class SQLWorker {
             }
         }
 
-        return new String[]{"0", "Not setuped!"};
+        return new String[]{"0", "No setup!"};
     }
 
     /**
@@ -528,7 +529,7 @@ public class SQLWorker {
         if (isRainbowSetup(guildId)) {
 
             // Delete the existing Webhook.
-            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
                             webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
                     .forEach(webhook -> webhook.delete().queue()));
 
@@ -579,7 +580,7 @@ public class SQLWorker {
                 // Return if there was a match.
                 if (rs != null && rs.next()) {
                     if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
-                        return new String[]{"0", "Not setuped!"};
+                        return new String[]{"0", "No setup!"};
                     else
                         return new String[]{rs.getString("CID"), rs.getString("TOKEN")};
                 }
@@ -587,7 +588,7 @@ public class SQLWorker {
             }
         }
 
-        return new String[]{"0", "Not setuped!"};
+        return new String[]{"0", "No setup!"};
     }
 
     /**
@@ -628,7 +629,7 @@ public class SQLWorker {
         if (isTwitchSetup(guildId, twitchName)) {
 
             // Delete the existing Webhook.
-            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
                             webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
                     .forEach(webhook -> webhook.delete().queue()));
 
@@ -652,7 +653,7 @@ public class SQLWorker {
         if (isTwitchSetup(guildId, twitchName)) {
 
             // Delete the existing Webhook.
-            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook ->
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
                             webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
                     .forEach(webhook -> webhook.delete().queue()));
 
@@ -746,7 +747,7 @@ public class SQLWorker {
             querySQL("UPDATE MuteRoles SET RID='" + roleId + "' WHERE GID='" + guildId + "'");
         } else {
             // Add a new entry into the Database.
-            querySQL("INSERT INTO MuteRoles (GID, RID) VALUES ('" + guildId + "', '" + roleId + "')");
+            querySQL("INSERT INTO MuteRoles (GID, RID) VALUES ('" + guildId + "', '" + roleId + "');");
         }
     }
 
@@ -810,7 +811,7 @@ public class SQLWorker {
         // Check if there is a role in the database.
         if (!isAutoRoleSetup(guildId, roleId)) {
             // Add a new entry into the Database.
-            querySQL("INSERT INTO AutoRoles (GID, RID) VALUES ('" + guildId + "', '" + roleId + "')");
+            querySQL("INSERT INTO AutoRoles (GID, RID) VALUES ('" + guildId + "', '" + roleId + "');");
         }
     }
 
@@ -912,7 +913,7 @@ public class SQLWorker {
         // Check if there is a role in the database.
         if (!isChatLevelRewardSetup(guildId, roleId)) {
             // Add a new entry into the Database.
-            querySQL("INSERT INTO ChatLevelAutoRoles (GID, RID) VALUES ('" + guildId + "', '" + roleId + "')");
+            querySQL("INSERT INTO ChatLevelAutoRoles (GID, RID) VALUES ('" + guildId + "', '" + roleId + "');");
         } else {
             // Update the entry.
             querySQL("UPDATE ChatLevelAutoRoles SET LVL='" + level + "' WHERE GID='" + guildId + "' AND RID='" + roleId + "'");
@@ -1015,7 +1016,7 @@ public class SQLWorker {
         // Check if there is a role in the database.
         if (!isVoiceLevelRewardSetup(guildId, roleId)) {
             // Add a new entry into the Database.
-            querySQL("INSERT INTO VCLevelAutoRoles (GID, RID) VALUES ('" + guildId + "', '" + roleId + "')");
+            querySQL("INSERT INTO VCLevelAutoRoles (GID, RID) VALUES ('" + guildId + "', '" + roleId + "');");
         } else {
             // Update the entry.
             querySQL("UPDATE VCLevelAutoRoles SET LVL='" + level + "' WHERE GID='" + guildId + "' AND RID='" + roleId + "'");
@@ -1169,6 +1170,438 @@ public class SQLWorker {
     public void removeInvite(String guildId, String inviteCreator, String inviteCode, int inviteUsage) {
         querySQL("DELETE FROM Invites WHERE GID='" + guildId + "' AND UID='" + inviteCreator + "' AND CODE='" + inviteCode + "' " +
                 "AND USES='" + inviteUsage + "'");
+    }
+
+    //endregion
+
+    //region Configuration
+
+    //region Join Message.
+
+    /**
+     * Get the Join Message of the given Guild.
+     * @param guildId the ID of the Guild.
+     * @return the Message as {@link String}
+     */
+    public String getMessage(String guildId) {
+
+        if(isMessageSetup(guildId)) {
+            // Creating a SQL Statement to get the Join Message from the JoinMessage Table by the GuildID.
+            try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM JoinMessage WHERE GID='" + guildId + "'").executeQuery()) {
+
+                // Return if found.
+                if (rs != null && rs.next()) return rs.getString("MSG");
+            } catch (Exception ignore) {
+            }
+        }
+
+        // If No setup return default Message.
+        return "Welcome %user_mention%!\nWe wish you a great stay on %guild_name%";
+    }
+
+    /**
+     * Change the current Join Message of a Guild.
+     * @param guildId the ID of the Guild.
+     * @param content the Join Message.
+     */
+    public void setMessage(String guildId, String content) {
+        if (isMessageSetup(guildId)) {
+            // If there is already an entry just replace it.
+            querySQL("UPDATE JoinMessage SET MSG='" + content + "' WHERE GID='" + guildId + "'");
+        } else {
+            // Create a new entry, if there was none.
+            querySQL("INSERT INTO JoinMessage (GID, MSG) VALUE ('" + guildId + "', '" + content + "');");
+        }
+    }
+
+    /**
+     * Check if there is a custom Join Message set in our Database.
+     * @param guildId the ID of the Guild.
+     * @return {@link Boolean} as result. If true, then there is an entry in our Database | If false, there is no entry in our Database for that Guild.
+     */
+    public boolean isMessageSetup(String guildId) {
+        // Creating a SQL Statement to get the Join Message from the JoinMessage Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM JoinMessage WHERE GID='" + guildId + "'").executeQuery()) {
+
+            // Return if found.
+            return  (rs != null && rs.next());
+        } catch (Exception ignore) {
+        }
+
+        // If error, return false.
+        return false;
+    }
+
+    //endregion
+
+    //region Chat Protector / Word Blacklist
+
+    /**
+     * Get every Blacklisted Word saved in our Database from the Guild.
+     * @param guildId the ID of the Guild.
+     * @return {@link ArrayList<String>} as list with every Blacklisted Word.
+     */
+    public ArrayList<String> getChatProtectorWords(String guildId) {
+        ArrayList<String> blacklistedWords = new ArrayList<>();
+
+        if (isChatProtectorSetup(guildId)) {
+            // Creating a SQL Statement to get the Blacklisted Words from the ChatProtector Table by the GuildID.
+            try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM ChatProtector WHERE GID='" + guildId + "'").executeQuery()) {
+
+                // Add if found.
+                while (rs != null && rs.next()) blacklistedWords.add(rs.getString("WORD"));
+            } catch (Exception ignore) {
+            }
+        }
+
+        // return the ArrayList with every blacklisted Word. (Can be empty!)
+        return blacklistedWords;
+    }
+
+    /**
+     * Check if there is an entry in our Database for the wanted Guild.
+     * @param guildId the ID of the Guild.
+     * @return {@link Boolean} as result. If true, there is an entry in our Database | If false, there is no entry in our Database.
+     */
+    public boolean isChatProtectorSetup(String guildId) {
+        // Creating a SQL Statement to check if there is an entry in the ChatProtector Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM ChatProtector WHERE GID='" + guildId + "'").executeQuery()) {
+
+            // Return if found.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {
+        }
+
+        //Return false if there was an error.
+        return false;
+    }
+
+    /**
+     * Check if there is an entry in our Database for the wanted Guild.
+     * @param guildId the ID of the Guild.
+     * @param word the Word that should be checked.
+     * @return {@link Boolean} as result. If true, there is an entry in our Database | If false, there is no entry in our Database.
+     */
+    public boolean isChatProtectorSetup(String guildId, String word) {
+        // Creating a SQL Statement to check if there is an entry in the ChatProtector Table by the GuildID and the Word.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM ChatProtector WHERE GID='" + guildId + "' AND WORD='" + word + "'").executeQuery()) {
+
+            // Return if found.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {
+        }
+
+        //Return false if there was an error.
+        return false;
+    }
+
+    /**
+     * Add a new Word to the blacklist for the given Guild.
+     * @param guildId the ID of the Guild.
+     * @param word the Word to be blocked.
+     */
+    public void addChatProtectorWord(String guildId, String word) {
+        // Check if there is already an entry for it.
+        if (isChatProtectorSetup(guildId, word)) return;
+
+        // If not then just add it.
+        querySQL("INSERT INTO ChatProtector (GID, WORD) VALUES ('" + guildId + "', '" + word + "');");
+    }
+
+    public void removeChatProtectorWord(String guildId, String word) {
+        // Check if there is no entry for it.
+        if (!isChatProtectorSetup(guildId, word)) return;
+
+        // If so then delete it.
+        querySQL("DELETE FROM ChatProtector WHERE GID='" + guildId + "' AND WORD='" + word + "'");
+    }
+
+    //endregion
+
+    //region Settings
+
+    /**
+     * Get the current Setting by the Guild and its Identifier.
+     * @param guildId the ID of the Guild.
+     * @param settingName the Identifier of the Setting.
+     * @return {@link Setting} which stores every information needed.
+     */
+    public Setting getSetting(String guildId, String settingName) {
+        // Check if there is an entry in the database.
+        if (hasSetting(guildId, settingName)) {
+            // Creating a SQL Statement to get the Setting in the Settings Table by the GuildID and the Setting name.
+            try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM Settings WHERE GID='" + guildId + "' AND NAME='" + settingName + "'").executeQuery()) {
+
+                // Return if found.
+                if (rs != null && rs.next()) return new Setting(settingName, rs.getObject("VALUE"));
+            } catch (Exception ignore) {
+            }
+        } else {
+            // Check if everything is alright with the config.
+            checkSetting(guildId, settingName);
+        }
+
+        return new Setting(settingName, true);
+    }
+
+    /**
+     * Set the Setting by the Guild and its Identifier.
+     * @param guildId the ID of the Guild.
+     * @param setting the Setting.
+     */
+    public void setSetting(String guildId, Setting setting) {
+        setSetting(guildId, setting.getName(), setting.getStringValue());
+    }
+
+    /**
+     * Set the Setting by the Guild and its Identifier.
+     * @param guildId the ID of the Guild.
+     * @param settingName the Identifier of the Setting.
+     * @param settingValue the Value of the Setting.
+     */
+    @SuppressWarnings("UnnecessaryCallToStringValueOf")
+    public void setSetting(String guildId, String settingName, Object settingValue) {
+        // Check if there is an entry.
+        if (hasSetting(guildId, settingName)) {
+            // If so update it.
+            querySQL("UPDATE Settings SET VALUE='" + String.valueOf(settingValue) + "' WHERE GID='" + guildId + "' AND NAME='" + settingName + "'");
+        } else {
+            // If not create a new one.
+            querySQL("INSERT INTO Settings (GID, NAME, VALUE) VALUES ('" + guildId + "', '" + settingName + "', '" + ((String)settingValue) + "');");
+        }
+    }
+
+    /**
+     * Check if there is a Setting entry for the Guild.
+     * @param guildId the ID of the Guild.
+     * @param setting the Setting itself.
+     * @return {@link Boolean} as result. If true, there is a Setting Entry for the Guild | if false, there is no Entry for it.
+     */
+    public boolean hasSetting(String guildId, Setting setting) {
+        return hasSetting(guildId, setting.getName());
+    }
+
+    /**
+     * Check if there is a Setting entry for the Guild.
+     * @param guildId the ID of the Guild.
+     * @param settingName the Identifier of the Setting.
+     * @return {@link Boolean} as result. If true, there is a Setting Entry for the Guild | if false, there is no Entry for it.
+     */
+    public boolean hasSetting(String guildId, String settingName) {
+        // Creating a SQL Statement to get the Setting in the Settings Table by the GuildID and the Setting name.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM Settings WHERE GID='" + guildId + "' AND NAME='" + settingName + "'").executeQuery()) {
+
+            // Return if found.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if there is an entry for the Setting, if not create one for every Setting that doesn't have an entry.
+     * @param guildId the ID of the Guild.
+     * @param setting the Setting itself.
+     */
+    public void checkSetting(String guildId, Setting setting) {
+        checkSetting(guildId, setting.getName());
+    }
+
+    /**
+     * Check if there is an entry for the Setting, if not create one for every Setting that doesn't have an entry.
+     * @param guildId the ID of the Guild.
+     * @param settingName the Identifier of the Setting.
+     */
+    public void checkSetting(String guildId, String settingName) {
+        // Check if the Setting exists in our Database.
+        if (!hasSetting(guildId, settingName)) {
+            // If not then creat every Setting that doesn't exist for the Guild.
+            createSettings(guildId);
+        }
+    }
+
+    /**
+     * Create Settings entries for the Guild
+     * @param guildId the ID of the Guild.
+     */
+    public void createSettings(String guildId) {
+
+        // Create the Chat Prefix Setting.
+        if (!hasSetting(guildId, "chatprefix")) setSetting(guildId, new Setting("chatprefix", "ree!"));
+
+        // TODO add Commands Setting creation.
+
+        // Create Log Settings.
+        if (!hasSetting(guildId, "logging_invite")) setSetting(guildId, "logging_invite", true);
+        if (!hasSetting(guildId, "logging_memberjoin")) setSetting(guildId, "logging_memberjoin", true);
+        if (!hasSetting(guildId, "logging_memberleave")) setSetting(guildId, "logging_memberleave", true);
+        if (!hasSetting(guildId, "logging_memberban")) setSetting(guildId, "logging_memberban", true);
+        if (!hasSetting(guildId, "logging_memberunban")) setSetting(guildId, "logging_memberunban", true);
+        if (!hasSetting(guildId, "logging_nickname")) setSetting(guildId, "logging_nickname", true);
+        if (!hasSetting(guildId, "logging_voicejoin")) setSetting(guildId, "logging_voicejoin", true);
+        if (!hasSetting(guildId, "logging_voicemove")) setSetting(guildId, "logging_voicemove", true);
+        if (!hasSetting(guildId, "logging_voiceleave")) setSetting(guildId, "logging_voiceleave", true);
+        if (!hasSetting(guildId, "logging_roleadd")) setSetting(guildId, "logging_roleadd", true);
+        if (!hasSetting(guildId, "logging_roleremove")) setSetting(guildId, "logging_roleremove", true);
+        if (!hasSetting(guildId, "logging_voicechannel")) setSetting(guildId, "logging_voicechannel", true);
+        if (!hasSetting(guildId, "logging_textchannel")) setSetting(guildId, "logging_textchannel", true);
+        if (!hasSetting(guildId, "logging_rolecreate")) setSetting(guildId, "logging_rolecreate", true);
+        if (!hasSetting(guildId, "logging_roledelete")) setSetting(guildId, "logging_roledelete", true);
+        if (!hasSetting(guildId, "logging_rolename")) setSetting(guildId, "logging_rolename", true);
+        if (!hasSetting(guildId, "logging_rolemention")) setSetting(guildId, "logging_rolemention", true);
+        if (!hasSetting(guildId, "logging_rolehoisted")) setSetting(guildId, "logging_rolehoisted", true);
+        if (!hasSetting(guildId, "logging_rolepermission")) setSetting(guildId, "logging_rolepermission", true);
+        if (!hasSetting(guildId, "logging_rolecolor")) setSetting(guildId, "logging_rolecolor", true);
+        if (!hasSetting(guildId, "logging_messagedelete")) setSetting(guildId, "logging_messagedelete", true);
+    }
+
+    //endregion
+
+    //endregion
+
+    //region Stats
+
+    public Long getStatsCommandGlobal(String command) {
+        // Creating a SQL Statement to get an entry in the CommandStats Table by the Command name.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM CommandStats WHERE COMMAND='" + command + "'").executeQuery()) {
+
+            // Return if found.
+            if (rs != null && rs.next()) return Long.parseLong(rs.getString("USES"));
+        } catch (Exception ignore) {
+        }
+
+        return 0L;
+    }
+
+    public Long getStatsCommand(String guildId, String command) {
+        // Creating a SQL Statement to get an entry in the CommandStats Table by Guild and Command name.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM CommandStats WHERE GID='" + guildId + "' AND COMMAND='" + command + "'").executeQuery()) {
+
+            // Return if found.
+            if (rs != null && rs.next()) return Long.parseLong(rs.getString("USES"));
+        } catch (Exception ignore) {
+        }
+
+        return 0L;
+    }
+
+    public HashMap<String, Long> getStats(String guildId) {
+        // HashMap with the Command name as key and the usage of it as value.
+        HashMap<String, Long> statsMap = new HashMap<>();
+
+        // Creating a SQL Statement to get every entry in the CommandStats Table by the Guild.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM CommandStats WHERE GID='" + guildId + "' ORDER BY cast(USES as unsigned) DESC LIMIT 5;").executeQuery()) {
+
+            // Return if found.
+            while (rs != null && rs.next()) statsMap.put(rs.getString("COMMAND"), Long.parseLong(rs.getString("USES")));
+        } catch (Exception ignore) {
+        }
+
+        // Return the HashMap.
+        return statsMap;
+    }
+
+    public HashMap<String, Long> getStatsGlobal() {
+
+        // HashMap with the Command name as key and the usage of it as value.
+        HashMap<String, Long> statsMap = new HashMap<>();
+
+        // Creating a SQL Statement to get every entry in the CommandStats Table.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM CommandStats ORDER BY cast(USES as unsigned) DESC LIMIT 5;").executeQuery()) {
+
+            // Return if found.
+            while (rs != null && rs.next()) statsMap.put(rs.getString("COMMAND"), Long.parseLong(rs.getString("USES")));
+        } catch (Exception ignore) {
+        }
+
+        // Return the HashMap.
+        return statsMap;
+    }
+
+    /**
+     * Check if there is any saved Stats for the given Guild.
+     * @param guildId the ID of the Guild.
+     * @return {@link Boolean} as result. If true, there is data saved in the Database | If false, there is no data saved.
+     */
+    public boolean isStatsSaved(String guildId) {
+        // Creating a SQL Statement to check if there is an entry in the GuildStats Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM GuildStats WHERE GID='" + guildId + "'").executeQuery()) {
+
+            // Return if found.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {
+        }
+
+        //Return false if there was an error.
+        return false;
+    }
+
+    /**
+     * Check if there is any saved Stats for the given Guild and Command.
+     * @param guildId the ID of the Guild.
+     * @param command the Name of the Command.
+     * @return {@link Boolean} as result. If true, there is data saved in the Database | If false, there is no data saved.
+     */
+    public boolean isStatsSaved(String guildId, String command) {
+        // Creating a SQL Statement to check if there is an entry in the GuildStats Table by the GuildID and the Command name.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM GuildStats WHERE GID='" + guildId + "' AND COMMAND='" + command + "'").executeQuery()) {
+
+            // Return if found.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {
+        }
+
+        //Return false if there was an error.
+        return false;
+    }
+
+    /**
+     * Check if there is any saved Stats for the given Command.
+     * @param command the Name of the Command.
+     * @return {@link Boolean} as result. If true, there is data saved in the Database | If false, there is no data saved.
+     */
+    public boolean isStatsSavedGlobal(String command) {
+        // Creating a SQL Statement to check if there is an entry in the CommandStats Table by the Command name.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM CommandStats WHERE COMMAND='" + command + "'").executeQuery()) {
+
+            // Return if found.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {
+        }
+
+        //Return false if there was an error.
+        return false;
+    }
+
+    public void addStats(String guildId, String command) {
+        // Check if there is an entry.
+        if (isStatsSaved(guildId, command)) {
+            querySQL("UPDATE GuildStats SET USES='" + (getStatsCommandGlobal(command) + 1) + "' GID='" + guildId + "' AND WHERE COMMAND='" + command + "'");
+        } else {
+            querySQL("INSERT INTO GuildStats (GID, COMMAND, USES) VALUES ('" + guildId + "', '" + command + "', '1')");
+        }
+
+        // Check if there is an entry.
+        if (isStatsSavedGlobal(command)) {
+            querySQL("UPDATE CommandStats SET USES='" + (getStatsCommandGlobal(command) + 1) + "' WHERE COMMAND='" + command + "'");
+        } else {
+            querySQL("INSERT INTO CommandStats (COMMAND, USES) VALUES ('" + command + "', '1')");
+        }
+    }
+
+    //endregion
+
+    //region Data delete
+
+    /**
+     * Delete Data saved in our Database by the given Guild ID.
+     * @param guildId the ID of the Guild.
+     */
+    public void deleteAllData(String guildId) {
+
+        // Go through every Table. And delete every entry with the Guild ID.
+        sqlConnector.getTables().forEach((s, s2) -> querySQL("DELETE FROM " + s + " WHERE GID='" + guildId + "'"));
     }
 
     //endregion

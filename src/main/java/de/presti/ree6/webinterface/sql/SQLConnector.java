@@ -25,6 +25,9 @@ public class SQLConnector {
     // An Instance of the SQL-Worker which works with the Data in the Database.
     private final SQLWorker sqlWorker;
 
+    // A HashMap with every Table Name as key and the values as value.
+    private final HashMap<String, String> tables = new HashMap<>();
+
     /**
      * Constructor with the needed data to open an SQL connection.
      * @param databaseUser the Database Username
@@ -80,33 +83,30 @@ public class SQLConnector {
         // Check if there is an open Connection if not, skip.
         if (!IsConnected()) return;
 
-        // Creating the HashMap for the tables.
-        final HashMap<String, String> valueMap = new HashMap<>();
-
-        // Registering the tables and types.
-        valueMap.put("Settings", "(GID VARCHAR(40), NAME VARCHAR(40), VALUE VARCHAR(50))");
-        valueMap.put("CommandStats", "(COMMAND VARCHAR(40), USES VARCHAR(50))");
-        valueMap.put("GuildStats", "(GID VARCHAR(40), COMMAND VARCHAR(40), USES VARCHAR(50))");
-        valueMap.put("TwitchNotify", "(GID VARCHAR(40), NAME VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
-        valueMap.put("LogWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
-        valueMap.put("WelcomeWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
-        valueMap.put("NewsWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
-        valueMap.put("RainbowWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
-        valueMap.put("JoinMessage", "(GID VARCHAR(40), MSG VARCHAR(250))");
-        valueMap.put("MuteRoles", "(GID VARCHAR(40), RID VARCHAR(40))");
-        valueMap.put("ChatProtector", "(GID VARCHAR(40), WORD VARCHAR(40))");
-        valueMap.put("AutoRoles", "(GID VARCHAR(40), RID VARCHAR(40))");
-        valueMap.put("Invites", "(GID VARCHAR(40), UID VARCHAR(40), USES VARCHAR(40), CODE VARCHAR(40))");
-        valueMap.put("Level", "(GID VARCHAR(40), UID VARCHAR(40), XP VARCHAR(500))");
-        valueMap.put("VCLevel", "(GID VARCHAR(40), UID VARCHAR(40), XP VARCHAR(500))");
-        valueMap.put("VCLevelAutoRoles", "(GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))");
-        valueMap.put("ChatLevelAutoRoles", "(GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))");
+        // Registering the tables and values.
+        tables.put("Settings", "(GID VARCHAR(40), NAME VARCHAR(40), VALUE VARCHAR(50))");
+        tables.put("CommandStats", "(COMMAND VARCHAR(40), USES VARCHAR(50))");
+        tables.put("GuildStats", "(GID VARCHAR(40), COMMAND VARCHAR(40), USES VARCHAR(50))");
+        tables.put("TwitchNotify", "(GID VARCHAR(40), NAME VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        tables.put("LogWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        tables.put("WelcomeWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        tables.put("NewsWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        tables.put("RainbowWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        tables.put("JoinMessage", "(GID VARCHAR(40), MSG VARCHAR(250))");
+        tables.put("MuteRoles", "(GID VARCHAR(40), RID VARCHAR(40))");
+        tables.put("ChatProtector", "(GID VARCHAR(40), WORD VARCHAR(40))");
+        tables.put("AutoRoles", "(GID VARCHAR(40), RID VARCHAR(40))");
+        tables.put("Invites", "(GID VARCHAR(40), UID VARCHAR(40), USES VARCHAR(40), CODE VARCHAR(40))");
+        tables.put("Level", "(GID VARCHAR(40), UID VARCHAR(40), XP VARCHAR(500))");
+        tables.put("VCLevel", "(GID VARCHAR(40), UID VARCHAR(40), XP VARCHAR(500))");
+        tables.put("VCLevelAutoRoles", "(GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))");
+        tables.put("ChatLevelAutoRoles", "(GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))");
 
         // Iterating through all table presets.
-        for (String key : valueMap.keySet()) {
+        for (String key : tables.keySet()) {
 
             // Create a Table based on the key.
-            try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + key + " " + valueMap.get(key))) {
+            try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + key + " " + tables.get(key))) {
                 ps.executeUpdate();
             } catch (SQLException ignore) {
 
@@ -162,4 +162,10 @@ public class SQLConnector {
     public SQLWorker getSqlWorker() {
         return sqlWorker;
     }
+
+    /**
+     * Retrieve a list with all Tables and it values.
+     * @return {@link HashMap} with all Tables as Key and all values as value.
+     */
+    public HashMap<String, String> getTables() { return tables; }
 }
