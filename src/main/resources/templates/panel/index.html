@@ -53,8 +53,10 @@
                 <div th:each="guild: ${guilds}" class="col-sm-6 col-lg-4 item">
                     <img th:src="${guild.getIconUrl()}" class="bi bi-shield-check border rounded-circle d-xl-flex mx-auto justify-content-xl-center align-items-xl-center icon" data-bss-hover-animate="pulse" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;margin-right: 5px;" />
                     <h4 class="d-xl-flex mx-auto justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);" th:text="${guild.getName()}">Test</h4>
-                    <a th:if="${guild.BotJoined()}" class="button btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" role="button" type="button" th:href="@{'/panel/server?id=' + ${identifier} + '&guildID=' + ${guild.getIdLong()}}">Manage</a>
-                    <a th:if="${!guild.BotJoined()}" class="button btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" style="background: rgb(112,128,144)" role="button" type="button" href="https://invite.ree6.de" target="_blank">Setup Ree6</a>
+                    <span class="actions">
+                        <a th:if="${guild.BotJoined()}" class="btn btn-primary action-button d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" role="button" type="button" style="width: fit-content;" th:href="@{'/panel/server?id=' + ${identifier} + '&guildID=' + ${guild.getIdLong()}}">Manage</a>
+                        <a th:if="${!guild.BotJoined()}" class="btn btn-primary action-button d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" role="button" type="button" style="width: fit-content; background: rgb(112,128,144);" href="https://invite.ree6.de" target="_blank">Setup Ree6</a>
+                    </span>
                     <br  />
                 </div>
             </div>

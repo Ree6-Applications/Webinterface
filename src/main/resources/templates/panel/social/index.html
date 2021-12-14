@@ -28,6 +28,8 @@
                 <li class="nav-item"></li>
                 <li class="nav-item"></li>
             </ul>
+            <span class="navbar-text actions"> <a class="btn btn-dark action-button" role="button"
+                                                  th:href="@{'/panel/server?id=' + ${identifier} + '&guildID=' + ${guild.getIdLong()}}">Back</a></span>
         </div>
     </div>
 </nav>
@@ -43,7 +45,7 @@
     <section id="server-info">
         <hr style="background: rgba(0,0,0,0);height: 50px;">
         <div class="container justify-content-center align-items-center align-content-center align-self-center m-auto">
-            <img th:src="${guild.getIconUrl()}" class="rounded-circle d-flex d-xl-flex justify-content-center align-items-center align-content-center align-self-center m-auto" loading="lazy">
+            <img th:src="${guild.getIconUrl()}" class="rounded-circle d-flex d-xl-flex justify-content-center align-items-center align-content-center align-self-center m-auto" loading="lazy" width="100">
             <h1 class="d-flex justify-content-center align-items-center d-xl-flex justify-content-xl-center align-items-xl-center" style="color: #ffffff;" th:text="${guild.getName()}">Servername</h1>
         </div>
         <hr style="background: rgba(0,0,0,0);height: 50px;">
@@ -84,8 +86,7 @@
                     <h3 class="d-flex d-sm-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-sm-center align-items-sm-center justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">Twitch-Notifier</h3>
                     <form class="d-flex justify-content-center flex-wrap" method="get">
                         <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
-                            <option value="0" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
-                            <option th:each="channel: ${channels}" th:value="${channel.getId()}" th:text="${channel.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
+                            <option value="none" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">USE REE!TWITCH ON THE SERVER</option>
                         </select></div>
                         <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
                     </form>
@@ -94,8 +95,7 @@
                     <h3 class="d-flex d-sm-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-sm-center align-items-sm-center justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">YouTube-Notifier</h3>
                     <form class="d-flex justify-content-center flex-wrap" method="get">
                         <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
-                            <option value="0" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
-                            <option th:each="channel: ${channels}" th:value="${channel.getId()}" th:text="${channel.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
+                            <option value="none" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">USE REE!SETUP ON THE SERVER</option>
                         </select></div>
                         <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
                     </form>
@@ -104,8 +104,7 @@
                     <h3 class="d-flex d-sm-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-sm-center align-items-sm-center justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">Twitter-Notifier</h3>
                     <form class="d-flex justify-content-center flex-wrap" method="get">
                         <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
-                            <option value="0" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
-                            <option th:each="channel: ${channels}" th:value="${channel.getId()}" th:text="${channel.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
+                            <option value="none" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">USE REE!SETUP ON THE SERVER</option>
                         </select></div>
                         <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
                     </form>

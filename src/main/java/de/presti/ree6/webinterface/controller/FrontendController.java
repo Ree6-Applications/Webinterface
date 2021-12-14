@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller for the Frontend to manage what the user sees.
@@ -249,7 +250,8 @@ public class FrontendController {
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
             // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
-            model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker());
+            model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
+                    .filter(setting -> setting.getName().startsWith("log")).collect(Collectors.toList()));
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
@@ -258,6 +260,8 @@ public class FrontendController {
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
+
+            e.printStackTrace();
         }
 
         // Return to the Logging Panel Page.
@@ -304,6 +308,8 @@ public class FrontendController {
             // Retrieve every Role and Channel of the Guild and set them as Attribute.
             model.addAttribute("roles", guild.getRoles());
             model.addAttribute("channels", guild.getTextChannels());
+            model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
+                    .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return "main/index";

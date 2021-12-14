@@ -1088,6 +1088,7 @@ public class SQLWorker {
 
     /**
      * Get a List of every saved Invite from our Database.
+     *
      * @param guildId the ID of the Guild.
      * @return {@link ArrayList<String>} as List with {@link InviteContainer}.
      */
@@ -1112,18 +1113,19 @@ public class SQLWorker {
 
     /**
      * Check if the given Invite Data is saved in our Database.
-     * @param guildId the ID of the Guild.
+     *
+     * @param guildId       the ID of the Guild.
      * @param inviteCreator the ID of the Invite Creator.
-     * @param inviteCode the Code of the Invite.
+     * @param inviteCode    the Code of the Invite.
      * @return {@link Boolean} as Result if true, then it's saved in our Database | if false, we couldn't find anything.
      */
     public boolean existsInvite(String guildId, String inviteCreator, String inviteCode) {
         // Creating a SQL Statement to get the Invite from the Invites Table by the GuildID, Invite Creator ID and Invite Code.
         try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM Invites WHERE GID='" + guildId + "' AND UID='"
-        + inviteCreator + "' AND CODE='" + inviteCode + "'").executeQuery()) {
+                + inviteCreator + "' AND CODE='" + inviteCode + "'").executeQuery()) {
 
             // Return if found.
-            return  (rs != null && rs.next());
+            return (rs != null && rs.next());
         } catch (Exception ignore) {
         }
 
@@ -1133,10 +1135,11 @@ public class SQLWorker {
 
     /**
      * Change the data of a saved Invite or create a new entry in our Database.
-     * @param guildId the ID of the Guild.
+     *
+     * @param guildId       the ID of the Guild.
      * @param inviteCreator the ID of the Invite Creator.
-     * @param inviteCode the Code of the Invite Code.
-     * @param inviteUsage the Usage count of the Invite.
+     * @param inviteCode    the Code of the Invite Code.
+     * @param inviteUsage   the Usage count of the Invite.
      */
     public void setInvite(String guildId, String inviteCreator, String inviteCode, int inviteUsage) {
         // Check if there is an entry with the same data.
@@ -1153,9 +1156,10 @@ public class SQLWorker {
 
     /**
      * Remove an entry from our Database.
-     * @param guildId the ID of the Guild.
+     *
+     * @param guildId       the ID of the Guild.
      * @param inviteCreator the ID of the Invite Creator.
-     * @param inviteCode the Code of the Invite.
+     * @param inviteCode    the Code of the Invite.
      */
     public void removeInvite(String guildId, String inviteCreator, String inviteCode) {
         querySQL("DELETE FROM Invites WHERE GID='" + guildId + "' AND UID='" + inviteCreator + "' AND CODE='" + inviteCode + "'");
@@ -1163,9 +1167,10 @@ public class SQLWorker {
 
     /**
      * Remove an entry from our Database.
-     * @param guildId the ID of the Guild.
+     *
+     * @param guildId       the ID of the Guild.
      * @param inviteCreator the ID of the Invite Creator.
-     * @param inviteCode the Code of the Invite.
+     * @param inviteCode    the Code of the Invite.
      */
     public void removeInvite(String guildId, String inviteCreator, String inviteCode, int inviteUsage) {
         querySQL("DELETE FROM Invites WHERE GID='" + guildId + "' AND UID='" + inviteCreator + "' AND CODE='" + inviteCode + "' " +
@@ -1180,12 +1185,13 @@ public class SQLWorker {
 
     /**
      * Get the Join Message of the given Guild.
+     *
      * @param guildId the ID of the Guild.
      * @return the Message as {@link String}
      */
     public String getMessage(String guildId) {
 
-        if(isMessageSetup(guildId)) {
+        if (isMessageSetup(guildId)) {
             // Creating a SQL Statement to get the Join Message from the JoinMessage Table by the GuildID.
             try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM JoinMessage WHERE GID='" + guildId + "'").executeQuery()) {
 
@@ -1201,6 +1207,7 @@ public class SQLWorker {
 
     /**
      * Change the current Join Message of a Guild.
+     *
      * @param guildId the ID of the Guild.
      * @param content the Join Message.
      */
@@ -1216,6 +1223,7 @@ public class SQLWorker {
 
     /**
      * Check if there is a custom Join Message set in our Database.
+     *
      * @param guildId the ID of the Guild.
      * @return {@link Boolean} as result. If true, then there is an entry in our Database | If false, there is no entry in our Database for that Guild.
      */
@@ -1224,7 +1232,7 @@ public class SQLWorker {
         try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM JoinMessage WHERE GID='" + guildId + "'").executeQuery()) {
 
             // Return if found.
-            return  (rs != null && rs.next());
+            return (rs != null && rs.next());
         } catch (Exception ignore) {
         }
 
@@ -1238,6 +1246,7 @@ public class SQLWorker {
 
     /**
      * Get every Blacklisted Word saved in our Database from the Guild.
+     *
      * @param guildId the ID of the Guild.
      * @return {@link ArrayList<String>} as list with every Blacklisted Word.
      */
@@ -1260,6 +1269,7 @@ public class SQLWorker {
 
     /**
      * Check if there is an entry in our Database for the wanted Guild.
+     *
      * @param guildId the ID of the Guild.
      * @return {@link Boolean} as result. If true, there is an entry in our Database | If false, there is no entry in our Database.
      */
@@ -1278,8 +1288,9 @@ public class SQLWorker {
 
     /**
      * Check if there is an entry in our Database for the wanted Guild.
+     *
      * @param guildId the ID of the Guild.
-     * @param word the Word that should be checked.
+     * @param word    the Word that should be checked.
      * @return {@link Boolean} as result. If true, there is an entry in our Database | If false, there is no entry in our Database.
      */
     public boolean isChatProtectorSetup(String guildId, String word) {
@@ -1297,8 +1308,9 @@ public class SQLWorker {
 
     /**
      * Add a new Word to the blacklist for the given Guild.
+     *
      * @param guildId the ID of the Guild.
-     * @param word the Word to be blocked.
+     * @param word    the Word to be blocked.
      */
     public void addChatProtectorWord(String guildId, String word) {
         // Check if there is already an entry for it.
@@ -1322,7 +1334,8 @@ public class SQLWorker {
 
     /**
      * Get the current Setting by the Guild and its Identifier.
-     * @param guildId the ID of the Guild.
+     *
+     * @param guildId     the ID of the Guild.
      * @param settingName the Identifier of the Setting.
      * @return {@link Setting} which stores every information needed.
      */
@@ -1345,7 +1358,35 @@ public class SQLWorker {
     }
 
     /**
+     * Get the every Setting by the Guild.
+     *
+     * @param guildId the ID of the Guild.
+     * @return {@link ArrayList<Setting>} which is a List with every Setting that stores every information needed.
+     */
+    public ArrayList<Setting> getAllSettings(String guildId) {
+
+        ArrayList<Setting> settings = new ArrayList<>();
+
+        // Creating a SQL Statement to get the Setting in the Settings Table by the GuildID and the Setting name.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM Settings WHERE GID='" + guildId + "'").executeQuery()) {
+
+            // Return if found.
+            while (rs != null && rs.next()) settings.add(new Setting(rs.getString("NAME"), rs.getObject("VALUE")));
+        } catch (Exception ignore) {
+        }
+
+        // If there is no setting to be found, create every setting.
+        if (settings.isEmpty()) {
+            createSettings(guildId);
+        }
+
+        // Return the list.
+        return settings;
+    }
+
+    /**
      * Set the Setting by the Guild and its Identifier.
+     *
      * @param guildId the ID of the Guild.
      * @param setting the Setting.
      */
@@ -1355,8 +1396,9 @@ public class SQLWorker {
 
     /**
      * Set the Setting by the Guild and its Identifier.
-     * @param guildId the ID of the Guild.
-     * @param settingName the Identifier of the Setting.
+     *
+     * @param guildId      the ID of the Guild.
+     * @param settingName  the Identifier of the Setting.
      * @param settingValue the Value of the Setting.
      */
     @SuppressWarnings("UnnecessaryCallToStringValueOf")
@@ -1364,15 +1406,16 @@ public class SQLWorker {
         // Check if there is an entry.
         if (hasSetting(guildId, settingName)) {
             // If so update it.
-            querySQL("UPDATE Settings SET VALUE='" + String.valueOf(settingValue) + "' WHERE GID='" + guildId + "' AND NAME='" + settingName + "'");
+            querySQL("UPDATE Settings SET VALUE='" + ("" + settingValue) + "' WHERE GID='" + guildId + "' AND NAME='" + settingName + "'");
         } else {
             // If not create a new one.
-            querySQL("INSERT INTO Settings (GID, NAME, VALUE) VALUES ('" + guildId + "', '" + settingName + "', '" + ((String)settingValue) + "');");
+            querySQL("INSERT INTO Settings (GID, NAME, VALUE) VALUES ('" + guildId + "', '" + settingName + "', '" + ("" + settingValue) + "');");
         }
     }
 
     /**
      * Check if there is a Setting entry for the Guild.
+     *
      * @param guildId the ID of the Guild.
      * @param setting the Setting itself.
      * @return {@link Boolean} as result. If true, there is a Setting Entry for the Guild | if false, there is no Entry for it.
@@ -1383,7 +1426,8 @@ public class SQLWorker {
 
     /**
      * Check if there is a Setting entry for the Guild.
-     * @param guildId the ID of the Guild.
+     *
+     * @param guildId     the ID of the Guild.
      * @param settingName the Identifier of the Setting.
      * @return {@link Boolean} as result. If true, there is a Setting Entry for the Guild | if false, there is no Entry for it.
      */
@@ -1401,6 +1445,7 @@ public class SQLWorker {
 
     /**
      * Check if there is an entry for the Setting, if not create one for every Setting that doesn't have an entry.
+     *
      * @param guildId the ID of the Guild.
      * @param setting the Setting itself.
      */
@@ -1410,7 +1455,8 @@ public class SQLWorker {
 
     /**
      * Check if there is an entry for the Setting, if not create one for every Setting that doesn't have an entry.
-     * @param guildId the ID of the Guild.
+     *
+     * @param guildId     the ID of the Guild.
      * @param settingName the Identifier of the Setting.
      */
     public void checkSetting(String guildId, String settingName) {
@@ -1423,6 +1469,7 @@ public class SQLWorker {
 
     /**
      * Create Settings entries for the Guild
+     *
      * @param guildId the ID of the Guild.
      */
     public void createSettings(String guildId) {
@@ -1521,6 +1568,7 @@ public class SQLWorker {
 
     /**
      * Check if there is any saved Stats for the given Guild.
+     *
      * @param guildId the ID of the Guild.
      * @return {@link Boolean} as result. If true, there is data saved in the Database | If false, there is no data saved.
      */
@@ -1539,6 +1587,7 @@ public class SQLWorker {
 
     /**
      * Check if there is any saved Stats for the given Guild and Command.
+     *
      * @param guildId the ID of the Guild.
      * @param command the Name of the Command.
      * @return {@link Boolean} as result. If true, there is data saved in the Database | If false, there is no data saved.
@@ -1558,6 +1607,7 @@ public class SQLWorker {
 
     /**
      * Check if there is any saved Stats for the given Command.
+     *
      * @param command the Name of the Command.
      * @return {@link Boolean} as result. If true, there is data saved in the Database | If false, there is no data saved.
      */
@@ -1596,6 +1646,7 @@ public class SQLWorker {
 
     /**
      * Delete Data saved in our Database by the given Guild ID.
+     *
      * @param guildId the ID of the Guild.
      */
     public void deleteAllData(String guildId) {
