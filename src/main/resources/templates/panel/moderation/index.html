@@ -92,6 +92,26 @@
                         <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Add</button></div>
                      </form>
                   </div>
+                  <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mic-mute d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;" viewBox="0 0 16 16">
+                        <path d="M13 8c0 .564-.094 1.107-.266 1.613l-.814-.814A4.02 4.02 0 0 0 12 8V7a.5.5 0 0 1 1 0v1zm-5 4c.818 0 1.578-.245 2.212-.667l.718.719a4.973 4.973 0 0 1-2.43.923V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 1 0v1a4 4 0 0 0 4 4zm3-9v4.879l-1-1V3a2 2 0 0 0-3.997-.118l-.845-.845A3.001 3.001 0 0 1 11 3z"/>
+                        <path d="m9.486 10.607-.748-.748A2 2 0 0 1 6 8v-.878l-1-1V8a3 3 0 0 0 4.486 2.607zm-7.84-9.253 12 12 .708-.708-12-12-.708.708z"/>
+                     </svg>
+                     <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">Muterole</h3>
+                        <form th:action="@{/panel/moderation/role}" th:object="${roleChangeForm}" id="roleForm" class="d-flex justify-content-center flex-wrap" method="post">
+                           <input type="hidden" id="type" name="type" value="muteRole" />
+                           <input type="hidden" id="guildSession" name="guildSession" th:value="${guild.getId()}" />
+                           <input type="hidden" id="identifierSession" name="identifierSession" th:value="${identifier}" />
+
+                           <div class="mb-3">
+                              <select name="role" class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
+                                 <option value="0" selected class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
+                                 <option th:each="role: ${roles}" th:value="${role.getId()}" th:text="${role.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
+                              </select>
+                           </div>
+                        </form>
+                        <div class="mb-3"><button class="btn btn-primary d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center" type="submit" form="roleForm" style="background: var(--bs-blue);">Change</button></div>
+                  </div>
                   <div th:each="command: ${commands}" class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="material-icons d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">border_color</i>
                      <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: #ffffff;" th:text="${command.getName().substring(8)}">Command</h3>
                      <form th:if="${!command.getBooleanValue()}">

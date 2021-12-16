@@ -64,22 +64,30 @@
                     <path d="M2 3h10v2H2V3zm0 3h4v3H2V6zm0 4h4v1H2v-1zm0 2h4v1H2v-1zm5-6h2v1H7V6zm3 0h2v1h-2V6zM7 8h2v1H7V8zm3 0h2v1h-2V8zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1z"></path>
                 </svg>
                     <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">Ree6-News</h3>
-                    <form class="d-flex justify-content-center flex-wrap" method="get">
-                        <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
-                            <option value="0" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
+                    <form th:action="@{/panel/social/channel}" th:object="${channelChangeForm}" id="channelForm" class="d-flex justify-content-center flex-wrap" method="post">
+                        <input type="hidden" name="type" value="newsChannel" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+
+                        <div class="mb-3"><select name="channel" class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
+                            <option value="0" selected class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
                             <option th:each="channel: ${channels}" th:value="${channel.getId()}" th:text="${channel.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
                         </select></div>
-                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" form="channelForm" style="background: var(--bs-blue);">Change</button></div>
                     </form>
                 </div>
                 <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><i class="fas fa-gamepad d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;font-size: 35px;"></i>
                     <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">Mate-Searcher</h3>
-                    <form class="d-flex justify-content-center flex-wrap" method="get">
-                        <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
-                            <option value="0" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
+                    <form th:action="@{/panel/social/channel}" th:object="${channelChangeForm}" id="channelFormMate" class="d-flex justify-content-center flex-wrap" method="post">
+                        <input type="hidden" name="type" value="mateChannel" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+
+                        <div class="mb-3"><select name="channel" class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
+                            <option value="0" selected class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
                             <option th:each="channel: ${channels}" th:value="${channel.getId()}" th:text="${channel.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
                         </select></div>
-                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" form="channelFormMate" style="background: var(--bs-blue);">Change</button></div>
                     </form>
                 </div>
                 <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><i class="fab fa-twitch d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;font-size: 35px;"></i>
@@ -122,12 +130,16 @@
                 </div>
                 <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><i class="far fa-hand-peace d-flex d-sm-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-sm-center align-items-sm-center justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;font-size: 35px;"></i>
                     <h3 class="d-flex d-sm-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-sm-center align-items-sm-center justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">Welcome-Channel</h3>
-                    <form class="d-flex justify-content-center flex-wrap" method="get">
-                        <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
+                    <form th:action="@{/panel/social/channel}" th:object="${channelChangeForm}" id="channelFormWelcome" class="d-flex justify-content-center flex-wrap" method="post">
+                        <input type="hidden" name="type" value="welcomeChannel" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+
+                        <div class="mb-3"><select name="channel" class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
                             <option value="0" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
                             <option th:each="channel: ${channels}" th:value="${channel.getId()}" th:text="${channel.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
                         </select></div>
-                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" form="channelFormWelcome" style="background: var(--bs-blue);">Change</button></div>
                     </form>
                 </div>
                 <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><i class="material-icons d-flex d-sm-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-sm-center align-items-sm-center justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;font-size: 35px;">message</i>
