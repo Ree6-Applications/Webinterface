@@ -63,9 +63,16 @@
                      <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"></path>
                   </svg>
                      <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">Prefix</h3>
-                     <form class="d-flex justify-content-center flex-wrap" method="get" enctype="application/x-www-form-urlencoded">
-                        <div class="mb-3"><input class="form-control" type="text" name="content" placeholder="Prefix (empty if default)" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" minlength="5" autocomplete="off" required=""></div>
-                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" id="settingChangeForm" class="d-flex justify-content-center flex-wrap" method="post">
+                        <input type="hidden" name="name" value="chatprefix" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <div class="mb-3">
+                           <input class="form-control" type="text" name="value" placeholder="Prefix (empty if default)" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" autocomplete="off">
+                        </div>
+                        <div class="mb-3">
+                           <button class="btn btn-primary" type="submit" form="settingChangeForm" style="background: var(--bs-blue);">Change</button>
+                        </div>
                      </form>
                   </div>
                   <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="far fa-file-word d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 40px;"></i>
