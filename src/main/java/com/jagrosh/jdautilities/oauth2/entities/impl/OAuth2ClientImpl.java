@@ -35,12 +35,10 @@ import net.dv8tion.jda.internal.requests.Method;
 import net.dv8tion.jda.internal.utils.Checks;
 import net.dv8tion.jda.internal.utils.EncodingUtil;
 import net.dv8tion.jda.internal.utils.IOUtil;
-import net.dv8tion.jda.internal.utils.JDALogger;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
