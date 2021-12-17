@@ -128,31 +128,6 @@ public interface OAuth2Client
     OAuth2Action<List<OAuth2Guild>> getGuilds(Session session);
 
     /**
-     * Requests a list of {@link com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild OAuth2Guilds}
-     * from the {@link com.jagrosh.jdautilities.oauth2.session.Session Session}.
-     *
-     * <p>All Sessions should handle an individual Discord User, and as such this method retrieves
-     * data on all the various Discord Guilds that user is a part of when the session is provided.
-     *
-     * <p>Note that this can only be performed for Sessions who have the necessary
-     * {@link com.jagrosh.jdautilities.oauth2.Scope#GUILDS 'guilds'} scope.
-     * <br>Trying to call this using a Session without the scope will cause a
-     * {@link com.jagrosh.jdautilities.oauth2.exceptions.MissingScopeException MissingScopeException}
-     * to be thrown.
-     *
-     * @param  oAuth2User
-     *         The Session to get OAuth2Guilds for.
-     *
-     * @param  guildId
-     *         The Session to get OAuth2Guilds for.
-     *
-     * @return A {@link com.jagrosh.jdautilities.oauth2.requests.OAuth2Action OAuth2Action} for
-     *         the OAuth2Guilds to be retrieved.
-     */
-    @CheckReturnValue
-    OAuth2Action<OAuth2User> joinGuild(OAuth2User oAuth2User, long guildId);
-
-    /**
      * Gets the client ID for this OAuth2Client.
      *
      * @return The client ID.

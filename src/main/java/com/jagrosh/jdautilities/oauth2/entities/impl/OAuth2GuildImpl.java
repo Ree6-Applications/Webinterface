@@ -45,7 +45,7 @@ public class OAuth2GuildImpl implements OAuth2Guild
     }
 
     @Override
-    public boolean BotJoined() { return BotInfo.botInstance.getGuildById(getIdLong()) != null; }
+    public boolean botJoined() { return BotInfo.botInstance.getGuildById(getIdLong()) != null; }
 
     @Override
     public OAuth2Client getClient()

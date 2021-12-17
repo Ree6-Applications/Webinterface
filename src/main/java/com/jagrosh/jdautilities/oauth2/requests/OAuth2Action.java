@@ -39,16 +39,14 @@ import java.util.function.Consumer;
  */
 public abstract class OAuth2Action<T>
 {
-    protected static final Consumer DEFAULT_SUCCESS = t -> {};
-    protected static final Consumer<Throwable> DEFAULT_FAILURE = t -> {
-        OAuth2Requester.LOGGER.error("Requester encountered an error while processing response!", t);
-    };
+    protected final Consumer<T> DEFAULT_SUCCESS = t -> {};
+    protected static final Consumer<Throwable> DEFAULT_FAILURE = t -> OAuth2Requester.LOGGER.error("Requester encountered an error while processing response!", t);
 
     protected final OAuth2ClientImpl client;
     protected final Method method;
     protected final String url;
 
-    public OAuth2Action(OAuth2ClientImpl client, Method method, String url)
+    protected OAuth2Action(OAuth2ClientImpl client, Method method, String url)
     {
         Checks.notNull(client, "OAuth2Client");
         Checks.notNull(method, "Request method");

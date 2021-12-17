@@ -42,7 +42,7 @@ public class Setting {
         if (value instanceof String) {
             return (String) value;
         } else if (value instanceof Boolean) {
-            return (Boolean) value + "";
+            return value + "";
         } else if (getName().equalsIgnoreCase("chatprefix")) {
             return "ree!";
         }

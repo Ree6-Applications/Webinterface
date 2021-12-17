@@ -54,16 +54,14 @@ import java.util.List;
  */
 public class OAuth2ClientImpl implements OAuth2Client
 {
-    private static final Logger LOG = JDALogger.getLog(OAuth2Client.class);
-    
     private final long clientId;
     private final String clientSecret;
-    private final SessionController sessionController;
+    private final SessionController<?> sessionController;
     private final StateController stateController;
     private final OkHttpClient httpClient;
     private final OAuth2Requester requester;
 
-    public OAuth2ClientImpl(long clientId, String clientSecret, SessionController sessionController,
+    public OAuth2ClientImpl(long clientId, String clientSecret, SessionController<?> sessionController,
                             StateController stateController, OkHttpClient httpClient)
     {
         Checks.check(clientId >= 0, "Invalid Client ID");
@@ -131,34 +129,6 @@ public class OAuth2ClientImpl implements OAuth2Client
                 return sessionController.createSession(new SessionData(identifier,
                     body.getString("access_token"), body.getString("refresh_token"),
                     body.getString("token_type"), OffsetDateTime.now().plusSeconds(body.getInt("expires_in")), scopes));
-            }
-        };
-    }
-
-    @Override
-    public OAuth2Action<OAuth2User> joinGuild(OAuth2User oAuth2User, long guildId)
-    {
-        OAuth2URL oAuth2URL = OAuth2URL.GUILD_JOIN;
-        return new OAuth2Action<OAuth2User>(this, Method.PUT, oAuth2URL.compile(guildId, oAuth2User.getIdLong()))
-        {
-            @Override
-            protected Headers getHeaders()
-            {
-                return new Headers.Builder().add("Authorization", "Bot BOTTOKEN").add("Content-Type", "application/json").build();
-            }
-
-            @Override
-            protected RequestBody getBody() {
-                return RequestBody.create(MediaType.parse("application/json"), "access_token=" + oAuth2User.getSession().getTokenType() + " " + oAuth2User.getSession().getAccessToken());
-            }
-
-            @Override
-            protected OAuth2User handle(Response response) throws IOException
-            {
-                if(!response.isSuccessful())
-                    throw failure(response);
-
-                return oAuth2User;
             }
         };
     }

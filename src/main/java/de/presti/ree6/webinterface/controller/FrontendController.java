@@ -11,7 +11,6 @@ import de.presti.ree6.webinterface.controller.forms.SettingChangeForm;
 import de.presti.ree6.webinterface.utils.RandomUtil;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Webhook;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -149,7 +147,7 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.size() <= 0) return "error/index";
+            if (guildList.isEmpty()) return "error/index";
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
@@ -214,7 +212,7 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.size() <= 0) return "error/index";
+            if (guildList.isEmpty()) return "error/index";
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
@@ -276,7 +274,7 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(roleChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.size() <= 0) return "error/index";
+            if (guildList.isEmpty()) return "error/index";
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(roleChangeForm.getGuild());
@@ -341,7 +339,7 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.size() <= 0) return "error/index";
+            if (guildList.isEmpty()) return "error/index";
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
@@ -410,7 +408,7 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.size() <= 0) return "error/index";
+            if (guildList.isEmpty()) return "error/index";
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
@@ -471,7 +469,7 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(channelChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.size() <= 0) return "error/index";
+            if (guildList.isEmpty()) return "error/index";
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(channelChangeForm.getGuild());
@@ -484,36 +482,27 @@ public class FrontendController {
                 // Check if null.
                 if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
                     // Create new Webhook.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-News").queue(new Consumer<Webhook>() {
-                        @Override
-                        public void accept(Webhook webhook) {
-                            // If it has been created successfully add it to our Database.
-                            Server.getInstance().getSqlConnector().getSqlWorker().setNewsWebhook(guild.getId(), webhook.getId(), webhook.getToken());
-                        }
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-News").queue(webhook -> {
+                        // If it has been created successfully add it to our Database.
+                        Server.getInstance().getSqlConnector().getSqlWorker().setNewsWebhook(guild.getId(), webhook.getId(), webhook.getToken());
                     });
                 }
             } else if (channelChangeForm.getType().equalsIgnoreCase("mateChannel")) {
                 // Check if null.
                 if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
                     // Create new Webhook.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-MateSearcher").queue(new Consumer<Webhook>() {
-                        @Override
-                        public void accept(Webhook webhook) {
-                            // If it has been created successfully add it to our Database.
-                            Server.getInstance().getSqlConnector().getSqlWorker().setRainbowWebhook(guild.getId(), webhook.getId(), webhook.getToken());
-                        }
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-MateSearcher").queue(webhook -> {
+                        // If it has been created successfully add it to our Database.
+                        Server.getInstance().getSqlConnector().getSqlWorker().setRainbowWebhook(guild.getId(), webhook.getId(), webhook.getToken());
                     });
                 }
             } else if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
                 // Check if null.
                 if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
                     // Create new Webhook.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(new Consumer<Webhook>() {
-                        @Override
-                        public void accept(Webhook webhook) {
-                            // If it has been created successfully add it to our Database.
-                            Server.getInstance().getSqlConnector().getSqlWorker().setWelcomeWebhook(guild.getId(), webhook.getId(), webhook.getToken());
-                        }
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook -> {
+                        // If it has been created successfully add it to our Database.
+                        Server.getInstance().getSqlConnector().getSqlWorker().setWelcomeWebhook(guild.getId(), webhook.getId(), webhook.getToken());
                     });
                 }
             }
@@ -569,7 +558,7 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.size() <= 0) return "error/index";
+            if (guildList.isEmpty()) return "error/index";
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
@@ -636,7 +625,7 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.size() <= 0) return "error/index";
+            if (guildList.isEmpty()) return "error/index";
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
@@ -670,8 +659,6 @@ public class FrontendController {
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
-
-            e.printStackTrace();
         }
 
         // Return to the Logging Panel Page.
@@ -699,7 +686,7 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(channelChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.size() <= 0) return "error/index";
+            if (guildList.isEmpty()) return "error/index";
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(channelChangeForm.getGuild());
@@ -712,12 +699,9 @@ public class FrontendController {
                 // Check if null.
                 if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
                     // Create new Webhook.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(new Consumer<Webhook>() {
-                        @Override
-                        public void accept(Webhook webhook) {
-                            // If it has been created successfully add it to our Database.
-                            Server.getInstance().getSqlConnector().getSqlWorker().setLogWebhook(guild.getId(), webhook.getId(), webhook.getToken());
-                        }
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook -> {
+                        // If it has been created successfully add it to our Database.
+                        Server.getInstance().getSqlConnector().getSqlWorker().setLogWebhook(guild.getId(), webhook.getId(), webhook.getToken());
                     });
                 }
             }
@@ -748,8 +732,6 @@ public class FrontendController {
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
-
-            e.printStackTrace();
         }
 
         // Return to the Logging Panel Page.
@@ -777,7 +759,7 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.size() <= 0) return "error/index";
+            if (guildList.isEmpty()) return "error/index";
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
@@ -814,8 +796,6 @@ public class FrontendController {
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
-
-            e.printStackTrace();
         }
 
         // Return to the Logging Panel Page.
