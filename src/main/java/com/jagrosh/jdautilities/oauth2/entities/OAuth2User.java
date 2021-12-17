@@ -162,7 +162,7 @@ public interface OAuth2User extends ISnowflake, IMentionable
      *         <br>This method is scheduled for removal upon merging it
      *         with <code>master</code> in JDA-Utilities 2.2
      */
-    @Deprecated(since = "1.5.0")
+    @Deprecated(since = "1.5.0", forRemoval = true)
     default boolean isBot()
     {
         // Note: the code here has not changed from it's implementation.

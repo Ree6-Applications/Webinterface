@@ -139,7 +139,7 @@ public class OAuth2UserImpl implements OAuth2User
     }
 
     @Override
-    public String getAsMention()
+    public @NotNull String getAsMention()
     {
         return "<@" + id + '>';
     }
