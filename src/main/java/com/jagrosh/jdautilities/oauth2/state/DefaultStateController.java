@@ -16,7 +16,6 @@
 package com.jagrosh.jdautilities.oauth2.state;
 
 import java.util.HashMap;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * The default {@link com.jagrosh.jdautilities.oauth2.state.StateController StateController} implementation.
@@ -46,7 +45,7 @@ public class DefaultStateController implements StateController
     {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < 10; i++)
-            sb.append(CHARACTERS.charAt(ThreadLocalRandom.current().nextInt() *CHARACTERS.length()));
+            sb.append(CHARACTERS.charAt((int)(Math.random() * CHARACTERS.length())));
         return sb.toString();
     }
 }
