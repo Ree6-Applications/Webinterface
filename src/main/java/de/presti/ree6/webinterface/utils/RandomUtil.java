@@ -2,8 +2,6 @@ package de.presti.ree6.webinterface.utils;
 
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Class used for Random Utilities or Utilities which use a Random Algorithm.
