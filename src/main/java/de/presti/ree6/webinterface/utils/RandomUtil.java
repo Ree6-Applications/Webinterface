@@ -1,5 +1,6 @@
 package de.presti.ree6.webinterface.utils;
 
+import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -9,14 +10,16 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class RandomUtil {
 
+    // A Secure Random to create actually secure Random data.
+    private static final SecureRandom secureRandom = new SecureRandom();
+
     /**
      * Create a new 126 Byte Base64 String.
      * @return {@link String} A 126 Byte Base64 String.
      */
     public static String getRandomBase64String() {
-        Random random = ThreadLocalRandom.current();
         byte[] randomBytes = new byte[128];
-        random.nextBytes(randomBytes);
+        secureRandom.nextBytes(randomBytes);
         return Base64.getUrlEncoder().encodeToString(randomBytes);
     }
 
