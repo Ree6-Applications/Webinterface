@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -161,6 +160,15 @@ public class FrontendController {
             // Set the Identifier.
             model.addAttribute("identifier", id);
 
+            // Check if there is a Guild in the Guild list else send to error Page.
+            if (guildList.stream().findFirst().isEmpty()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't load Guild Information! ");
+
+                // Return to error page.
+                return "error/index";
+            }
+
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
@@ -217,6 +225,15 @@ public class FrontendController {
             // Set the Identifier.
             model.addAttribute("identifier", id);
 
+            // Check if there is a Guild in the Guild list else send to error Page.
+            if (guildList.stream().findFirst().isEmpty()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't load Guild Information! ");
+
+                // Return to error page.
+                return "error/index";
+            }
+
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
@@ -246,7 +263,7 @@ public class FrontendController {
      * @return {@link String} for Thyme to the HTML Page.
      */
     @RequestMapping("/panel/moderation/role")
-    public String openPanelModeration(@ModelAttribute(name = "roleChangeForm", binding = true) RoleChangeForm roleChangeForm, Model model) {
+    public String openPanelModeration(@ModelAttribute(name = "roleChangeForm") RoleChangeForm roleChangeForm, Model model) {
 
         Session session = null;
 
@@ -274,6 +291,15 @@ public class FrontendController {
 
             // Set the Identifier.
             model.addAttribute("identifier", roleChangeForm.getIdentifier());
+
+            // Check if there is a Guild in the Guild list else send to error Page.
+            if (guildList.stream().findFirst().isEmpty()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't load Guild Information! ");
+
+                // Return to error page.
+                return "error/index";
+            }
 
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
@@ -303,7 +329,7 @@ public class FrontendController {
      * @return {@link String} for Thyme to the HTML Page.
      */
     @RequestMapping("/panel/moderation/settings")
-    public String openPanelModeration(@ModelAttribute(name = "settingChangeForm", binding = true) SettingChangeForm settingChangeForm, Model model) {
+    public String openPanelModeration(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
         Session session = null;
 
         try {
@@ -328,6 +354,15 @@ public class FrontendController {
 
             // Set the Identifier.
             model.addAttribute("identifier", settingChangeForm.getIdentifier());
+
+            // Check if there is a Guild in the Guild list else send to error Page.
+            if (guildList.stream().findFirst().isEmpty()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't load Guild Information! ");
+
+                // Return to error page.
+                return "error/index";
+            }
 
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
@@ -386,6 +421,15 @@ public class FrontendController {
             // Set the Identifier.
             model.addAttribute("identifier", id);
 
+            // Check if there is a Guild in the Guild list else send to error Page.
+            if (guildList.stream().findFirst().isEmpty()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't load Guild Information! ");
+
+                // Return to error page.
+                return "error/index";
+            }
+
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
@@ -413,7 +457,7 @@ public class FrontendController {
      * @return {@link String} for Thyme to the HTML Page.
      */
     @RequestMapping("/panel/social/channel")
-    public String openPanelSocial(@ModelAttribute(name = "channelChangeForm", binding = true) ChannelChangeForm channelChangeForm, Model model) {
+    public String openPanelSocial(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
         System.out.println(channelChangeForm.getType() + " - " + channelChangeForm.getChannel() + " - " + channelChangeForm.getGuild() + " - " + channelChangeForm.getIdentifier());
 
         Session session = null;
@@ -477,6 +521,15 @@ public class FrontendController {
             // Set the Identifier.
             model.addAttribute("identifier", channelChangeForm.getIdentifier());
 
+            // Check if there is a Guild in the Guild list else send to error Page.
+            if (guildList.stream().findFirst().isEmpty()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't load Guild Information! ");
+
+                // Return to error page.
+                return "error/index";
+            }
+
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
@@ -503,7 +556,7 @@ public class FrontendController {
      * @return {@link String} for Thyme to the HTML Page.
      */
     @RequestMapping("/panel/social/settings")
-    public String openPanelSocial(@ModelAttribute(name = "settingChangeForm", binding = true) SettingChangeForm settingChangeForm, Model model) {
+    public String openPanelSocial(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         Session session = null;
 
@@ -529,6 +582,15 @@ public class FrontendController {
 
             // Set the Identifier.
             model.addAttribute("identifier", settingChangeForm.getIdentifier());
+
+            // Check if there is a Guild in the Guild list else send to error Page.
+            if (guildList.stream().findFirst().isEmpty()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't load Guild Information! ");
+
+                // Return to error page.
+                return "error/index";
+            }
 
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
@@ -585,6 +647,15 @@ public class FrontendController {
             // Set the Identifier.
             model.addAttribute("identifier", id);
 
+            // Check if there is a Guild in the Guild list else send to error Page.
+            if (guildList.stream().findFirst().isEmpty()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't load Guild Information! ");
+
+                // Return to error page.
+                return "error/index";
+            }
+
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
@@ -615,7 +686,7 @@ public class FrontendController {
      * @return {@link String} for Thyme to the HTML Page.
      */
     @RequestMapping("/panel/logging/channel")
-    public String openPanelLogging(@ModelAttribute(name = "channelChangeForm", binding = true) ChannelChangeForm channelChangeForm, Model model) {
+    public String openPanelLogging(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
 
         Session session = null;
 
@@ -654,6 +725,15 @@ public class FrontendController {
             // Set the Identifier.
             model.addAttribute("identifier", channelChangeForm.getIdentifier());
 
+            // Check if there is a Guild in the Guild list else send to error Page.
+            if (guildList.stream().findFirst().isEmpty()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't load Guild Information! ");
+
+                // Return to error page.
+                return "error/index";
+            }
+
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());
 
@@ -684,7 +764,7 @@ public class FrontendController {
      * @return {@link String} for Thyme to the HTML Page.
      */
     @RequestMapping("/panel/logging/settings")
-    public String openPanelLogging(@ModelAttribute(name = "settingChangeForm", binding = true) SettingChangeForm settingChangeForm, Model model) {
+    public String openPanelLogging(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         Session session = null;
 
@@ -710,6 +790,15 @@ public class FrontendController {
 
             // Set the Identifier.
             model.addAttribute("identifier", settingChangeForm.getIdentifier());
+
+            // Check if there is a Guild in the Guild list else send to error Page.
+            if (guildList.stream().findFirst().isEmpty()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't load Guild Information! ");
+
+                // Return to error page.
+                return "error/index";
+            }
 
             // If a Guild has been found set it as Attribute.
             model.addAttribute("guild", guildList.stream().findFirst().get());

@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import javax.security.auth.login.LoginException;
 import java.awt.*;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Class used to cover small utilities for the Bot.
@@ -89,8 +90,7 @@ public class BotUtil {
 
     public static Color randomEmbedColor() {
         String zeros = "000000";
-        Random rnd = new Random();
-        String s = Integer.toString(rnd.nextInt(0X1000000), 16);
+        String s = Integer.toString(ThreadLocalRandom.current().nextInt(0X1000000), 16);
         s = zeros.substring(s.length()) + s;
         return Color.decode("#" + s);
     }

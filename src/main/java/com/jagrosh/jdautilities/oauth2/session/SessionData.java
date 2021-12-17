@@ -120,4 +120,9 @@ public class SessionData
             getIdentifier(), getAccessToken(), getRefreshToken(), getTokenType(),
             getExpiration().format(DateTimeFormatter.RFC_1123_DATE_TIME));
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
