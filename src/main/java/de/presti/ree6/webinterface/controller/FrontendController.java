@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class FrontendController {
 
     // Paths to Thymeleaf Templates.
-    private final String mainPath = "main/index", errorPath = "error/index", moderationPath = "panel/moderation/index", socialPath = "panel/social/index", loggingPath = "panel/logging/index";
+    private static final String mainPath = "main/index", errorPath = "error/index", moderationPath = "panel/moderation/index", socialPath = "panel/social/index", loggingPath = "panel/logging/index";
 
     /**
      * A Get Mapper for the Main Page.
