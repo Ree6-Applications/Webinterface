@@ -29,6 +29,9 @@ import java.util.stream.Collectors;
 @Controller
 public class FrontendController {
 
+    // Paths to Thymeleaf Templates.
+    private final String mainPath = "main/index", errorPath = "error/index", moderationPath = "panel/moderation/index", socialPath = "panel/social/index", loggingPath = "panel/logging/index";
+
     /**
      * A Get Mapper for the Main Page.
      *
@@ -36,7 +39,7 @@ public class FrontendController {
      */
     @GetMapping("/")
     public String main() {
-        return "main/index";
+        return mainPath;
     }
 
     //region Discord.
@@ -110,7 +113,7 @@ public class FrontendController {
             model.addAttribute("guilds", guilds);
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that his Guilds couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -147,13 +150,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return "error/index";
+            if (guildList.isEmpty()) return errorPath;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return "error/index";
+            if (guild == null) return errorPath;
 
             // Set the Identifier.
             model.addAttribute("identifier", id);
@@ -164,7 +167,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return "error/index";
+                return errorPath;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -175,7 +178,7 @@ public class FrontendController {
             model.addAttribute("commandstats", "");
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -212,13 +215,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return "error/index";
+            if (guildList.isEmpty()) return errorPath;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return "error/index";
+            if (guild == null) return errorPath;
 
             // Set the Identifier.
             model.addAttribute("identifier", id);
@@ -229,7 +232,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return "error/index";
+                return errorPath;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -242,7 +245,7 @@ public class FrontendController {
                     .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -250,7 +253,7 @@ public class FrontendController {
         }
 
         // Return to the Moderation Panel Page.
-        return "panel/moderation/index";
+        return moderationPath;
     }
 
     /**
@@ -274,13 +277,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(roleChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return "error/index";
+            if (guildList.isEmpty()) return errorPath;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(roleChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return "error/index";
+            if (guild == null) return errorPath;
 
             // Change the role Data.
             if (roleChangeForm.getType().equalsIgnoreCase("muterole")) {
@@ -296,7 +299,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return "error/index";
+                return errorPath;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -309,14 +312,14 @@ public class FrontendController {
                     .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
         }
 
-        return "panel/moderation/index";
+        return moderationPath;
     }
 
     /**
@@ -339,13 +342,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return "error/index";
+            if (guildList.isEmpty()) return errorPath;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return "error/index";
+            if (guild == null) return errorPath;
 
             // Change the Setting Data.
             Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
@@ -359,7 +362,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return "error/index";
+                return errorPath;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -372,14 +375,14 @@ public class FrontendController {
                     .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
         }
 
-        return "panel/moderation/index";
+        return moderationPath;
     }
 
     //endregion
@@ -408,13 +411,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return "error/index";
+            if (guildList.isEmpty()) return errorPath;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return "error/index";
+            if (guild == null) return errorPath;
 
             // Set the Identifier.
             model.addAttribute("identifier", id);
@@ -425,7 +428,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return "error/index";
+                return errorPath;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -436,7 +439,7 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -444,7 +447,7 @@ public class FrontendController {
         }
 
         // Return to the Social Panel Page.
-        return "panel/social/index";
+        return socialPath;
     }
 
     /**
@@ -469,41 +472,29 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(channelChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return "error/index";
+            if (guildList.isEmpty()) return errorPath;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(channelChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return "error/index";
+            if (guild == null) return errorPath;
 
             // Change the channel Data.
-            if (channelChangeForm.getType().equalsIgnoreCase("newsChannel")) {
-                // Check if null.
-                if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
-                    // Create new Webhook.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-News").queue(webhook -> {
-                        // If it has been created successfully add it to our Database.
-                        Server.getInstance().getSqlConnector().getSqlWorker().setNewsWebhook(guild.getId(), webhook.getId(), webhook.getToken());
-                    });
-                }
-            } else if (channelChangeForm.getType().equalsIgnoreCase("mateChannel")) {
-                // Check if null.
-                if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
-                    // Create new Webhook.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-MateSearcher").queue(webhook -> {
-                        // If it has been created successfully add it to our Database.
-                        Server.getInstance().getSqlConnector().getSqlWorker().setRainbowWebhook(guild.getId(), webhook.getId(), webhook.getToken());
-                    });
-                }
-            } else if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
-                // Check if null.
-                if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
-                    // Create new Webhook.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook -> {
-                        // If it has been created successfully add it to our Database.
-                        Server.getInstance().getSqlConnector().getSqlWorker().setWelcomeWebhook(guild.getId(), webhook.getId(), webhook.getToken());
-                    });
+            // Check if null.
+            if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
+                if (channelChangeForm.getType().equalsIgnoreCase("newsChannel")) {
+                    // Create new Webhook, If it has been created successfully add it to our Database.
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-News").queue(webhook ->
+                            Server.getInstance().getSqlConnector().getSqlWorker().setNewsWebhook(guild.getId(), webhook.getId(), webhook.getToken()));
+                } else if (channelChangeForm.getType().equalsIgnoreCase("mateChannel")) {
+                    // Create new Webhook, If it has been created successfully add it to our Database.
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-MateSearcher").queue(webhook ->
+                            Server.getInstance().getSqlConnector().getSqlWorker().setRainbowWebhook(guild.getId(), webhook.getId(), webhook.getToken()));
+                } else if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
+                    // Create new Webhook, If it has been created successfully add it to our Database.
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook ->
+                            Server.getInstance().getSqlConnector().getSqlWorker().setWelcomeWebhook(guild.getId(), webhook.getId(), webhook.getToken()));
                 }
             }
 
@@ -516,7 +507,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return "error/index";
+                return errorPath;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -527,14 +518,14 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
         }
 
-        return "panel/social/index";
+        return socialPath;
     }
 
     /**
@@ -558,13 +549,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return "error/index";
+            if (guildList.isEmpty()) return errorPath;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return "error/index";
+            if (guild == null) return errorPath;
 
             // Change the setting Data.
             Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
@@ -578,7 +569,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return "error/index";
+                return errorPath;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -589,14 +580,14 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
         }
 
-        return "panel/social/index";
+        return socialPath;
     }
 
     //endregion
@@ -625,13 +616,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return "error/index";
+            if (guildList.isEmpty()) return errorPath;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return "error/index";
+            if (guild == null) return errorPath;
 
             // Set the Identifier.
             model.addAttribute("identifier", id);
@@ -642,7 +633,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return "error/index";
+                return errorPath;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -654,7 +645,7 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -662,7 +653,7 @@ public class FrontendController {
         }
 
         // Return to the Logging Panel Page.
-        return "panel/logging/index";
+        return loggingPath;
     }
 
     /**
@@ -686,24 +677,20 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(channelChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return "error/index";
+            if (guildList.isEmpty()) return errorPath;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(channelChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return "error/index";
+            if (guild == null) return errorPath;
 
             // Change the channel Data.
-            if (channelChangeForm.getType().equalsIgnoreCase("logChannel")) {
-                // Check if null.
-                if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
-                    // Create new Webhook.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook -> {
-                        // If it has been created successfully add it to our Database.
-                        Server.getInstance().getSqlConnector().getSqlWorker().setLogWebhook(guild.getId(), webhook.getId(), webhook.getToken());
-                    });
-                }
+            // Check if null.
+            if (channelChangeForm.getType().equalsIgnoreCase("logChannel") && guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
+                // Create new Webhook, If it has been created successfully add it to our Database.
+                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook ->
+                        Server.getInstance().getSqlConnector().getSqlWorker().setLogWebhook(guild.getId(), webhook.getId(), webhook.getToken()));
             }
 
             // Set the Identifier.
@@ -715,7 +702,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return "error/index";
+                return errorPath;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -727,7 +714,7 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -735,7 +722,7 @@ public class FrontendController {
         }
 
         // Return to the Logging Panel Page.
-        return "panel/logging/index";
+        return loggingPath;
     }
 
     /**
@@ -759,13 +746,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return "error/index";
+            if (guildList.isEmpty()) return errorPath;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return "error/index";
+            if (guild == null) return errorPath;
 
             // Change the setting Data.
             Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
@@ -779,7 +766,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return "error/index";
+                return errorPath;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -791,7 +778,7 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return "main/index";
+            if (session == null) return mainPath;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -799,7 +786,7 @@ public class FrontendController {
         }
 
         // Return to the Logging Panel Page.
-        return "panel/logging/index";
+        return loggingPath;
     }
 
     //endregion

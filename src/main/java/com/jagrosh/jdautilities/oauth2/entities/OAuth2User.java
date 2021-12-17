@@ -55,7 +55,7 @@ public interface OAuth2User extends ISnowflake, IMentionable
      *
      * @return The user's Snowflake ID as a String.
      */
-    @NotNull String getId();
+    @NotNull @Override String getId();
 
     /**
      * Gets the user's Snowflake ID as a {@code long}.
