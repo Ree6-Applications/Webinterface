@@ -6,7 +6,9 @@ package de.presti.ree6.webinterface.invite;
 public class InviteContainer {
 
     // information about the Invite.
-    String creatorId, guildId, code;
+    String creatorId,
+            guildId,
+            code;
 
     // The use count from our Database.
     int uses;
