@@ -756,6 +756,57 @@ public class SQLWorker {
     }
 
     /**
+     * Get the all Twitch-Notifier.
+     *
+     * @return {@link ArrayList<>} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public ArrayList<String> getAllTwitchNames() {
+
+        ArrayList<String> userNames = new ArrayList<>();
+
+        // Creating a SQL Statement to get the Entry from the TwitchNotify Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitchNotify").executeQuery()) {
+
+            // Return if there was a match.
+            while (rs != null && rs.next()) {
+                userNames.add(rs.getString("NAME"));
+            }
+        } catch (Exception ignore) {
+        }
+
+        return userNames;
+    }
+
+    /**
+     * Get every Twitch-Notifier that has been setup for the given Guild.
+     *
+     * @param guildId the ID of the Guild.
+     *
+     * @return {@link ArrayList<>} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public ArrayList<String> getAllTwitchNames(String guildId) {
+
+        ArrayList<String> userNames = new ArrayList<>();
+
+        // Check for SQL Statements to prevent SQL Injections.
+        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return userNames;
+        }
+
+        // Creating a SQL Statement to get the Entry from the TwitchNotify Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitchNotify AND GID='" + guildId + "'").executeQuery()) {
+
+            // Return if there was a match.
+            while (rs != null && rs.next()) {
+                userNames.add(rs.getString("NAME"));
+            }
+        } catch (Exception ignore) {
+        }
+
+        return userNames;
+    }
+
+    /**
      * Set the TwitchNotify in our Database.
      *
      * @param guildId    the ID of the Guild.
@@ -1444,6 +1495,22 @@ public class SQLWorker {
             querySQL("INSERT INTO Invites (GID, UID, USES, CODE) VALUES ('" + guildId + "', '" + inviteCode + "', '" + inviteUsage + "', " +
                     "'" + inviteCode + "');");
         }
+    }
+
+    /**
+     * Remove an entry from our Database.
+     *
+     * @param guildId       the ID of the Guild.
+     * @param inviteCode    the Code of the Invite.
+     */
+    public void removeInvite(String guildId, String inviteCode) {
+        // Check for SQL Statements to prevent SQL Injections.
+        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
+                inviteCode.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return;
+        }
+
+        querySQL("DELETE FROM Invites WHERE GID='" + guildId + "' AND CODE='" + inviteCode + "'");
     }
 
     /**

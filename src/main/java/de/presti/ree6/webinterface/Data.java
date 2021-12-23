@@ -1,5 +1,8 @@
 package de.presti.ree6.webinterface;
 
+/**
+ * Utility class to save long term used Data.
+ */
 public class Data {
 
     /**
