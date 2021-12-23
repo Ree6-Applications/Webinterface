@@ -8,6 +8,7 @@ class WebinterfaceApplicationTests {
 
     @Test
     void contextLoads() {
+        Server.getInstance().logger.warn("Please do not use Test mode!");
     }
 
 }

@@ -5,6 +5,10 @@ import de.presti.ree6.webinterface.bot.*;
 
 public class FileUtil {
 
+    private FileUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String getToken() {
         if (BotInfo.version == BotVersion.DEV) {
             return Server.getInstance().getConfig().getConfig().getString("discord.bot.tokens.dev");

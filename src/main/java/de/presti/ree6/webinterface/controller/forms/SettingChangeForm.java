@@ -8,7 +8,10 @@ import de.presti.ree6.webinterface.utils.Setting;
 public class SettingChangeForm {
 
     // information needed to Validate a Setting Change in the Database.
-    private final String name, value, identifierSession, guildSession;
+    private final String name,
+            value,
+            identifierSession,
+            guildSession;
 
     /**
      * Constructor to get the needed data.

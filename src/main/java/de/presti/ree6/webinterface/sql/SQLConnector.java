@@ -1,10 +1,13 @@
 package de.presti.ree6.webinterface.sql;
 
+import de.presti.ree6.webinterface.Server;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A "Connector" Class which connect with the used Database Server.
@@ -14,7 +17,10 @@ import java.util.HashMap;
 public class SQLConnector {
 
     // Various String that keep connection information to use for a connection.
-    private final String databaseUser, databaseName, databasePassword, databaseServerIP;
+    private final String databaseUser,
+            databaseName,
+            databasePassword,
+            databaseServerIP;
 
     // The port of the Server.
     private final int databaseServerPort;
@@ -58,20 +64,20 @@ public class SQLConnector {
             try {
                 // Close if there is and notify.
                 connection.close();
-                System.out.println("Service (MariaDB) has been stopped.");
+                Server.getInstance().getLogger().info("Service (MariaDB) has been stopped.");
             } catch (Exception ignore) {
                 // Notify if there was an error.
-                System.out.println("Service (MariaDB) couldn't be stopped.");
+                Server.getInstance().getLogger().error("Service (MariaDB) couldn't be stopped.");
             }
         }
 
         try {
             // Create a new Connection by using the SQL DriverManager and the MariaDB Java Driver and notify if successful.
             connection = DriverManager.getConnection("jdbc:mariadb://" + databaseServerIP + ":" + databaseServerPort + "/" + databaseName + "?autoReconnect=true", databaseUser, databasePassword);
-            System.out.println("Service (MariaDB) has been started. Connection was successful.");
+            Server.getInstance().getLogger().info("Service (MariaDB) has been started. Connection was successful.");
         } catch (Exception ignore) {
             // Notify if there was an error.
-            System.out.println("Service (MariaDB) couldn't be started. Connection was unsuccessful.");
+            Server.getInstance().getLogger().error("Service (MariaDB) couldn't be started. Connection was unsuccessful.");
         }
     }
 
@@ -103,15 +109,15 @@ public class SQLConnector {
         tables.put("ChatLevelAutoRoles", "(GID VARCHAR(40), RID VARCHAR(40), LVL VARCHAR(500))");
 
         // Iterating through all table presets.
-        for (String key : tables.keySet()) {
+        for (Map.Entry<String, String> entry : tables.entrySet()) {
 
             // Create a Table based on the key.
-            try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + key + " " + tables.get(key))) {
+            try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + entry.getKey() + " " + entry.getValue())) {
                 ps.executeUpdate();
             } catch (SQLException ignore) {
 
                 // Notify if there was an error.
-                System.out.println("Couldn't create " + key + " Table.");
+                Server.getInstance().getLogger().error("Couldn't create " + entry.getKey() + " Table.");
             }
         }
 
@@ -139,10 +145,10 @@ public class SQLConnector {
             try {
                 // Close if there is and notify.
                 connection.close();
-                System.out.println("Service (MariaDB) has been stopped.");
+                Server.getInstance().getLogger().info("Service (MariaDB) has been stopped.");
             } catch (Exception ignore) {
                 // Notify if there was an error.
-                System.out.println("Service (MariaDB) couldn't be stopped.");
+                Server.getInstance().getLogger().error("Service (MariaDB) couldn't be stopped.");
             }
         }
     }

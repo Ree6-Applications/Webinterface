@@ -6,6 +6,9 @@ import de.presti.ree6.webinterface.bot.BotUtil;
 import de.presti.ree6.webinterface.bot.BotVersion;
 import de.presti.ree6.webinterface.sql.SQLConnector;
 import de.presti.ree6.webinterface.utils.Config;
+import net.dv8tion.jda.api.JDA;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The "Main" Class used to store Instance of the needed Classes.
@@ -13,7 +16,7 @@ import de.presti.ree6.webinterface.utils.Config;
 public class Server {
 
     // Class Instance.
-    private static Server instance;
+    private static final Server instance = new Server();
 
     // OAuth Instance.
     OAuth2Client oAuth2Client;
@@ -24,11 +27,13 @@ public class Server {
     // Config Instance
     Config config;
 
+    // Logger Instance.
+    Logger logger;
+
     /**
      * Call when the Class should be Initialized.
      */
     public Server() {
-        instance = this;
         load();
     }
 
@@ -36,6 +41,9 @@ public class Server {
      * Call to load and Initialize Data.
      */
     public void load() {
+
+        // Create the Logger with a LoggerFactory.
+        logger = LoggerFactory.getLogger(Server.class);
 
         // Create Config Instance.
         config = new Config();
@@ -49,10 +57,10 @@ public class Server {
         // Create a new JDA Session.
         try {
             BotUtil.createBot(BotVersion.DEV, "1.5.0");
-            System.out.println("Service (JDA) has been started. Creation was successful.");
+            logger.info("Service (JDA) has been started. Creation was successful.");
         } catch (Exception ignore) {
             //Inform if not successful.
-            System.out.println("Service (JDA) couldn't be started. Creation was unsuccessful.");
+            logger.error("Service (JDA) couldn't be started. Creation was unsuccessful.");
         }
 
         // Creating OAuth2 Instance.
@@ -104,4 +112,10 @@ public class Server {
      * @return {@link Config} Instance of the Config.
      */
     public Config getConfig() { return config; }
+
+    /**
+     * Retrieve the Instance of the Logger.
+     * @return {@link Logger} Instance of the Logger.
+     */
+    public Logger getLogger() { return logger; }
 }

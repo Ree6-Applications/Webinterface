@@ -29,10 +29,11 @@ import java.util.EnumSet;
 public class OAuth2GuildImpl implements OAuth2Guild
 {
     private final OAuth2Client client;
-    private final long id;
-    private final String name, icon;
+    private final long id,
+            permissions;
+    private final String name,
+            icon;
     private final boolean owner;
-    private final long permissions;
     
     public OAuth2GuildImpl(OAuth2Client client, long id, String name, String icon, boolean owner, long permissions)
     {
@@ -102,13 +103,13 @@ public class OAuth2GuildImpl implements OAuth2Guild
             return true;
 
         long adminPermRaw = Permission.ADMINISTRATOR.getRawValue();
-        long permissions = getPermissionsRaw();
+        long permissionsRaw = getPermissionsRaw();
 
-        if ((permissions & adminPermRaw) == adminPermRaw)
+        if ((permissionsRaw & adminPermRaw) == adminPermRaw)
             return true;
 
         long checkPermsRaw = Permission.getRaw(perms);
 
-        return (permissions & checkPermsRaw) == checkPermsRaw;
+        return (permissionsRaw & checkPermsRaw) == checkPermsRaw;
     }
 }

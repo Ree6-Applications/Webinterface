@@ -6,7 +6,10 @@ package de.presti.ree6.webinterface.controller.forms;
 public class RoleChangeForm {
 
     // information needed to Validate a Role Change in the Database.
-    private final String type, role, identifierSession, guildSession;
+    private final String type,
+            role,
+            identifierSession,
+            guildSession;
 
     /**
      * Constructor to get the needed data.

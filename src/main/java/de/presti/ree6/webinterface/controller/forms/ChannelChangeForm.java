@@ -6,7 +6,10 @@ package de.presti.ree6.webinterface.controller.forms;
 public class ChannelChangeForm {
 
     // information needed to Validate a Channel Change in the Database.
-    private final String type, channel, identifierSession, guildSession;
+    private final String type,
+            channel,
+            identifierSession,
+            guildSession;
 
     /**
      * Constructor to get the needed data.

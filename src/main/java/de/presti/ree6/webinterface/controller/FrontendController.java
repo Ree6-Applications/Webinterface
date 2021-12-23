@@ -460,7 +460,6 @@ public class FrontendController {
      */
     @PostMapping(path = "/panel/social/channel")
     public String openPanelSocial(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
-        System.out.println(channelChangeForm.getType() + " - " + channelChangeForm.getChannel() + " - " + channelChangeForm.getGuild() + " - " + channelChangeForm.getIdentifier());
 
         Session session = null;
 

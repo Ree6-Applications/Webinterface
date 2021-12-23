@@ -45,7 +45,9 @@ public class DefaultSessionController implements SessionController<DefaultSessio
 
     public static class DefaultSession implements Session
     {
-        private final String accessToken, refreshToken, tokenType;
+        private final String accessToken,
+                refreshToken,
+                tokenType;
         private final OffsetDateTime expiration;
         private final Scope[] scopes;
         

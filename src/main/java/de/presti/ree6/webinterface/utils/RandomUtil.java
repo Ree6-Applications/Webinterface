@@ -8,6 +8,13 @@ import java.util.Base64;
  */
 public class RandomUtil {
 
+    /**
+     * Constructor for the Random Utility class.
+     */
+    private RandomUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     // A Secure Random to create actually secure Random data.
     private static final SecureRandom secureRandom = new SecureRandom();
 

@@ -3,8 +3,7 @@ package de.presti.ree6.webinterface.controller;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +25,7 @@ public class BackendController {
      * @param count count of the max users in the response.
      * @return {@link String} a stringified JsonObject.
      */
-    @RequestMapping(value = "/api/v1/level/leaderboard", produces = "application/json", method = RequestMethod.GET)
+    @GetMapping(value = "/api/v1/level/leaderboard", produces = "application/json")
     public String getLeaderboard(@RequestParam String guildId, @RequestParam int count) {
         JsonObject jsonObject = new JsonObject();
 
@@ -45,7 +44,7 @@ public class BackendController {
      * @param userID the UserID of the wanted User.
      * @return {@link String} a stringified JsonObject.
      */
-    @RequestMapping(value = "/api/v1/level/member", produces = "application/json", method = RequestMethod.GET)
+    @GetMapping(value = "/api/v1/level/member", produces = "application/json")
     public String getLeaderboard(@RequestParam String guildID, @RequestParam String userID) {
         JsonObject jsonObject = new JsonObject();
 

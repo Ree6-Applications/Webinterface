@@ -18,7 +18,7 @@ public class WebinterfaceApplication {
         SpringApplication.run(WebinterfaceApplication.class, args);
 
         // Initialize the Server class to create the needed Instances.
-        new Server();
+        //// new Server();
     }
 
 }

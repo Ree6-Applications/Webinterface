@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class ErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
+public class ErrorControllerImpl implements org.springframework.boot.web.servlet.error.ErrorController {
 
     /**
      * Error Attributes in the Application
@@ -16,7 +16,7 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
      * Controller for the Error Controller
      * @param errorAttributes Attributes that give more Info about the Error.
      */
-    public ErrorController(ErrorAttributes errorAttributes) {
+    public ErrorControllerImpl(ErrorAttributes errorAttributes) {
         this.errorAttributes = errorAttributes;
     }
 

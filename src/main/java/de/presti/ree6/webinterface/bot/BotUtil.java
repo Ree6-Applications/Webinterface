@@ -21,6 +21,13 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BotUtil {
 
     /**
+     * Constructor for the Bot Utility class.
+     */
+    private BotUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    /**
      * Create a new {@link net.dv8tion.jda.api.JDA} instance and set the rest information for later use.
      * @param version the current Bot Version "typ".
      * @param build the current Bot Version.
@@ -66,7 +73,7 @@ public class BotUtil {
             em.setDescription(description);
 
         if (!footer.isEmpty())
-            em.setFooter(footer + " - " + Data.advertisement);
+            em.setFooter(footer + " - " + Data.ADVERTISEMENT);
 
         if (!title.isEmpty())
             em.setTitle(title);

@@ -28,7 +28,10 @@ import java.time.format.DateTimeFormatter;
  */
 public class SessionData
 {
-    private final String identifier, accessToken, refreshToken, tokenType;
+    private final String identifier,
+            accessToken,
+            refreshToken,
+            tokenType;
     private final OffsetDateTime expiration;
     private final Scope[] scopes;
 
