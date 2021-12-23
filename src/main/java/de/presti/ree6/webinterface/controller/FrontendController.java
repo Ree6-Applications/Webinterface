@@ -13,10 +13,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -30,7 +27,11 @@ import java.util.stream.Collectors;
 public class FrontendController {
 
     // Paths to Thymeleaf Templates.
-    private static final String mainPath = "main/index", errorPath = "error/index", moderationPath = "panel/moderation/index", socialPath = "panel/social/index", loggingPath = "panel/logging/index";
+    private static final String MAIN_PATH = "main/index",
+            ERROR_PATH = "error/index",
+            MODERATION_PATH = "panel/moderation/index",
+            SOCIAL_PATH = "panel/social/index",
+            LOGGING_PATH = "panel/logging/index";
 
     /**
      * A Get Mapper for the Main Page.
@@ -39,7 +40,7 @@ public class FrontendController {
      */
     @GetMapping("/")
     public String main() {
-        return mainPath;
+        return MAIN_PATH;
     }
 
     //region Discord.
@@ -61,7 +62,7 @@ public class FrontendController {
      * @param state the local State of the OAuth2 Session.
      * @return {@link ModelAndView} with the redirect data.
      */
-    @RequestMapping("/discord/auth/callback")
+    @RequestMapping(value = "/discord/auth/callback", method = RequestMethod.GET)
     public ModelAndView discordLogin(@RequestParam String code, @RequestParam String state) {
         Session session = null;
 
@@ -90,7 +91,7 @@ public class FrontendController {
      * @param model the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel")
+    @RequestMapping(path = "/panel", method = RequestMethod.GET)
     public String openPanel(@RequestParam String id, Model model) {
 
         Session session = null;
@@ -113,7 +114,7 @@ public class FrontendController {
             model.addAttribute("guilds", guilds);
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that his Guilds couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -136,7 +137,7 @@ public class FrontendController {
      * @param model   the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel/server")
+    @RequestMapping(path = "/panel/server", method = RequestMethod.GET)
     public String openServerPanel(@RequestParam String id, @RequestParam String guildID, Model model) {
 
         Session session = null;
@@ -150,13 +151,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return errorPath;
+            if (guildList.isEmpty()) return ERROR_PATH;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return errorPath;
+            if (guild == null) return ERROR_PATH;
 
             // Set the Identifier.
             model.addAttribute("identifier", id);
@@ -167,7 +168,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return errorPath;
+                return ERROR_PATH;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -178,7 +179,7 @@ public class FrontendController {
             model.addAttribute("commandstats", "");
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -201,7 +202,7 @@ public class FrontendController {
      * @param model   the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel/moderation")
+    @RequestMapping(path = "/panel/moderation", method = RequestMethod.GET)
     public String openPanelModeration(@RequestParam String id, @RequestParam String guildID, Model model) {
 
         Session session = null;
@@ -215,13 +216,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return errorPath;
+            if (guildList.isEmpty()) return ERROR_PATH;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return errorPath;
+            if (guild == null) return ERROR_PATH;
 
             // Set the Identifier.
             model.addAttribute("identifier", id);
@@ -232,7 +233,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return errorPath;
+                return ERROR_PATH;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -245,7 +246,7 @@ public class FrontendController {
                     .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -253,7 +254,7 @@ public class FrontendController {
         }
 
         // Return to the Moderation Panel Page.
-        return moderationPath;
+        return MODERATION_PATH;
     }
 
     /**
@@ -263,7 +264,7 @@ public class FrontendController {
      * @param model          the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel/moderation/role")
+    @RequestMapping(path = "/panel/moderation/role", method = RequestMethod.POST)
     public String openPanelModeration(@ModelAttribute(name = "roleChangeForm") RoleChangeForm roleChangeForm, Model model) {
 
         Session session = null;
@@ -277,13 +278,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(roleChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return errorPath;
+            if (guildList.isEmpty()) return ERROR_PATH;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(roleChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return errorPath;
+            if (guild == null) return ERROR_PATH;
 
             // Change the role Data.
             if (roleChangeForm.getType().equalsIgnoreCase("muterole")) {
@@ -299,7 +300,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return errorPath;
+                return ERROR_PATH;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -312,14 +313,14 @@ public class FrontendController {
                     .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
         }
 
-        return moderationPath;
+        return MODERATION_PATH;
     }
 
     /**
@@ -329,7 +330,7 @@ public class FrontendController {
      * @param model             the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel/moderation/settings")
+    @RequestMapping(path = "/panel/moderation/settings", method = RequestMethod.POST)
     public String openPanelModeration(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
         Session session = null;
 
@@ -342,13 +343,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return errorPath;
+            if (guildList.isEmpty()) return ERROR_PATH;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return errorPath;
+            if (guild == null) return ERROR_PATH;
 
             // Change the Setting Data.
             Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
@@ -362,7 +363,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return errorPath;
+                return ERROR_PATH;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -375,14 +376,14 @@ public class FrontendController {
                     .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
         }
 
-        return moderationPath;
+        return MODERATION_PATH;
     }
 
     //endregion
@@ -397,7 +398,7 @@ public class FrontendController {
      * @param model   the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel/social")
+    @RequestMapping(path = "/panel/social", method = RequestMethod.GET)
     public String openPanelSocial(@RequestParam String id, @RequestParam String guildID, Model model) {
 
         Session session = null;
@@ -411,13 +412,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return errorPath;
+            if (guildList.isEmpty()) return ERROR_PATH;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return errorPath;
+            if (guild == null) return ERROR_PATH;
 
             // Set the Identifier.
             model.addAttribute("identifier", id);
@@ -428,7 +429,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return errorPath;
+                return ERROR_PATH;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -439,7 +440,7 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -447,7 +448,7 @@ public class FrontendController {
         }
 
         // Return to the Social Panel Page.
-        return socialPath;
+        return SOCIAL_PATH;
     }
 
     /**
@@ -457,7 +458,7 @@ public class FrontendController {
      * @param model             the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel/social/channel")
+    @RequestMapping(path = "/panel/social/channel", method = RequestMethod.POST)
     public String openPanelSocial(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
         System.out.println(channelChangeForm.getType() + " - " + channelChangeForm.getChannel() + " - " + channelChangeForm.getGuild() + " - " + channelChangeForm.getIdentifier());
 
@@ -472,13 +473,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(channelChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return errorPath;
+            if (guildList.isEmpty()) return ERROR_PATH;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(channelChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return errorPath;
+            if (guild == null) return ERROR_PATH;
 
             // Change the channel Data.
             // Check if null.
@@ -507,7 +508,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return errorPath;
+                return ERROR_PATH;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -518,14 +519,14 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
         }
 
-        return socialPath;
+        return SOCIAL_PATH;
     }
 
     /**
@@ -535,7 +536,7 @@ public class FrontendController {
      * @param model             the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel/social/settings")
+    @RequestMapping(path = "/panel/social/settings", method = RequestMethod.POST)
     public String openPanelSocial(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         Session session = null;
@@ -549,13 +550,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return errorPath;
+            if (guildList.isEmpty()) return ERROR_PATH;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return errorPath;
+            if (guild == null) return ERROR_PATH;
 
             // Change the setting Data.
             Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
@@ -569,7 +570,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return errorPath;
+                return ERROR_PATH;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -580,14 +581,14 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Guild Information! ");
         }
 
-        return socialPath;
+        return SOCIAL_PATH;
     }
 
     //endregion
@@ -602,7 +603,7 @@ public class FrontendController {
      * @param model   the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel/logging")
+    @RequestMapping(path = "/panel/logging", method = RequestMethod.GET)
     public String openPanelLogging(@RequestParam String id, @RequestParam String guildID, Model model) {
 
         Session session = null;
@@ -616,13 +617,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return errorPath;
+            if (guildList.isEmpty()) return ERROR_PATH;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(guildID);
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return errorPath;
+            if (guild == null) return ERROR_PATH;
 
             // Set the Identifier.
             model.addAttribute("identifier", id);
@@ -633,7 +634,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return errorPath;
+                return ERROR_PATH;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -645,7 +646,7 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -653,7 +654,7 @@ public class FrontendController {
         }
 
         // Return to the Logging Panel Page.
-        return loggingPath;
+        return LOGGING_PATH;
     }
 
     /**
@@ -663,7 +664,7 @@ public class FrontendController {
      * @param model             the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel/logging/channel")
+    @RequestMapping(path = "/panel/logging/channel", method = RequestMethod.POST)
     public String openPanelLogging(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
 
         Session session = null;
@@ -677,13 +678,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(channelChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return errorPath;
+            if (guildList.isEmpty()) return ERROR_PATH;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(channelChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return errorPath;
+            if (guild == null) return ERROR_PATH;
 
             // Change the channel Data.
             // Check if null.
@@ -702,7 +703,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return errorPath;
+                return ERROR_PATH;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -714,7 +715,7 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -722,7 +723,7 @@ public class FrontendController {
         }
 
         // Return to the Logging Panel Page.
-        return loggingPath;
+        return LOGGING_PATH;
     }
 
     /**
@@ -732,7 +733,7 @@ public class FrontendController {
      * @param model             the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping("/panel/logging/settings")
+    @RequestMapping(path = "/panel/logging/settings", method = RequestMethod.POST)
     public String openPanelLogging(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         Session session = null;
@@ -746,13 +747,13 @@ public class FrontendController {
             guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
 
             // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return errorPath;
+            if (guildList.isEmpty()) return ERROR_PATH;
 
             // Retrieve the Guild by its giving ID.
             Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return errorPath;
+            if (guild == null) return ERROR_PATH;
 
             // Change the setting Data.
             Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
@@ -766,7 +767,7 @@ public class FrontendController {
                 model.addAttribute("error", "Couldn't load Guild Information! ");
 
                 // Return to error page.
-                return errorPath;
+                return ERROR_PATH;
             }
 
             // If a Guild has been found set it as Attribute.
@@ -778,7 +779,7 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return mainPath;
+            if (session == null) return MAIN_PATH;
 
             // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
             model.addAttribute("IsError", true);
@@ -786,7 +787,7 @@ public class FrontendController {
         }
 
         // Return to the Logging Panel Page.
-        return loggingPath;
+        return LOGGING_PATH;
     }
 
     //endregion
