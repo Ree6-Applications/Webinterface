@@ -68,7 +68,7 @@
                         <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
                         <input type="hidden" name="identifierSession" th:value="${identifier}" />
                         <div class="mb-3">
-                           <input class="form-control" type="text" name="value" placeholder="Prefix (empty if default)" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" autocomplete="off">
+                           <input class="form-control" type="text" name="value" th:value="${prefixSetting.getStringValue()}" placeholder="Prefix (default, if empty)" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" autocomplete="off">
                         </div>
                         <div class="mb-3">
                            <button class="btn btn-primary" type="submit" form="settingChangeForm" style="background: var(--bs-blue);">Change</button>
@@ -78,8 +78,7 @@
                   <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="far fa-file-word d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 40px;"></i>
                      <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: #ffffff;">Blacklist</h3>
                      <ul class="list-unstyled border rounded border-dark d-flex flex-row justify-content-start flex-nowrap justify-content-xl-start align-items-xl-center" style="color: var(--bs-white);background: var(--bs-gray-700);font-size: 12px;">
-                        <li class="border rounded border-dark" style="color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin-right: 5px;margin-top: 5px;margin-bottom: 5px;margin-left: 5px;">Item 1</li>
-                        <li class="border rounded border-dark" style="color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin-top: 5px;margin-right: 5px;margin-bottom: 5px;margin-left: 5px;">Item 2</li>
+                        <li th:each="word: ${words}" class="border rounded border-dark" style="color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin-right: 5px;margin-top: 5px;margin-bottom: 5px;margin-left: 5px;" th:value="${word}" th:text="${word}">Item</li>
                      </ul>
                      <form class="d-flex justify-content-center flex-wrap" method="get" enctype="application/x-www-form-urlencoded">
                         <div class="mb-3"><input class="form-control" type="text" name="content" placeholder="Word" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" minlength="5" autocomplete="off" required=""></div>
@@ -89,7 +88,7 @@
                   <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="far fa-user d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;"></i>
                      <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: #ffffff;">Autoroles</h3>
                      <ul class="list-unstyled border rounded border-dark d-flex flex-row justify-content-start flex-nowrap justify-content-xl-start align-items-xl-center" style="color: var(--bs-white);background: var(--bs-gray-700);font-size: 12px;">
-                        <li class="border rounded border-dark" style="color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin-right: 5px;margin-top: 5px;margin-bottom: 5px;margin-left: 5px;">Item 1</li>
+                        <li th:each="role: ${roles}" class="border rounded border-dark" style="color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin-right: 5px;margin-top: 5px;margin-bottom: 5px;margin-left: 5px;" th:value="${role.getId()}" th:text="${role.getName()}">Item</li>
                         <li class="border rounded border-dark" style="color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin-top: 5px;margin-right: 5px;margin-bottom: 5px;margin-left: 5px;">Item 2</li>
                      </ul>
                      <form class="d-flex justify-content-center flex-wrap" method="get">
