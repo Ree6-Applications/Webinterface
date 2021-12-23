@@ -47,7 +47,7 @@ public class DefaultStateController implements StateController
     {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < 10; i++)
-            sb.append(CHARACTERS.charAt(((int) (Math.random() * CHARACTERS.length()))));
+            sb.append(CHARACTERS.charAt(((int) (secureRandom.nextDouble() * CHARACTERS.length()))));
         return sb.toString();
     }
 }
