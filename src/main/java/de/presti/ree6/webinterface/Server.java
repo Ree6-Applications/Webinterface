@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 public class Server {
 
     // Class Instance.
-    private static final Server instance = new Server();
+    private static Server instance = new Server();
 
     // OAuth Instance.
     OAuth2Client oAuth2Client;
@@ -90,7 +90,7 @@ public class Server {
      * @return instance of Server.
      */
     public static Server getInstance() {
-        return instance;
+        return instance == null ? instance = new Server() : instance;
     }
 
     /**
