@@ -117,7 +117,7 @@ public class SQLConnector {
             } catch (SQLException ignore) {
 
                 // Notify if there was an error.
-                Server.getInstance().getLogger().error("Couldn't create " + entry.getKey() + " Table.");
+                Server.getInstance().getLogger().error("Couldn't create {0} Table.", entry.getKey());
             }
         }
 

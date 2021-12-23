@@ -6,7 +6,6 @@ import de.presti.ree6.webinterface.bot.BotUtil;
 import de.presti.ree6.webinterface.bot.BotVersion;
 import de.presti.ree6.webinterface.sql.SQLConnector;
 import de.presti.ree6.webinterface.utils.Config;
-import net.dv8tion.jda.api.JDA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +89,7 @@ public class Server {
      * @return instance of Server.
      */
     public static Server getInstance() {
-        return instance == null ? instance = new Server() : instance;
+        return instance;
     }
 
     /**
