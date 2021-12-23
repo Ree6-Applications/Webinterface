@@ -1,5 +1,6 @@
 package de.presti.ree6.webinterface.sql;
 
+import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.bot.BotInfo;
 import de.presti.ree6.webinterface.invite.InviteContainer;
 import de.presti.ree6.webinterface.utils.Setting;
@@ -781,7 +782,6 @@ public class SQLWorker {
      * Get every Twitch-Notifier that has been setup for the given Guild.
      *
      * @param guildId the ID of the Guild.
-     *
      * @return {@link ArrayList<>} in the first index is the Webhook ID and in the second the Auth-Token.
      */
     public ArrayList<String> getAllTwitchNames(String guildId) {
@@ -1500,8 +1500,8 @@ public class SQLWorker {
     /**
      * Remove an entry from our Database.
      *
-     * @param guildId       the ID of the Guild.
-     * @param inviteCode    the Code of the Invite.
+     * @param guildId    the ID of the Guild.
+     * @param inviteCode the Code of the Invite.
      */
     public void removeInvite(String guildId, String inviteCode) {
         // Check for SQL Statements to prevent SQL Injections.
@@ -2174,7 +2174,7 @@ public class SQLWorker {
         try (Statement statement = sqlConnector.getConnection().createStatement()) {
             statement.executeUpdate(sqlQuery);
         } catch (Exception ignore) {
-            System.out.println("Couldn't send Query to SQL-Server");
+            Server.getInstance().getLogger().error("Couldn't send Query to SQL-Server");
         }
     }
 
