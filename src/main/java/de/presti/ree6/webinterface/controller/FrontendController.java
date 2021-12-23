@@ -62,7 +62,7 @@ public class FrontendController {
      * @param state the local State of the OAuth2 Session.
      * @return {@link ModelAndView} with the redirect data.
      */
-    @RequestMapping(value = "/discord/auth/callback", method = RequestMethod.GET)
+    @GetMapping(value = "/discord/auth/callback")
     public ModelAndView discordLogin(@RequestParam String code, @RequestParam String state) {
         Session session = null;
 
@@ -91,7 +91,7 @@ public class FrontendController {
      * @param model the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel", method = RequestMethod.GET)
+    @GetMapping(path = "/panel")
     public String openPanel(@RequestParam String id, Model model) {
 
         Session session = null;
@@ -137,7 +137,7 @@ public class FrontendController {
      * @param model   the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel/server", method = RequestMethod.GET)
+    @GetMapping(path = "/panel/server")
     public String openServerPanel(@RequestParam String id, @RequestParam String guildID, Model model) {
 
         Session session = null;
@@ -202,7 +202,7 @@ public class FrontendController {
      * @param model   the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel/moderation", method = RequestMethod.GET)
+    @GetMapping(path = "/panel/moderation")
     public String openPanelModeration(@RequestParam String id, @RequestParam String guildID, Model model) {
 
         Session session = null;
@@ -264,7 +264,7 @@ public class FrontendController {
      * @param model          the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel/moderation/role", method = RequestMethod.POST)
+    @PostMapping(path = "/panel/moderation/role")
     public String openPanelModeration(@ModelAttribute(name = "roleChangeForm") RoleChangeForm roleChangeForm, Model model) {
 
         Session session = null;
@@ -330,7 +330,7 @@ public class FrontendController {
      * @param model             the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel/moderation/settings", method = RequestMethod.POST)
+    @PostMapping(path = "/panel/moderation/settings")
     public String openPanelModeration(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
         Session session = null;
 
@@ -398,7 +398,7 @@ public class FrontendController {
      * @param model   the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel/social", method = RequestMethod.GET)
+    @GetMapping(path = "/panel/social")
     public String openPanelSocial(@RequestParam String id, @RequestParam String guildID, Model model) {
 
         Session session = null;
@@ -458,7 +458,7 @@ public class FrontendController {
      * @param model             the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel/social/channel", method = RequestMethod.POST)
+    @PostMapping(path = "/panel/social/channel")
     public String openPanelSocial(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
         System.out.println(channelChangeForm.getType() + " - " + channelChangeForm.getChannel() + " - " + channelChangeForm.getGuild() + " - " + channelChangeForm.getIdentifier());
 
@@ -536,7 +536,7 @@ public class FrontendController {
      * @param model             the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel/social/settings", method = RequestMethod.POST)
+    @PostMapping(path = "/panel/social/settings")
     public String openPanelSocial(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         Session session = null;
@@ -603,7 +603,7 @@ public class FrontendController {
      * @param model   the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel/logging", method = RequestMethod.GET)
+    @GetMapping(path = "/panel/logging")
     public String openPanelLogging(@RequestParam String id, @RequestParam String guildID, Model model) {
 
         Session session = null;
@@ -664,7 +664,7 @@ public class FrontendController {
      * @param model             the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel/logging/channel", method = RequestMethod.POST)
+    @PostMapping(path = "/panel/logging/channel")
     public String openPanelLogging(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
 
         Session session = null;
@@ -733,7 +733,7 @@ public class FrontendController {
      * @param model             the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @RequestMapping(path = "/panel/logging/settings", method = RequestMethod.POST)
+    @PostMapping(path = "/panel/logging/settings")
     public String openPanelLogging(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         Session session = null;
