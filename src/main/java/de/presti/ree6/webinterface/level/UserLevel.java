@@ -100,4 +100,18 @@ public class UserLevel {
     public void setLevel(long level) {
         this.level = level;
     }
+
+    /**
+     * Get the current Progress of the User.
+     * @return the Progress.
+     */
+    public long getProgress() {
+        long tempXp = getXp();
+
+        while (tempXp > 1000) {
+            tempXp -= 1000;
+        }
+
+        return (tempXp / 1000) * 100;
+    }
 }

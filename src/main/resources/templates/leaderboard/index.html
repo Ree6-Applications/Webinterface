@@ -67,7 +67,7 @@
                 </div>
                 <div class="col d-xl-flex">
                     <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
-                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 10%;">10%</div>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:attr="aria-valuenow='${user1.getProgress()}'" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user1.getProgress()} + '%'}">10%</div>
                     </div>
                 </div>
                 <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
@@ -84,7 +84,7 @@
                 </div>
                 <div class="col d-xl-flex">
                     <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
-                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 10%;">10%</div>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:attr="aria-valuenow='${user2.getProgress()}'" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user2.getProgress()} + '%'}">10%</div>
                     </div>
                 </div>
                 <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
@@ -101,7 +101,7 @@
                 </div>
                 <div class="col d-xl-flex">
                     <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
-                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 10%;">10%</div>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:attr="aria-valuenow='${user3.getProgress()}'" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user3.getProgress()} + '%'}">10%</div>
                     </div>
                 </div>
                 <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
@@ -118,7 +118,7 @@
                 </div>
                 <div class="col d-xl-flex">
                     <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
-                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 10%;">10%</div>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:attr="aria-valuenow='${user4.getProgress()}'" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user4.getProgress()} + '%'}">10%</div>
                     </div>
                 </div>
                 <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
@@ -135,7 +135,7 @@
                 </div>
                 <div class="col d-xl-flex">
                     <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
-                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 10%;">10%</div>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:attr="aria-valuenow='${user5.getProgress()}'" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user5.getProgress()} + '%'}">10%</div>
                     </div>
                 </div>
                 <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
