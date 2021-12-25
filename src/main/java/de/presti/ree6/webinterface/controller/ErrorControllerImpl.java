@@ -3,6 +3,7 @@ package de.presti.ree6.webinterface.controller;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.context.request.WebRequest;
 
 @Controller
 public class ErrorControllerImpl implements org.springframework.boot.web.servlet.error.ErrorController {
@@ -25,5 +26,7 @@ public class ErrorControllerImpl implements org.springframework.boot.web.servlet
      * @return {@link String} for Thyme to the HTML Page.
      */
     @GetMapping(value = "/error")
-    public String error() { return "error/index"; }
+    public String error(WebRequest webRequest) {
+        return "error/index";
+    }
 }

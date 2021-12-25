@@ -8,15 +8,20 @@ import de.presti.ree6.webinterface.bot.BotInfo;
 import de.presti.ree6.webinterface.controller.forms.ChannelChangeForm;
 import de.presti.ree6.webinterface.controller.forms.RoleChangeForm;
 import de.presti.ree6.webinterface.controller.forms.SettingChangeForm;
+import de.presti.ree6.webinterface.level.UserLevel;
 import de.presti.ree6.webinterface.utils.RandomUtil;
+import de.presti.ree6.webinterface.utils.Setting;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -78,6 +83,60 @@ public class FrontendController {
         // If the given data was valid and a Session has been created redirect to the panel Site. If not redirect to error.
         if (session != null) return new ModelAndView("redirect:http://localhost:8080/panel?id=" + identifier);
         else return new ModelAndView("redirect:http://localhost:8080/error");
+    }
+
+    //endregion
+
+    //region Leaderboard.
+
+    /**
+     * The Request Mapper for the Guild Leaderboard.
+     *
+     * @param guildId  the ID of the Guild.
+     * @param model the ViewModel.
+     * @return {@link ModelAndView} with the redirect data.
+     */
+    @GetMapping(value = "/leaderboard/chat")
+    public String getLeaderboardChat(@RequestParam String guildId, Model model) {
+
+        Guild guild = BotInfo.botInstance.getGuildById(guildId);
+
+        if(guild != null) model.addAttribute("guild", guild);
+
+        int i = 1;
+        for (String userIds : Server.getInstance().getSqlConnector().getSqlWorker().getTopChat(guildId, 5)) {
+
+            UserLevel userLevel = new UserLevel(userIds, Server.getInstance().getSqlConnector().getSqlWorker().getChatXP(guildId, userIds));
+
+            model.addAttribute("user" + i, userLevel);
+        }
+
+        return "leaderboard/index";
+    }
+
+    /**
+     * The Request Mapper for the Guild Leaderboard.
+     *
+     * @param guildId  the ID of the Guild.
+     * @param model the ViewModel.
+     * @return {@link ModelAndView} with the redirect data.
+     */
+    @GetMapping(value = "/leaderboard/voice")
+    public String getLeaderboardVoice(@RequestParam String guildId, Model model) {
+
+        Guild guild = BotInfo.botInstance.getGuildById(guildId);
+
+        if(guild != null) model.addAttribute("guild", guild);
+
+        int i = 1;
+        for (String userIds : Server.getInstance().getSqlConnector().getSqlWorker().getTopVoice(guildId, 5)) {
+
+            UserLevel userLevel = new UserLevel(userIds, Server.getInstance().getSqlConnector().getSqlWorker().getVoiceXP(guildId, userIds));
+
+            model.addAttribute("user" + i, userLevel);
+        }
+
+        return "leaderboard/index";
     }
 
     //endregion
@@ -176,7 +235,20 @@ public class FrontendController {
 
             // Retrieve every Role and Channel of the Guild and set them as Attribute.
             model.addAttribute("invites", Server.getInstance().getSqlConnector().getSqlWorker().getInvites(guild.getId()));
-            model.addAttribute("commandstats", "");
+
+            StringBuilder commandStats = new StringBuilder();
+
+            for (Map.Entry<String, Long> entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildID).entrySet()) {
+                commandStats.append(entrySet.getKey()).append(" - ").append(entrySet.getValue()).append(", ");
+            }
+
+            if (commandStats.length() > 0) {
+                commandStats = new StringBuilder(commandStats.substring(0, commandStats.length() - 2));
+            } else {
+                commandStats = new StringBuilder("None.");
+            }
+
+            model.addAttribute("commandstats", commandStats.toString());
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return MAIN_PATH;
@@ -244,6 +316,17 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
             model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
                     .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
+            model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guildID, "chatprefix"));
+            model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
+
+            List<Role> roles = new ArrayList<>();
+
+            for (String ids : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
+                roles.add(guild.getRoleById(ids));
+            }
+
+            model.addAttribute("autoroles", roles);
+            model.addAttribute("muterole", guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guildID)));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return MAIN_PATH;
@@ -311,6 +394,17 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
             model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
                     .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
+            model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guild.getId(), "chatprefix"));
+            model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
+
+            List<Role> roles = new ArrayList<>();
+
+            for (String ids : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
+                roles.add(guild.getRoleById(ids));
+            }
+
+            model.addAttribute("autoroles", roles);
+            model.addAttribute("muterole", guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId())));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return MAIN_PATH;
@@ -352,7 +446,38 @@ public class FrontendController {
             if (guild == null) return ERROR_PATH;
 
             // Change the Setting Data.
-            Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
+            if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("addBadWord") &&
+                    !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeBadWord") &&
+                    !settingChangeForm.getSetting().getName().equalsIgnoreCase("addAutoRole") &&
+                    !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeAutoRole")) {
+                Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
+            } else {
+                switch (settingChangeForm.getSetting().getName()) {
+                    case "addBadWord": {
+                        Server.getInstance().getSqlConnector().getSqlWorker().addChatProtectorWord(settingChangeForm.getGuild(),
+                                settingChangeForm.getSetting().getStringValue());
+                        break;
+                    }
+
+                    case "removeBadWord": {
+                        Server.getInstance().getSqlConnector().getSqlWorker().removeChatProtectorWord(settingChangeForm.getGuild(),
+                                settingChangeForm.getSetting().getStringValue());
+                        break;
+                    }
+
+                    case "addAutoRole": {
+                        Server.getInstance().getSqlConnector().getSqlWorker().addAutoRole(settingChangeForm.getGuild(),
+                                settingChangeForm.getSetting().getStringValue());
+                        break;
+                    }
+
+                    case "removeAutoRole": {
+                        Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(settingChangeForm.getGuild(),
+                                settingChangeForm.getSetting().getStringValue());
+                        break;
+                    }
+                }
+            }
 
             // Set the Identifier.
             model.addAttribute("identifier", settingChangeForm.getIdentifier());
@@ -374,6 +499,17 @@ public class FrontendController {
             model.addAttribute("channels", guild.getTextChannels());
             model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
                     .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
+            model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guild.getId(), "chatprefix"));
+            model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
+
+            List<Role> roles = new ArrayList<>();
+
+            for (String ids : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
+                roles.add(guild.getRoleById(ids));
+            }
+
+            model.addAttribute("autoroles", roles);
+            model.addAttribute("muterole", guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId())));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return MAIN_PATH;
@@ -438,6 +574,7 @@ public class FrontendController {
             // Retrieve every Role and Channel of the Guild and set them as Attribute.
             model.addAttribute("roles", guild.getRoles());
             model.addAttribute("channels", guild.getTextChannels());
+            model.addAttribute("joinMessage", new Setting("joinMessage", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guildID)));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return MAIN_PATH;
@@ -516,6 +653,7 @@ public class FrontendController {
             // Retrieve every Role and Channel of the Guild and set them as Attribute.
             model.addAttribute("roles", guild.getRoles());
             model.addAttribute("channels", guild.getTextChannels());
+            model.addAttribute("joinMessage", new Setting("joinMessage", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return MAIN_PATH;
@@ -558,7 +696,12 @@ public class FrontendController {
             if (guild == null) return ERROR_PATH;
 
             // Change the setting Data.
-            Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
+            if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("joinMessage")) {
+                Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
+            } else {
+                Server.getInstance().getSqlConnector().getSqlWorker().setMessage(settingChangeForm.getGuild(),
+                        settingChangeForm.getSetting().getStringValue());
+            }
 
             // Set the Identifier.
             model.addAttribute("identifier", settingChangeForm.getIdentifier());
@@ -578,6 +721,7 @@ public class FrontendController {
             // Retrieve every Role and Channel of the Guild and set them as Attribute.
             model.addAttribute("roles", guild.getRoles());
             model.addAttribute("channels", guild.getTextChannels());
+            model.addAttribute("joinMessage", new Setting("joinMessage", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) return MAIN_PATH;

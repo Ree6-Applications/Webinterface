@@ -1934,8 +1934,6 @@ public class SQLWorker {
         // Create the Chat Prefix Setting.
         if (!hasSetting(guildId, "chatprefix")) setSetting(guildId, new Setting("chatprefix", "ree!"));
 
-        // TODO add Commands Setting creation.
-
         // Create Log Settings.
         if (!hasSetting(guildId, "logging_invite")) setSetting(guildId, "logging_invite", true);
         if (!hasSetting(guildId, "logging_memberjoin")) setSetting(guildId, "logging_memberjoin", true);

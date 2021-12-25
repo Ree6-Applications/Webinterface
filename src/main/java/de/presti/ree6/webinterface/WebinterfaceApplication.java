@@ -16,6 +16,9 @@ public class WebinterfaceApplication {
     public static void main(String[] args) {
         // Runt the Application.
         SpringApplication.run(WebinterfaceApplication.class, args);
+
+        // Initialize the Server class
+        new Server();
     }
 
 }

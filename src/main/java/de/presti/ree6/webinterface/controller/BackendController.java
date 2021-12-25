@@ -3,17 +3,20 @@ package de.presti.ree6.webinterface.controller;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import de.presti.ree6.webinterface.Server;
+import de.presti.ree6.webinterface.bot.BotInfo;
+import net.dv8tion.jda.api.entities.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * Used as an BackendController for API Request for Ree6.
  */
 @RestController
 public class BackendController {
-
-    //TODO add more endpoints and make them work.
 
     //region API 1.0
 
@@ -31,9 +34,66 @@ public class BackendController {
 
         jsonObject.addProperty("count", count);
 
-        JsonArray jsonArray = new JsonArray();
+        JsonArray chatLeaderboardArray = new JsonArray();
 
-        jsonObject.add("list", jsonArray);
+        JsonArray voiceLeaderboardArray = new JsonArray();
+
+        for (String entry : Server.getInstance().getSqlConnector().getSqlWorker().getTopChat(guildId, count)) {
+            JsonObject userObject = new JsonObject();
+
+            User user = BotInfo.botInstance.getUserById(entry);
+
+            if (user == null) continue;
+
+            userObject.addProperty("user.name", user.getName());
+            userObject.addProperty("user.tag", user.getAsTag());
+
+            long xp = Server.getInstance().getSqlConnector().getSqlWorker().getChatXP(guildId, entry);
+
+            userObject.addProperty("xp",
+                    xp);
+
+            int level = 1;
+
+            while (xp > 1000) {
+                xp -= 1000;
+                level++;
+            }
+
+            userObject.addProperty("level", level);
+
+            chatLeaderboardArray.add(userObject);
+        }
+
+        for (String entry : Server.getInstance().getSqlConnector().getSqlWorker().getTopVoice(guildId, count)) {
+            JsonObject userObject = new JsonObject();
+
+            User user = BotInfo.botInstance.getUserById(entry);
+
+            if (user == null) continue;
+
+            userObject.addProperty("user.name", user.getName());
+            userObject.addProperty("user.tag", user.getAsTag());
+
+            long xp = Server.getInstance().getSqlConnector().getSqlWorker().getVoiceXP(guildId, entry);
+
+            userObject.addProperty("xp",
+                    xp);
+
+            int level = 1;
+
+            while (xp > 1000) {
+                xp -= 1000;
+                level++;
+            }
+
+            userObject.addProperty("level", level);
+
+            voiceLeaderboardArray.add(userObject);
+        }
+
+        jsonObject.add("list.chat", chatLeaderboardArray);
+        jsonObject.add("list.voice", voiceLeaderboardArray);
 
         return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
     }
@@ -52,14 +112,32 @@ public class BackendController {
 
         JsonObject voiceJsonObject = new JsonObject();
 
-        voiceJsonObject.addProperty("voice.xp", 0L);
-        voiceJsonObject.addProperty("voice.level", 0L);
+        long xp = Server.getInstance().getSqlConnector().getSqlWorker().getVoiceXP(guildID, userID);
+
+        int level = 1;
+
+        while (xp > 1000) {
+            xp -= 1000;
+            level++;
+        }
+
+        voiceJsonObject.addProperty("voice.xp", xp);
+        voiceJsonObject.addProperty("voice.level", level);
         voiceJsonObject.addProperty("voice.rank", 0L);
 
         JsonObject chatJsonObject = new JsonObject();
 
-        chatJsonObject.addProperty("chat.xp", 0L);
-        chatJsonObject.addProperty("chat.level", 0L);
+        xp = Server.getInstance().getSqlConnector().getSqlWorker().getChatXP(guildID, userID);
+
+        level = 1;
+
+        while (xp > 1000) {
+            xp -= 1000;
+            level++;
+        }
+
+        chatJsonObject.addProperty("chat.xp", xp);
+        chatJsonObject.addProperty("chat.level", level);
         chatJsonObject.addProperty("chat.rank", 0L);
 
         jsonObject.add("chat", chatJsonObject);
@@ -67,6 +145,80 @@ public class BackendController {
 
         return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
     }
+    //endregion
+
+    //region Stats
+
+    //region Global
+
+    /**
+     * Request mapper for a Command Stats Request.
+     * @param command the Name of the Command.
+     * @return {@link String} a stringified JsonObject.
+     */
+    @GetMapping(value = "/api/v1/stats/command", produces = "application/json")
+    public String getStatsCommand(@RequestParam String command) {
+        JsonObject jsonObject = new JsonObject();
+
+        jsonObject.addProperty("command", command);
+        jsonObject.addProperty("usage", Server.getInstance().getSqlConnector().getSqlWorker().getStatsCommandGlobal(command));
+
+        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
+    }
+
+    /**
+     * Request mapper for a Command Stats Request.
+     * @return {@link String} a stringified JsonObject.
+     */
+    @GetMapping(value = "/api/v1/stats/all", produces = "application/json")
+    public String getStatsGlobal() {
+        JsonObject jsonObject = new JsonObject();
+
+        for (Map.Entry<String, Long> entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStatsGlobal().entrySet()) {
+            jsonObject.addProperty(entrySet.getKey(), entrySet.getValue());
+        }
+
+        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
+    }
+
+    //endregion
+
+    //region Guild.
+
+    /**
+     * Request mapper for a Command Guild Stats Request.
+     * @param guildID the GuildID of the wanted Guild.
+     * @param command the Name of the Command.
+     * @return {@link String} a stringified JsonObject.
+     */
+    @GetMapping(value = "/api/v1/stats/guild/command", produces = "application/json")
+    public String getStatsGuildCommand(@RequestParam String guildID, @RequestParam String command) {
+        JsonObject jsonObject = new JsonObject();
+
+        jsonObject.addProperty("command", command);
+        jsonObject.addProperty("usage", Server.getInstance().getSqlConnector().getSqlWorker().getStatsCommand(guildID, command));
+
+        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
+    }
+
+    /**
+     * Request mapper for a Guild Stats Request.
+     * @param guildID the GuildID of the wanted Guild.
+     * @return {@link String} a stringified JsonObject.
+     */
+    @GetMapping(value = "/api/v1/stats/guild/all", produces = "application/json")
+    public String getStatsGuildAll(@RequestParam String guildID) {
+        JsonObject jsonObject = new JsonObject();
+
+        for (Map.Entry<String, Long> entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildID).entrySet()) {
+            jsonObject.addProperty(entrySet.getKey(), entrySet.getValue());
+        }
+
+        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
+    }
+
+    //endregion
+
     //endregion
 
     //endregion

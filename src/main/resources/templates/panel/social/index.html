@@ -96,7 +96,7 @@
                         <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
                             <option value="none" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">USE REE!TWITCH ON THE SERVER</option>
                         </select></div>
-                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" disabled style="background: var(--bs-blue);">Change</button></div>
                     </form>
                 </div>
                 <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><i class="fab fa-youtube d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;font-size: 35px;"></i>
@@ -105,7 +105,7 @@
                         <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
                             <option value="none" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">USE REE!SETUP ON THE SERVER</option>
                         </select></div>
-                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" disabled style="background: var(--bs-blue);">Change</button></div>
                     </form>
                 </div>
                 <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><i class="fab fa-twitter d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;font-size: 35px;"></i>
@@ -114,7 +114,7 @@
                         <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
                             <option value="none" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">USE REE!SETUP ON THE SERVER</option>
                         </select></div>
-                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" disabled style="background: var(--bs-blue);">Change</button></div>
                     </form>
                 </div>
                 <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-chat d-flex d-sm-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-sm-center align-items-sm-center justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;">
@@ -125,7 +125,7 @@
                         <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
                             <option value="none" selected="" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">USE REE!SETUP ON THE SERVER</option>
                         </select></div>
-                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" disabled style="background: var(--bs-blue);">Change</button></div>
                     </form>
                 </div>
                 <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><i class="far fa-hand-peace d-flex d-sm-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-sm-center align-items-sm-center justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;font-size: 35px;"></i>
@@ -144,8 +144,11 @@
                 </div>
                 <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><i class="material-icons d-flex d-sm-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-sm-center align-items-sm-center justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;font-size: 35px;">message</i>
                     <h3 class="d-flex d-sm-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-sm-center align-items-sm-center justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">Welcome-Message</h3>
-                    <form class="d-flex justify-content-center flex-wrap" method="post">
-                        <div class="mb-3"><input class="border-dark form-control" type="text" name="content" placeholder="Message-Content" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" minlength="5" required=""></div>
+                    <form th:action="@{/panel/social/settings}" th:object="${settingChangeForm}" class="d-flex justify-content-center flex-wrap" method="post">
+                        <input type="hidden" name="name" value="joinMessage" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <div class="mb-3"><input class="border-dark form-control" type="text" name="value" th:value="${joinMessage.getStringValue()}" placeholder="Message-Content" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" minlength="5" required=""></div>
                         <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Change</button></div>
                     </form>
                 </div>

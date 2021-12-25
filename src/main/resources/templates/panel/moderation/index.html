@@ -68,7 +68,7 @@
                         <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
                         <input type="hidden" name="identifierSession" th:value="${identifier}" />
                         <div class="mb-3">
-                           <input class="form-control" type="text" name="value" th:value="${prefixSetting.getStringValue()}" placeholder="Prefix (default, if empty)" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" autocomplete="off">
+                           <input class="form-control" type="text" name="value" th:value="${prefixSetting.getStringValue()}" placeholder="Prefix (default, ree!)" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" autocomplete="off">
                         </div>
                         <div class="mb-3">
                            <button class="btn btn-primary" type="submit" form="settingChangeForm" style="background: var(--bs-blue);">Change</button>
@@ -76,23 +76,43 @@
                      </form>
                   </div>
                   <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="far fa-file-word d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 40px;"></i>
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" method="post" id="liForm">
+                        <input type="hidden" id="liFormName" name="name" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <input type="hidden" id="liFormValue" name="value" />
+                     </form>
                      <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: #ffffff;">Blacklist</h3>
-                     <ul class="list-unstyled border rounded border-dark d-flex flex-row justify-content-start flex-nowrap justify-content-xl-start align-items-xl-center" style="color: var(--bs-white);background: var(--bs-gray-700);font-size: 12px;">
-                        <li th:each="word: ${words}" class="border rounded border-dark" style="color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin-right: 5px;margin-top: 5px;margin-bottom: 5px;margin-left: 5px;" th:value="${word}" th:text="${word}">Item</li>
+                     <ul class="list-unstyled border rounded border-dark flex-row justify-content-start flex-nowrap justify-content-xl-start align-items-xl-center" style="min-height: 40px; color: var(--bs-white);background: var(--bs-gray-700);font-size: 12px;">
+                        <li th:each="word: ${words}" class="border rounded border-dark" style="pointer-events: auto; display: inline-block;color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin: 5px;" th:text="${word}" th:attr="onclick='(function () {
+                        document.getElementById(\'liFormName\').value = \'removeBadWord\';
+                        document.getElementById(\'liFormValue\').value = \'' + ${word} + '\';
+                        document.forms[\'liForm\'].submit();
+                        })()'">Test
+                        </li>
                      </ul>
-                     <form class="d-flex justify-content-center flex-wrap" method="get" enctype="application/x-www-form-urlencoded">
-                        <div class="mb-3"><input class="form-control" type="text" name="content" placeholder="Word" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" minlength="5" autocomplete="off" required=""></div>
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" class="d-flex justify-content-center flex-wrap" method="post">
+                        <input type="hidden" name="name" value="addBadWord" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <div class="mb-3"><input class="form-control" type="text" name="value" placeholder="Word" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" minlength="2" autocomplete="off" required=""></div>
                         <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Add</button></div>
                      </form>
                   </div>
                   <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="far fa-user d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;"></i>
                      <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: #ffffff;">Autoroles</h3>
-                     <ul class="list-unstyled border rounded border-dark d-flex flex-row justify-content-start flex-nowrap justify-content-xl-start align-items-xl-center" style="color: var(--bs-white);background: var(--bs-gray-700);font-size: 12px;">
-                        <li th:each="role: ${roles}" class="border rounded border-dark" style="color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin-right: 5px;margin-top: 5px;margin-bottom: 5px;margin-left: 5px;" th:value="${role.getId()}" th:text="${role.getName()}">Item</li>
-                        <li class="border rounded border-dark" style="color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin-top: 5px;margin-right: 5px;margin-bottom: 5px;margin-left: 5px;">Item 2</li>
+                     <ul class="list-unstyled border rounded border-dark flex-row justify-content-start flex-nowrap justify-content-xl-start align-items-xl-center" style="min-height: 40px; color: var(--bs-white);background: var(--bs-gray-700);font-size: 12px;">
+                        <li th:each="role: ${autoroles}" class="border rounded border-dark" style="display: inline-block;color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin: 5px;" th:value="${role.getId()}" th:text="${role.getName()}" th:attr="onclick='(function () {
+                        document.getElementById(\'liFormName\').value = \'removeAutoRole\';
+                        document.getElementById(\'liFormValue\').value = \'' + ${role.getId()} + '\';
+                        document.forms[\'liForm\'].submit();
+                        })()'">Item</li>
                      </ul>
-                     <form class="d-flex justify-content-center flex-wrap" method="get">
-                        <div class="mb-3"><select class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" class="d-flex justify-content-center flex-wrap" method="post">
+                        <input type="hidden" name="name" value="addAutoRole" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <div class="mb-3"><select name="value" class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
                            <option th:each="role: ${roles}" th:value="${role.getId()}" th:text="${role.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
                         </select></div>
                         <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Add</button></div>
@@ -112,7 +132,7 @@
                            <div class="mb-3">
                               <select name="role" class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
                                  <option value="0" selected class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
-                                 <option th:each="role: ${roles}" th:value="${role.getId()}" th:text="${role.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
+                                 <option th:each="role: ${roles}" th:value="${role.getId()}" th:text="${role.getName()}" th:selected="${role == muterole}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
                               </select>
                            </div>
                         </form>
@@ -121,10 +141,10 @@
                   <div th:each="command: ${commands}" class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="material-icons d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">border_color</i>
                      <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: #ffffff;" th:text="${command.getName().substring(8)}">Command</h3>
                      <form th:if="${!command.getBooleanValue()}">
-                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-blue);" title="Activate"><i class="fas fa-check"></i></button></div>
+                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-green);" title="Activate"><i class="fas fa-check"></i></button></div>
                      </form>
                      <form th:if="${command.getBooleanValue()}">
-                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-blue);" title="Deactivate"><i class="fas fa-times"></i></button></div>
+                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-red);" title="Deactivate"><i class="fas fa-times"></i></button></div>
                      </form>
                   </div>
                </div><!-- End: Features -->

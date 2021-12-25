@@ -88,8 +88,8 @@
                         <input type="hidden" name="identifierSession" th:value="${identifier}" />
                      </form>
 
-                     <div th:if="${!log.getBooleanValue()}" class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-blue);" th:form="${log.getName()}" title="Activate"><i class="fas fa-check"></i></button></div>
-                     <div th:if="${log.getBooleanValue()}" class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-blue);" th:form="${log.getName()}" title="Deactivate"><i class="fas fa-times"></i></button></div>
+                     <div th:if="${!log.getBooleanValue()}" class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-green);" th:form="${log.getName()}" title="Activate"><i class="fas fa-check"></i></button></div>
+                     <div th:if="${log.getBooleanValue()}" class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-red);" th:form="${log.getName()}" title="Deactivate"><i class="fas fa-times"></i></button></div>
                   </div>
                </div><!-- End: Features -->
             </div>
