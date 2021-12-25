@@ -1,7 +1,11 @@
 package de.presti.ree6.webinterface;
 
+import org.springframework.boot.Banner;
+import org.springframework.boot.ImageBanner;
+import org.springframework.boot.ResourceBanner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.io.Resource;
 
 /**
  * Base class used by SpringBoot to boot up the Application.
@@ -14,8 +18,12 @@ public class WebinterfaceApplication {
      * @param args {@link String[]} used as List of the Arguments given at the start of the Application.
      */
     public static void main(String[] args) {
-        // Runt the Application.
-        SpringApplication.run(WebinterfaceApplication.class, args);
+
+        // Initialize SpringApplication.
+        SpringApplication application = new SpringApplication(WebinterfaceApplication.class);
+
+        // Run the Application.
+        application.run(args);
 
         // Initialize the Server class
         new Server();
