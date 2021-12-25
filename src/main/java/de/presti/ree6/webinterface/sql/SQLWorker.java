@@ -8,7 +8,9 @@ import de.presti.ree6.webinterface.utils.Setting;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A Class to actually handle the SQL data.
@@ -1991,7 +1993,7 @@ public class SQLWorker {
         }
 
         // Creating a SQL Statement to get an entry in the CommandStats Table by Guild and Command name.
-        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM CommandStats WHERE GID='" + guildId + "' AND COMMAND='" + command + "'").executeQuery()) {
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM GuildStats WHERE GID='" + guildId + "' AND COMMAND='" + command + "'").executeQuery()) {
 
             // Return if found.
             if (rs != null && rs.next()) return Long.parseLong(rs.getString("USES"));
@@ -2011,15 +2013,22 @@ public class SQLWorker {
         }
 
         // Creating a SQL Statement to get every entry in the CommandStats Table by the Guild.
-        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM CommandStats WHERE GID='" + guildId + "' ORDER BY cast(USES as unsigned) DESC LIMIT 5;").executeQuery()) {
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM GuildStats WHERE GID='" + guildId + "' ORDER BY cast(uses as unsigned) DESC LIMIT 5;").executeQuery()) {
 
             // Return if found.
             while (rs != null && rs.next()) statsMap.put(rs.getString("COMMAND"), Long.parseLong(rs.getString("USES")));
         } catch (Exception ignore) {
         }
 
+        HashMap<String, Long> sortedStatsMap = new HashMap<>();
+
+        statsMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEachOrdered(x -> sortedStatsMap.put(x.getKey(), x.getValue()));
+
         // Return the HashMap.
-        return statsMap;
+        return sortedStatsMap;
     }
 
     public HashMap<String, Long> getStatsGlobal() {
@@ -2028,15 +2037,22 @@ public class SQLWorker {
         HashMap<String, Long> statsMap = new HashMap<>();
 
         // Creating a SQL Statement to get every entry in the CommandStats Table.
-        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM CommandStats ORDER BY cast(USES as unsigned) DESC LIMIT 5;").executeQuery()) {
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM CommandStats ORDER BY cast(uses as unsigned) DESC LIMIT 5;").executeQuery()) {
 
             // Return if found.
             while (rs != null && rs.next()) statsMap.put(rs.getString("COMMAND"), Long.parseLong(rs.getString("USES")));
         } catch (Exception ignore) {
         }
 
+        HashMap<String, Long> sortedStatsMap = new HashMap<>();
+
+        statsMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEachOrdered(x -> sortedStatsMap.put(x.getKey(), x.getValue()));
+
         // Return the HashMap.
-        return statsMap;
+        return sortedStatsMap;
     }
 
     /**
