@@ -5,6 +5,7 @@ import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
 import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.bot.BotInfo;
+import de.presti.ree6.webinterface.bot.BotVersion;
 import de.presti.ree6.webinterface.controller.forms.ChannelChangeForm;
 import de.presti.ree6.webinterface.controller.forms.RoleChangeForm;
 import de.presti.ree6.webinterface.controller.forms.SettingChangeForm;
@@ -57,7 +58,9 @@ public class FrontendController {
      */
     @GetMapping("/discord/auth")
     public ModelAndView startDiscordAuth() {
-        return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL("http://cp.ree6.de/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
+        return new ModelAndView("redirect:" +
+                Server.getInstance().getOAuth2Client().generateAuthorizationURL((BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") +
+                        "/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
     }
 
     /**
@@ -81,8 +84,8 @@ public class FrontendController {
         }
 
         // If the given data was valid and a Session has been created redirect to the panel Site. If not redirect to error.
-        if (session != null) return new ModelAndView("redirect:http://cp.ree6.de/panel?id=" + identifier);
-        else return new ModelAndView("redirect:http://cp.ree6.de/error");
+        if (session != null) return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/panel?id=" + identifier);
+        else return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/error");
     }
 
     //endregion
@@ -108,7 +111,12 @@ public class FrontendController {
 
             UserLevel userLevel = new UserLevel(userIds, Server.getInstance().getSqlConnector().getSqlWorker().getChatXP(guildId, userIds));
 
+            try {
+                userLevel.setUser(BotInfo.botInstance.retrieveUserById(userIds).complete());
+            } catch (Exception ignore) {}
+
             model.addAttribute("user" + i, userLevel);
+            i++;
         }
 
         return "leaderboard/index";
@@ -133,7 +141,12 @@ public class FrontendController {
 
             UserLevel userLevel = new UserLevel(userIds, Server.getInstance().getSqlConnector().getSqlWorker().getVoiceXP(guildId, userIds));
 
+            try {
+                userLevel.setUser(BotInfo.botInstance.retrieveUserById(userIds).complete());
+            } catch (Exception ignore) {}
+
             model.addAttribute("user" + i, userLevel);
+            i++;
         }
 
         return "leaderboard/index";

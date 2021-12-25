@@ -59,88 +59,88 @@
             </div>
             <!-- End: Intro -->
             <hr style="background: rgba(0,0,0,0);">
-            <div th:if="${user1 != null}" class="row" style="border-style: solid;border-color: #282d32;">
+            <div th:if="${user1 != null && user1.getUser() != null}" class="row" style="border-style: solid;border-color: #282d32;">
                 <div class="col-auto d-flex d-xl-flex my-auto"><i class="fas fa-crown" style="color: var(--bs-yellow);"></i></div>
-                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user1.getUser().getAvatarUrl()}" src="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63" loading="lazy" width="100"></div>
+                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user1.getUser().getEffectiveAvatarUrl()}" src="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63" loading="lazy" width="100"></div>
                 <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
                     <h4 style="border-color: #ffffff;color: #ffffff;" th:text="${user1.getUser().getName()}">Name</h4>
                 </div>
                 <div class="col d-xl-flex">
                     <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
-                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:attr="aria-valuenow='${user1.getProgress()}'" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user1.getProgress()} + '%'}">10%</div>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:aria-valuenow="${user5.getProgress()}" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user1.getProgress()} + '%'}">10%</div>
                     </div>
                 </div>
                 <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
-                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level' + ${user1.getLevel()}}">Level:</p>
-                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP' + ${user1.getXP()}}">XP:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level: ' + ${user1.getLevel()}}">Level:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP: ' + ${user1.getXp()}}">XP:</p>
                 </div>
             </div>
             <hr style="background: rgba(0,0,0,0);">
-            <div th:if="${user2 != null}" class="row" style="border-style: solid;border-color: #282d32;">
+            <div th:if="${user2 != null && user2.getUser() != null}" class="row" style="border-style: solid;border-color: #282d32;">
                 <div class="col-auto d-flex d-xl-flex my-auto"><i class="fas fa-crown" style="color: #a2a8ae;border-color: var(--bs-gray-600);"></i></div>
-                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user2.getUser().getAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63" loading="lazy" width="100"></div>
+                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user2.getUser().getEffectiveAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63" loading="lazy" width="100"></div>
                 <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
                     <h4 style="border-color: #ffffff;color: #ffffff;" th:text="${user2.getUser().getName()}">Name</h4>
                 </div>
                 <div class="col d-xl-flex">
                     <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
-                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:attr="aria-valuenow='${user2.getProgress()}'" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user2.getProgress()} + '%'}">10%</div>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:aria-valuenow="${user5.getProgress()}" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user2.getProgress()} + '%'}">10%</div>
                     </div>
                 </div>
                 <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
-                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level' + ${user2.getLevel()}}">Level:</p>
-                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP' + ${user2.getXP()}}">XP:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level: ' + ${user2.getLevel()}}">Level:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP: ' + ${user2.getXp()}}">XP:</p>
                 </div>
             </div>
             <hr style="background: rgba(0,0,0,0);">
-            <div th:if="${user3 != null}" class="row" style="border-style: solid;border-color: #282d32;">
+            <div th:if="${user3 != null && user3.getUser() != null}" class="row" style="border-style: solid;border-color: #282d32;">
                 <div class="col-auto d-flex d-xl-flex my-auto"><i class="fas fa-crown" style="color: #D2691E;border-color: var(--bs-gray-600);"></i></div>
-                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user3.getUser().getAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63" loading="lazy" width="100"></div>
+                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user3.getUser().getEffectiveAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63" loading="lazy" width="100"></div>
                 <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
                     <h4 style="border-color: #ffffff;color: #ffffff;" th:text="${user3.getUser().getName()}">Name</h4>
                 </div>
                 <div class="col d-xl-flex">
                     <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
-                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:attr="aria-valuenow='${user3.getProgress()}'" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user3.getProgress()} + '%'}">10%</div>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:aria-valuenow="${user5.getProgress()}" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user3.getProgress()} + '%'}">10%</div>
                     </div>
                 </div>
                 <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
                     <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level' + ${user3.getLevel()}}">Level:</p>
-                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP' + ${user3.getXP()}}">XP:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP' + ${user3.getXp()}}">XP:</p>
                 </div>
             </div>
             <hr style="background: rgba(0,0,0,0);">
-            <div th:if="${user4 != null}" class="row" style="border-style: solid;border-color: #282d32;">
+            <div th:if="${user4 != null && user4.getUser() != null}" class="row" style="border-style: solid;border-color: #282d32;">
                 <div class="col-auto d-flex d-xl-flex my-auto"><i class="material-icons" style="color: var(--bs-white);border-color: var(--bs-gray-600);">looks_4</i></div>
-                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user4.getUser().getAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63" loading="lazy" width="100"></div>
+                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user4.getUser().getEffectiveAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63" loading="lazy" width="100"></div>
                 <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
                     <h4 style="border-color: #ffffff;color: #ffffff;" th:text="${user4.getUser().getName()}">Name</h4>
                 </div>
                 <div class="col d-xl-flex">
                     <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
-                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:attr="aria-valuenow='${user4.getProgress()}'" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user4.getProgress()} + '%'}">10%</div>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:aria-valuenow="${user5.getProgress()}" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user4.getProgress()} + '%'}">10%</div>
                     </div>
                 </div>
                 <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
-                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level' + ${user4.getLevel()}}">Level:</p>
-                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP' + ${user4.getXP()}}">XP:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level: ' + ${user4.getLevel()}}">Level:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP: ' + ${user4.getXp()}}">XP:</p>
                 </div>
             </div>
             <hr style="background: rgba(0,0,0,0);">
-            <div th:if="${user5 != null}" class="row" style="border-style: solid;border-color: #282d32;">
+            <div th:if="${user5 != null && user5.getUser() != null}" class="row" style="border-style: solid;border-color: #282d32;">
                 <div class="col-auto d-flex d-xl-flex my-auto"><i class="material-icons" style="color: var(--bs-white);border-color: var(--bs-gray-600);">looks_5</i></div>
-                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user5.getUser().getAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63" loading="lazy" width="100"></div>
+                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user5.getUser().getEffectiveAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png?h=30aa8b66578eadcbddba12405b85eb63" loading="lazy" width="100"></div>
                 <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
                     <h4 style="border-color: #ffffff;color: #ffffff;" th:text="${user5.getUser().getName()}">Name</h4>
                 </div>
                 <div class="col d-xl-flex">
                     <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
-                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:attr="aria-valuenow='${user5.getProgress()}'" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user5.getProgress()} + '%'}">10%</div>
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:aria-valuenow="${user5.getProgress()}" aria-valuemin="0" aria-valuemax="100" style="width: 10%;" th:text="@{${user5.getProgress()} + '%'}">10%</div>
                     </div>
                 </div>
                 <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
-                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level' + ${user5.getLevel()}}">Level:</p>
-                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP' + ${user5.getXP()}}">XP:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level: ' + ${user5.getLevel()}}">Level:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP: ' + ${user5.getXp()}}">XP:</p>
                 </div>
             </div>
             <hr style="background: rgba(0,0,0,0);">

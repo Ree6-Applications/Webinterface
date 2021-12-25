@@ -9,6 +9,9 @@ import net.dv8tion.jda.api.entities.User;
  */
 public class UserLevel {
 
+    // The ID of the User.
+    String Id;
+
     // The User.
     User user;
 
@@ -22,7 +25,7 @@ public class UserLevel {
      * @param xp his XP count.
      */
     public UserLevel(String id, long xp) {
-        this.user = BotInfo.botInstance.getUserById(id);
+        this.Id = id;
         this.xp = xp;
 
         long tempXp = xp;
@@ -42,9 +45,27 @@ public class UserLevel {
      * @param level his Level.
      */
     public UserLevel(String id, long xp, long level) {
-        this.user = BotInfo.botInstance.getUserById(id);
+        this.Id = id;
         this.xp = xp;
         this.level = level;
+    }
+
+    /**
+     * Get the ID of the wanted User.
+     *
+     * @return the ID.
+     */
+    public String getId() {
+        return Id;
+    }
+
+    /**
+     * Change the ID of the User.
+     *
+     * @param id the new ID.
+     */
+    public void setId(String id) {
+        this.Id = id;
     }
 
     /**
@@ -57,12 +78,12 @@ public class UserLevel {
     }
 
     /**
-     * Change the ID of the User.
+     * Change the User Entity of the User.
      *
-     * @param id the new ID.
+     * @param user the new User.
      */
-    public void setUser(String id) {
-        this.user = BotInfo.botInstance.getUserById(id);
+    public void setUser(User user) {
+        this.user = user;
     }
 
     /**
@@ -105,13 +126,13 @@ public class UserLevel {
      * Get the current Progress of the User.
      * @return the Progress.
      */
-    public long getProgress() {
-        long tempXp = getXp();
+    public int getProgress() {
+        float tempXp = getXp();
 
         while (tempXp > 1000) {
             tempXp -= 1000;
         }
 
-        return (tempXp / 1000) * 100;
+        return Math.round(((tempXp / 1000F) * 100F));
     }
 }
