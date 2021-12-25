@@ -57,7 +57,7 @@ public class FrontendController {
      */
     @GetMapping("/discord/auth")
     public ModelAndView startDiscordAuth() {
-        return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL("http://localhost:8080/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
+        return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL("http://cp.ree6.de/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
     }
 
     /**
@@ -81,8 +81,8 @@ public class FrontendController {
         }
 
         // If the given data was valid and a Session has been created redirect to the panel Site. If not redirect to error.
-        if (session != null) return new ModelAndView("redirect:http://localhost:8080/panel?id=" + identifier);
-        else return new ModelAndView("redirect:http://localhost:8080/error");
+        if (session != null) return new ModelAndView("redirect:http://cp.ree6.de/panel?id=" + identifier);
+        else return new ModelAndView("redirect:http://cp.ree6.de/error");
     }
 
     //endregion
