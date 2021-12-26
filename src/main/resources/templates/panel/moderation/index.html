@@ -140,10 +140,18 @@
                   </div>
                   <div th:each="command: ${commands}" class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="material-icons d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">border_color</i>
                      <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: #ffffff;" th:text="${command.getName().substring(8)}">Command</h3>
-                     <form th:if="${!command.getBooleanValue()}">
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" th:id="${command.getName()}" class="d-flex justify-content-center flex-wrap" method="post" th:if="${!command.getBooleanValue()}">
+                        <input type="hidden" name="name" th:value="${command.getName()}" />
+                        <input type="hidden" name="value" th:value="${!command.getBooleanValue()}" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
                         <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-green);" title="Activate"><i class="fas fa-check"></i></button></div>
                      </form>
-                     <form th:if="${command.getBooleanValue()}">
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" th:id="${command.getName()}" class="d-flex justify-content-center flex-wrap" method="post" th:if="${command.getBooleanValue()}">
+                        <input type="hidden" name="name" th:value="${command.getName()}" />
+                        <input type="hidden" name="value" th:value="${!command.getBooleanValue()}" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
                         <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-red);" title="Deactivate"><i class="fas fa-times"></i></button></div>
                      </form>
                   </div>
@@ -180,7 +188,7 @@
                   <p>Ree6 has been made to support users and give them enough tools to support and manage their Guild. We don't like how most of the Discord Bots want you to pay for special "features". So we decided to change that.</p>
                </div>
                <!-- End: Footer Text --><!-- Start: Social Icons -->
-               <div class="col item social"><a href="support.ree6.de"><i class="fab fa-discord"></i></a><a href="https://twitter.com/ree6bot"><i class="icon ion-social-twitter"></i></a><a href="https://github.com/DxsSucuk/Ree6"><i class="icon ion-social-github"></i></a><a href="mailto:support@ree6.de"><i class="icon ion-android-mail"></i></a></div>
+               <div class="col item social"><a href="https://support.ree6.de"><i class="fab fa-discord"></i></a><a href="https://twitter.com/ree6bot"><i class="icon ion-social-twitter"></i></a><a href="https://github.com/Ree6-Applications/Ree6"><i class="icon ion-social-github"></i></a><a href="mailto:support@ree6.de"><i class="icon ion-android-mail"></i></a></div>
                <!-- End: Social Icons -->
             </div>
             <!-- Start: Copyright -->

@@ -113,7 +113,9 @@ public class FrontendController {
 
             try {
                 userLevel.setUser(BotInfo.botInstance.retrieveUserById(userIds).complete());
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+                Server.getInstance().getSqlConnector().getSqlWorker().addChatXP(guildId, userIds, -userLevel.getXp());
+            }
 
             model.addAttribute("user" + i, userLevel);
             i++;
@@ -143,7 +145,9 @@ public class FrontendController {
 
             try {
                 userLevel.setUser(BotInfo.botInstance.retrieveUserById(userIds).complete());
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+                Server.getInstance().getSqlConnector().getSqlWorker().addChatXP(guildId, userIds, -userLevel.getXp());
+            }
 
             model.addAttribute("user" + i, userLevel);
             i++;
