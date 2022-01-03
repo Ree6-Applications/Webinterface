@@ -2,6 +2,7 @@ package de.presti.ree6.webinterface.controller;
 
 import com.jagrosh.jdautilities.oauth2.Scope;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
+import com.jagrosh.jdautilities.oauth2.entities.OAuth2User;
 import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.bot.BotInfo;
@@ -14,6 +15,7 @@ import de.presti.ree6.webinterface.utils.RandomUtil;
 import de.presti.ree6.webinterface.utils.Setting;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,11 +35,7 @@ import java.util.stream.Collectors;
 public class FrontendController {
 
     // Paths to Thymeleaf Templates.
-    private static final String MAIN_PATH = "main/index",
-            ERROR_PATH = "error/index",
-            MODERATION_PATH = "panel/moderation/index",
-            SOCIAL_PATH = "panel/social/index",
-            LOGGING_PATH = "panel/logging/index";
+    private static final String MAIN_PATH = "main/index", ERROR_PATH = "error/index", MODERATION_PATH = "panel/moderation/index", SOCIAL_PATH = "panel/social/index", LOGGING_PATH = "panel/logging/index";
 
     /**
      * A Get Mapper for the Main Page.
@@ -58,9 +56,7 @@ public class FrontendController {
      */
     @GetMapping("/discord/auth")
     public ModelAndView startDiscordAuth() {
-        return new ModelAndView("redirect:" +
-                Server.getInstance().getOAuth2Client().generateAuthorizationURL((BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") +
-                        "/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
+        return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL((BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
     }
 
     /**
@@ -84,8 +80,10 @@ public class FrontendController {
         }
 
         // If the given data was valid and a Session has been created redirect to the panel Site. If not redirect to error.
-        if (session != null) return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/panel?id=" + identifier);
-        else return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/error");
+        if (session != null)
+            return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/panel?id=" + identifier);
+        else
+            return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/error");
     }
 
     //endregion
@@ -95,8 +93,8 @@ public class FrontendController {
     /**
      * The Request Mapper for the Guild Leaderboard.
      *
-     * @param guildId  the ID of the Guild.
-     * @param model the ViewModel.
+     * @param guildId the ID of the Guild.
+     * @param model   the ViewModel.
      * @return {@link ModelAndView} with the redirect data.
      */
     @GetMapping(value = "/leaderboard/chat")
@@ -104,7 +102,7 @@ public class FrontendController {
 
         Guild guild = BotInfo.botInstance.getGuildById(guildId);
 
-        if(guild != null) model.addAttribute("guild", guild);
+        if (guild != null) model.addAttribute("guild", guild);
 
         int i = 1;
         for (String userIds : Server.getInstance().getSqlConnector().getSqlWorker().getTopChat(guildId, 5)) {
@@ -127,8 +125,8 @@ public class FrontendController {
     /**
      * The Request Mapper for the Guild Leaderboard.
      *
-     * @param guildId  the ID of the Guild.
-     * @param model the ViewModel.
+     * @param guildId the ID of the Guild.
+     * @param model   the ViewModel.
      * @return {@link ModelAndView} with the redirect data.
      */
     @GetMapping(value = "/leaderboard/voice")
@@ -136,7 +134,7 @@ public class FrontendController {
 
         Guild guild = BotInfo.botInstance.getGuildById(guildId);
 
-        if(guild != null) model.addAttribute("guild", guild);
+        if (guild != null) model.addAttribute("guild", guild);
 
         int i = 1;
         for (String userIds : Server.getInstance().getSqlConnector().getSqlWorker().getTopVoice(guildId, 5)) {
@@ -216,64 +214,25 @@ public class FrontendController {
     @GetMapping(path = "/panel/server")
     public String openServerPanel(@RequestParam String id, @RequestParam String guildID, Model model) {
 
-        Session session = null;
+        // Set default Data and If there was an error return to the Error Page.
+        if (setDefaultInformation(model, guildID, id)) return ERROR_PATH;
 
-        try {
-            // Try retrieving the Session from the Identifier.
-            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+        // Retrieve every Role and Channel of the Guild and set them as Attribute.
+        model.addAttribute("invites", Server.getInstance().getSqlConnector().getSqlWorker().getInvites(guildID));
 
-            // Try retrieving the Guild of the OAuth2 User by its ID.
-            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
+        StringBuilder commandStats = new StringBuilder();
 
-            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return ERROR_PATH;
-
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(guildID);
-
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return ERROR_PATH;
-
-            // Set the Identifier.
-            model.addAttribute("identifier", id);
-
-            // Check if there is a Guild in the Guild list else send to error Page.
-            if (guildList.stream().findFirst().isEmpty()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't load Guild Information! ");
-
-                // Return to error page.
-                return ERROR_PATH;
-            }
-
-            // If a Guild has been found set it as Attribute.
-            model.addAttribute("guild", guildList.stream().findFirst().get());
-
-            // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("invites", Server.getInstance().getSqlConnector().getSqlWorker().getInvites(guild.getId()));
-
-            StringBuilder commandStats = new StringBuilder();
-
-            for (Map.Entry<String, Long> entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildID).entrySet()) {
-                commandStats.append(entrySet.getKey()).append(" - ").append(entrySet.getValue()).append(", ");
-            }
-
-            if (commandStats.length() > 0) {
-                commandStats = new StringBuilder(commandStats.substring(0, commandStats.length() - 2));
-            } else {
-                commandStats = new StringBuilder("None.");
-            }
-
-            model.addAttribute("commandstats", commandStats.toString());
-        } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
-
-            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guild Information! ");
+        for (Map.Entry<String, Long> entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildID).entrySet()) {
+            commandStats.append(entrySet.getKey()).append(" - ").append(entrySet.getValue()).append(", ");
         }
+
+        if (commandStats.length() > 0) {
+            commandStats = new StringBuilder(commandStats.substring(0, commandStats.length() - 2));
+        } else {
+            commandStats = new StringBuilder("None.");
+        }
+
+        model.addAttribute("commandstats", commandStats.toString());
 
         // Return to the Server Panel Page.
         return "panel/server/index";
@@ -294,64 +253,45 @@ public class FrontendController {
     @GetMapping(path = "/panel/moderation")
     public String openPanelModeration(@RequestParam String id, @RequestParam String guildID, Model model) {
 
-        Session session = null;
+        // Set default Data and If there was an error return to the Error Page.
+        if (setDefaultInformation(model, guildID, id)) return ERROR_PATH;
+
+        // Get the Guild from the Model.
+        Guild guild = null;
+
+        if (model.getAttribute("guild") instanceof Guild) guild = (Guild) model.getAttribute("guild");
+
+        // If null return to Error page.
+        if (guild == null) return ERROR_PATH;
+
+        // Retrieve every Role and Channel of the Guild and set them as Attribute.
+        model.addAttribute("roles", guild.getRoles());
+        model.addAttribute("channels", guild.getTextChannels());
+        model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guildID).stream().filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
+        model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guildID, "chatprefix"));
+        model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guildID));
+
+        List<Role> roles = new ArrayList<>();
+
+        for (String ids : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
+            try {
+                roles.add(guild.getRoleById(ids));
+            } catch (Exception ignore) {
+                Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(guild.getId(), ids);
+            }
+        }
+
+        model.addAttribute("autoroles", roles);
+
+        Role muteRole = null;
 
         try {
-            // Try retrieving the Session from the Identifier.
-            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
-
-            // Try retrieving the Guild of the OAuth2 User by its ID.
-            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
-
-            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return ERROR_PATH;
-
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(guildID);
-
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return ERROR_PATH;
-
-            // Set the Identifier.
-            model.addAttribute("identifier", id);
-
-            // Check if there is a Guild in the Guild list else send to error Page.
-            if (guildList.stream().findFirst().isEmpty()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't load Guild Information! ");
-
-                // Return to error page.
-                return ERROR_PATH;
-            }
-
-            // If a Guild has been found set it as Attribute.
-            model.addAttribute("guild", guildList.stream().findFirst().get());
-
-            // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", guild.getRoles());
-            model.addAttribute("channels", guild.getTextChannels());
-            model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
-                    .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
-            model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guildID, "chatprefix"));
-            model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
-
-            List<Role> roles = new ArrayList<>();
-
-            for (String ids : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
-                roles.add(guild.getRoleById(ids));
-            }
-
-            model.addAttribute("autoroles", roles);
-            model.addAttribute("muterole", guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guildID)));
-        } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
-
-            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guild Information! ");
+            muteRole = guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guildID));
+        } catch (Exception ignore) {
+            Server.getInstance().getSqlConnector().getSqlWorker().removeMuteRole(guildID, Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guildID));
         }
+
+        model.addAttribute("muterole", muteRole);
 
         // Return to the Moderation Panel Page.
         return MODERATION_PATH;
@@ -367,69 +307,46 @@ public class FrontendController {
     @PostMapping(path = "/panel/moderation/role")
     public String openPanelModeration(@ModelAttribute(name = "roleChangeForm") RoleChangeForm roleChangeForm, Model model) {
 
-        Session session = null;
+        // Set default Data and If there was an error return to the Error Page.
+        if (setDefaultInformation(model, roleChangeForm.getGuild(), roleChangeForm.getIdentifier())) return ERROR_PATH;
+
+        // Get the Guild from the Model.
+        Guild guild = null;
+
+        if (model.getAttribute("guild") instanceof Guild) guild = (Guild) model.getAttribute("guild");
+
+        // If null return to Error page.
+        if (guild == null) return ERROR_PATH;
+
+        // Change the role Data.
+        if (roleChangeForm.getType().equalsIgnoreCase("muterole")) {
+            Server.getInstance().getSqlConnector().getSqlWorker().setMuteRole(roleChangeForm.getGuild(), roleChangeForm.getRole());
+        }
+
+        // Retrieve every Role and Channel of the Guild and set them as Attribute.
+        model.addAttribute("roles", guild.getRoles());
+        model.addAttribute("channels", guild.getTextChannels());
+        model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
+        model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guild.getId(), "chatprefix"));
+        model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
+
+        List<Role> roles = new ArrayList<>();
+
+        for (String ids : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
+            roles.add(guild.getRoleById(ids));
+        }
+
+        model.addAttribute("autoroles", roles);
+
+        Role muteRole = null;
 
         try {
-            // Try retrieving the Session from the Identifier.
-            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(roleChangeForm.getIdentifier());
-
-            // Try retrieving the Guild of the OAuth2 User by its ID.
-            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(roleChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
-
-            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return ERROR_PATH;
-
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(roleChangeForm.getGuild());
-
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return ERROR_PATH;
-
-            // Change the role Data.
-            if (roleChangeForm.getType().equalsIgnoreCase("muterole")) {
-                Server.getInstance().getSqlConnector().getSqlWorker().setMuteRole(roleChangeForm.getGuild(), roleChangeForm.getRole());
-            }
-
-            // Set the Identifier.
-            model.addAttribute("identifier", roleChangeForm.getIdentifier());
-
-            // Check if there is a Guild in the Guild list else send to error Page.
-            if (guildList.stream().findFirst().isEmpty()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't load Guild Information! ");
-
-                // Return to error page.
-                return ERROR_PATH;
-            }
-
-            // If a Guild has been found set it as Attribute.
-            model.addAttribute("guild", guildList.stream().findFirst().get());
-
-            // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", guild.getRoles());
-            model.addAttribute("channels", guild.getTextChannels());
-            model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
-                    .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
-            model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guild.getId(), "chatprefix"));
-            model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
-
-            List<Role> roles = new ArrayList<>();
-
-            for (String ids : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
-                roles.add(guild.getRoleById(ids));
-            }
-
-            model.addAttribute("autoroles", roles);
-            model.addAttribute("muterole", guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId())));
-        } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
-
-            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guild Information! ");
+            muteRole = guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId()));
+        } catch (Exception ignore) {
+            Server.getInstance().getSqlConnector().getSqlWorker().removeMuteRole(guild.getId(), Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId()));
         }
+
+        model.addAttribute("muterole", muteRole);
 
         return MODERATION_PATH;
     }
@@ -443,98 +360,70 @@ public class FrontendController {
      */
     @PostMapping(path = "/panel/moderation/settings")
     public String openPanelModeration(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
-        Session session = null;
 
-        try {
-            // Try retrieving the Session from the Identifier.
-            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(settingChangeForm.getIdentifier());
+        // Set default Data and If there was an error return to the Error Page.
+        if (setDefaultInformation(model, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
+            return ERROR_PATH;
 
-            // Try retrieving the Guild of the OAuth2 User by its ID.
-            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
+        // Get the Guild from the Model.
+        Guild guild = null;
 
-            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return ERROR_PATH;
+        if (model.getAttribute("guild") instanceof Guild) guild = (Guild) model.getAttribute("guild");
 
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
+        // If null return to Error page.
+        if (guild == null) return ERROR_PATH;
 
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return ERROR_PATH;
+        // Change the Setting Data.
+        if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("addBadWord") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeBadWord") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("addAutoRole") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeAutoRole")) {
+            Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
+        } else {
+            switch (settingChangeForm.getSetting().getName()) {
+                case "addBadWord": {
+                    Server.getInstance().getSqlConnector().getSqlWorker().addChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                    break;
+                }
 
-            // Change the Setting Data.
-            if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("addBadWord") &&
-                    !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeBadWord") &&
-                    !settingChangeForm.getSetting().getName().equalsIgnoreCase("addAutoRole") &&
-                    !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeAutoRole")) {
-                Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
-            } else {
-                switch (settingChangeForm.getSetting().getName()) {
-                    case "addBadWord": {
-                        Server.getInstance().getSqlConnector().getSqlWorker().addChatProtectorWord(settingChangeForm.getGuild(),
-                                settingChangeForm.getSetting().getStringValue());
-                        break;
-                    }
+                case "removeBadWord": {
+                    Server.getInstance().getSqlConnector().getSqlWorker().removeChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                    break;
+                }
 
-                    case "removeBadWord": {
-                        Server.getInstance().getSqlConnector().getSqlWorker().removeChatProtectorWord(settingChangeForm.getGuild(),
-                                settingChangeForm.getSetting().getStringValue());
-                        break;
-                    }
+                case "addAutoRole": {
+                    Server.getInstance().getSqlConnector().getSqlWorker().addAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                    break;
+                }
 
-                    case "addAutoRole": {
-                        Server.getInstance().getSqlConnector().getSqlWorker().addAutoRole(settingChangeForm.getGuild(),
-                                settingChangeForm.getSetting().getStringValue());
-                        break;
-                    }
-
-                    case "removeAutoRole": {
-                        Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(settingChangeForm.getGuild(),
-                                settingChangeForm.getSetting().getStringValue());
-                        break;
-                    }
+                case "removeAutoRole": {
+                    Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                    break;
                 }
             }
-
-            // Set the Identifier.
-            model.addAttribute("identifier", settingChangeForm.getIdentifier());
-
-            // Check if there is a Guild in the Guild list else send to error Page.
-            if (guildList.stream().findFirst().isEmpty()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't load Guild Information! ");
-
-                // Return to error page.
-                return ERROR_PATH;
-            }
-
-            // If a Guild has been found set it as Attribute.
-            model.addAttribute("guild", guildList.stream().findFirst().get());
-
-            // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", guild.getRoles());
-            model.addAttribute("channels", guild.getTextChannels());
-            model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
-                    .filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
-            model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guild.getId(), "chatprefix"));
-            model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
-
-            List<Role> roles = new ArrayList<>();
-
-            for (String ids : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
-                roles.add(guild.getRoleById(ids));
-            }
-
-            model.addAttribute("autoroles", roles);
-            model.addAttribute("muterole", guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId())));
-        } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
-
-            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guild Information! ");
         }
+
+        // Retrieve every Role and Channel of the Guild and set them as Attribute.
+        model.addAttribute("roles", guild.getRoles());
+        model.addAttribute("channels", guild.getTextChannels());
+        model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("com")).collect(Collectors.toList()));
+        model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guild.getId(), "chatprefix"));
+        model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
+
+        List<Role> roles = new ArrayList<>();
+
+        for (String ids : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
+            roles.add(guild.getRoleById(ids));
+        }
+
+        model.addAttribute("autoroles", roles);
+
+        Role muteRole = null;
+
+        try {
+            muteRole = guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId()));
+        } catch (Exception ignore) {
+            Server.getInstance().getSqlConnector().getSqlWorker().removeMuteRole(guild.getId(), Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId()));
+        }
+
+        model.addAttribute("muterole", muteRole);
 
         return MODERATION_PATH;
     }
@@ -554,52 +443,21 @@ public class FrontendController {
     @GetMapping(path = "/panel/social")
     public String openPanelSocial(@RequestParam String id, @RequestParam String guildID, Model model) {
 
-        Session session = null;
+        // Set default Data and If there was an error return to the Error Page.
+        if (setDefaultInformation(model, guildID, id)) return ERROR_PATH;
 
-        try {
-            // Try retrieving the Session from the Identifier.
-            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+        // Get the Guild from the Model.
+        Guild guild = null;
 
-            // Try retrieving the Guild of the OAuth2 User by its ID.
-            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
+        if (model.getAttribute("guild") instanceof Guild) guild = (Guild) model.getAttribute("guild");
 
-            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return ERROR_PATH;
+        // If null return to Error page.
+        if (guild == null) return ERROR_PATH;
 
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(guildID);
-
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return ERROR_PATH;
-
-            // Set the Identifier.
-            model.addAttribute("identifier", id);
-
-            // Check if there is a Guild in the Guild list else send to error Page.
-            if (guildList.stream().findFirst().isEmpty()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't load Guild Information! ");
-
-                // Return to error page.
-                return ERROR_PATH;
-            }
-
-            // If a Guild has been found set it as Attribute.
-            model.addAttribute("guild", guildList.stream().findFirst().get());
-
-            // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", guild.getRoles());
-            model.addAttribute("channels", guild.getTextChannels());
-            model.addAttribute("joinMessage", new Setting("joinMessage", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guildID)));
-        } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
-
-            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guild Information! ");
-        }
+        // Retrieve every Role and Channel of the Guild and set them as Attribute.
+        model.addAttribute("roles", guild.getRoles());
+        model.addAttribute("channels", guild.getTextChannels());
+        model.addAttribute("joinMessage", new Setting("joinMessage", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guildID)));
 
         // Return to the Social Panel Page.
         return SOCIAL_PATH;
@@ -615,70 +473,40 @@ public class FrontendController {
     @PostMapping(path = "/panel/social/channel")
     public String openPanelSocial(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
 
-        Session session = null;
+        // Set default Data and If there was an error return to the Error Page.
+        if (setDefaultInformation(model, channelChangeForm.getGuild(), channelChangeForm.getIdentifier()))
+            return ERROR_PATH;
 
-        try {
-            // Try retrieving the Session from the Identifier.
-            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(channelChangeForm.getIdentifier());
+        // Get the Guild from the Model.
+        Guild guild = null;
 
-            // Try retrieving the Guild of the OAuth2 User by its ID.
-            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(channelChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
+        if (model.getAttribute("guild") instanceof Guild) guild = (Guild) model.getAttribute("guild");
 
-            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return ERROR_PATH;
+        // If null return to Error page.
+        if (guild == null) return ERROR_PATH;
 
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(channelChangeForm.getGuild());
-
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return ERROR_PATH;
-
-            // Change the channel Data.
-            // Check if null.
-            if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
-                if (channelChangeForm.getType().equalsIgnoreCase("newsChannel")) {
-                    // Create new Webhook, If it has been created successfully add it to our Database.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-News").queue(webhook ->
-                            Server.getInstance().getSqlConnector().getSqlWorker().setNewsWebhook(guild.getId(), webhook.getId(), webhook.getToken()));
-                } else if (channelChangeForm.getType().equalsIgnoreCase("mateChannel")) {
-                    // Create new Webhook, If it has been created successfully add it to our Database.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-MateSearcher").queue(webhook ->
-                            Server.getInstance().getSqlConnector().getSqlWorker().setRainbowWebhook(guild.getId(), webhook.getId(), webhook.getToken()));
-                } else if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
-                    // Create new Webhook, If it has been created successfully add it to our Database.
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook ->
-                            Server.getInstance().getSqlConnector().getSqlWorker().setWelcomeWebhook(guild.getId(), webhook.getId(), webhook.getToken()));
-                }
+        // Change the channel Data.
+        // Check if null.
+        if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
+            if (channelChangeForm.getType().equalsIgnoreCase("newsChannel")) {
+                // Create new Webhook, If it has been created successfully add it to our Database.
+                Guild finalGuild = guild;
+                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-News").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setNewsWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+            } else if (channelChangeForm.getType().equalsIgnoreCase("mateChannel")) {
+                // Create new Webhook, If it has been created successfully add it to our Database.
+                Guild finalGuild = guild;
+                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-MateSearcher").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setRainbowWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+            } else if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
+                // Create new Webhook, If it has been created successfully add it to our Database.
+                Guild finalGuild = guild;
+                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setWelcomeWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
             }
-
-            // Set the Identifier.
-            model.addAttribute("identifier", channelChangeForm.getIdentifier());
-
-            // Check if there is a Guild in the Guild list else send to error Page.
-            if (guildList.stream().findFirst().isEmpty()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't load Guild Information! ");
-
-                // Return to error page.
-                return ERROR_PATH;
-            }
-
-            // If a Guild has been found set it as Attribute.
-            model.addAttribute("guild", guildList.stream().findFirst().get());
-
-            // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", guild.getRoles());
-            model.addAttribute("channels", guild.getTextChannels());
-            model.addAttribute("joinMessage", new Setting("joinMessage", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
-        } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
-
-            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guild Information! ");
         }
+
+        // Retrieve every Role and Channel of the Guild and set them as Attribute.
+        model.addAttribute("roles", guild.getRoles());
+        model.addAttribute("channels", guild.getTextChannels());
+        model.addAttribute("joinMessage", new Setting("joinMessage", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
 
         return SOCIAL_PATH;
     }
@@ -693,60 +521,29 @@ public class FrontendController {
     @PostMapping(path = "/panel/social/settings")
     public String openPanelSocial(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
-        Session session = null;
+        // Set default Data and If there was an error return to the Error Page.
+        if (setDefaultInformation(model, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
+            return ERROR_PATH;
 
-        try {
-            // Try retrieving the Session from the Identifier.
-            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(settingChangeForm.getIdentifier());
+        // Get the Guild from the Model.
+        Guild guild = null;
 
-            // Try retrieving the Guild of the OAuth2 User by its ID.
-            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
+        if (model.getAttribute("guild") instanceof Guild) guild = (Guild) model.getAttribute("guild");
 
-            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return ERROR_PATH;
+        // If null return to Error page.
+        if (guild == null) return ERROR_PATH;
 
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
-
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return ERROR_PATH;
-
-            // Change the setting Data.
-            if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("joinMessage")) {
-                Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
-            } else {
-                Server.getInstance().getSqlConnector().getSqlWorker().setMessage(settingChangeForm.getGuild(),
-                        settingChangeForm.getSetting().getStringValue());
-            }
-
-            // Set the Identifier.
-            model.addAttribute("identifier", settingChangeForm.getIdentifier());
-
-            // Check if there is a Guild in the Guild list else send to error Page.
-            if (guildList.stream().findFirst().isEmpty()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't load Guild Information! ");
-
-                // Return to error page.
-                return ERROR_PATH;
-            }
-
-            // If a Guild has been found set it as Attribute.
-            model.addAttribute("guild", guildList.stream().findFirst().get());
-
-            // Retrieve every Role and Channel of the Guild and set them as Attribute.
-            model.addAttribute("roles", guild.getRoles());
-            model.addAttribute("channels", guild.getTextChannels());
-            model.addAttribute("joinMessage", new Setting("joinMessage", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
-        } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
-
-            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guild Information! ");
+        // Change the setting Data.
+        if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("joinMessage")) {
+            Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
+        } else {
+            Server.getInstance().getSqlConnector().getSqlWorker().setMessage(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
         }
+
+        // Retrieve every Role and Channel of the Guild and set them as Attribute.
+        model.addAttribute("roles", guild.getRoles());
+        model.addAttribute("channels", guild.getTextChannels());
+        model.addAttribute("joinMessage", new Setting("joinMessage", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
 
         return SOCIAL_PATH;
     }
@@ -766,52 +563,20 @@ public class FrontendController {
     @GetMapping(path = "/panel/logging")
     public String openPanelLogging(@RequestParam String id, @RequestParam String guildID, Model model) {
 
-        Session session = null;
+        // Set default Data and If there was an error return to the Error Page.
+        if (setDefaultInformation(model, guildID, id)) return ERROR_PATH;
 
-        try {
-            // Try retrieving the Session from the Identifier.
-            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+        // Get the Guild from the Model.
+        Guild guild = null;
 
-            // Try retrieving the Guild of the OAuth2 User by its ID.
-            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(guildID) || !guild.hasPermission(Permission.ADMINISTRATOR));
+        if (model.getAttribute("guild") instanceof Guild) guild = (Guild) model.getAttribute("guild");
 
-            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return ERROR_PATH;
+        // If null return to Error page.
+        if (guild == null) return ERROR_PATH;
 
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(guildID);
-
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return ERROR_PATH;
-
-            // Set the Identifier.
-            model.addAttribute("identifier", id);
-
-            // Check if there is a Guild in the Guild list else send to error Page.
-            if (guildList.stream().findFirst().isEmpty()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't load Guild Information! ");
-
-                // Return to error page.
-                return ERROR_PATH;
-            }
-
-            // If a Guild has been found set it as Attribute.
-            model.addAttribute("guild", guildList.stream().findFirst().get());
-
-            // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
-            model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
-                    .filter(setting -> setting.getName().startsWith("log")).collect(Collectors.toList()));
-            model.addAttribute("channels", guild.getTextChannels());
-        } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
-
-            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guild Information! ");
-        }
+        // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
+        model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).collect(Collectors.toList()));
+        model.addAttribute("channels", guild.getTextChannels());
 
         // Return to the Logging Panel Page.
         return LOGGING_PATH;
@@ -827,60 +592,29 @@ public class FrontendController {
     @PostMapping(path = "/panel/logging/channel")
     public String openPanelLogging(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
 
-        Session session = null;
+        // Set default Data and If there was an error return to the Error Page.
+        if (setDefaultInformation(model, channelChangeForm.getGuild(), channelChangeForm.getIdentifier()))
+            return ERROR_PATH;
 
-        try {
-            // Try retrieving the Session from the Identifier.
-            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(channelChangeForm.getIdentifier());
+        // Get the Guild from the Model.
+        Guild guild = null;
 
-            // Try retrieving the Guild of the OAuth2 User by its ID.
-            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(channelChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
+        if (model.getAttribute("guild") instanceof Guild) guild = (Guild) model.getAttribute("guild");
 
-            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return ERROR_PATH;
+        // If null return to Error page.
+        if (guild == null) return ERROR_PATH;
 
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(channelChangeForm.getGuild());
-
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return ERROR_PATH;
-
-            // Change the channel Data.
-            // Check if null.
-            if (channelChangeForm.getType().equalsIgnoreCase("logChannel") && guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
-                // Create new Webhook, If it has been created successfully add it to our Database.
-                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook ->
-                        Server.getInstance().getSqlConnector().getSqlWorker().setLogWebhook(guild.getId(), webhook.getId(), webhook.getToken()));
-            }
-
-            // Set the Identifier.
-            model.addAttribute("identifier", channelChangeForm.getIdentifier());
-
-            // Check if there is a Guild in the Guild list else send to error Page.
-            if (guildList.stream().findFirst().isEmpty()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't load Guild Information! ");
-
-                // Return to error page.
-                return ERROR_PATH;
-            }
-
-            // If a Guild has been found set it as Attribute.
-            model.addAttribute("guild", guildList.stream().findFirst().get());
-
-            // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
-            model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
-                    .filter(setting -> setting.getName().startsWith("log")).collect(Collectors.toList()));
-            model.addAttribute("channels", guild.getTextChannels());
-        } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
-
-            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guild Information! ");
+        // Change the channel Data.
+        // Check if null.
+        if (channelChangeForm.getType().equalsIgnoreCase("logChannel") && guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
+            // Create new Webhook, If it has been created successfully add it to our Database.
+            Guild finalGuild = guild;
+            guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setLogWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
         }
+
+        // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
+        model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).collect(Collectors.toList()));
+        model.addAttribute("channels", guild.getTextChannels());
 
         // Return to the Logging Panel Page.
         return LOGGING_PATH;
@@ -896,58 +630,70 @@ public class FrontendController {
     @PostMapping(path = "/panel/logging/settings")
     public String openPanelLogging(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
-        Session session = null;
+        // Set default Data and If there was an error return to the Error Page.
+        if (setDefaultInformation(model, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
+            return ERROR_PATH;
 
-        try {
-            // Try retrieving the Session from the Identifier.
-            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(settingChangeForm.getIdentifier());
+        // Get the Guild from the Model.
+        Guild guild = null;
 
-            // Try retrieving the Guild of the OAuth2 User by its ID.
-            List<OAuth2Guild> guildList = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-            guildList.removeIf(guild -> !guild.getId().equalsIgnoreCase(settingChangeForm.getGuild()) || !guild.hasPermission(Permission.ADMINISTRATOR));
+        if (model.getAttribute("guild") instanceof Guild) guild = (Guild) model.getAttribute("guild");
 
-            // If the given Guild ID couldn't be found in his Guild list redirect him to the Error page.
-            if (guildList.isEmpty()) return ERROR_PATH;
+        // If null return to Error page.
+        if (guild == null) return ERROR_PATH;
 
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(settingChangeForm.getGuild());
-
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return ERROR_PATH;
-
-            // Change the setting Data.
-            Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
-
-            // Set the Identifier.
-            model.addAttribute("identifier", settingChangeForm.getIdentifier());
-
-            // Check if there is a Guild in the Guild list else send to error Page.
-            if (guildList.stream().findFirst().isEmpty()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't load Guild Information! ");
-
-                // Return to error page.
-                return ERROR_PATH;
-            }
-
-            // If a Guild has been found set it as Attribute.
-            model.addAttribute("guild", guildList.stream().findFirst().get());
-
-            // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
-            model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream()
-                    .filter(setting -> setting.getName().startsWith("log")).collect(Collectors.toList()));
-            model.addAttribute("channels", guild.getTextChannels());
-        } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
-
-            // If the Session isn't null give the User a Notification that the Guild couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guild Information! ");
-        }
+        // Change the setting Data.
+        Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
+        // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
+        model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).collect(Collectors.toList()));
+        model.addAttribute("channels", guild.getTextChannels());
 
         // Return to the Logging Panel Page.
         return LOGGING_PATH;
+    }
+
+    //endregion
+
+    //region Utility
+
+    /**
+     * Set default information such as the Session Identifier and {@link Guild} Entity.
+     *
+     * @param model      the View Model.
+     * @param guildId    the ID of the Guild
+     * @param identifier the Session Identifier.
+     * @return true, if there was an error | false, if everything was alright.
+     */
+    public boolean setDefaultInformation(Model model, String guildId, String identifier) {
+        try {
+            // Try retrieving the Session from the Identifier.
+            Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(identifier);
+
+            // Try retrieving the User from the Session.
+            OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
+
+            // Retrieve the Guild by its giving ID.
+            Guild guild = BotInfo.botInstance.getGuildById(guildId);
+
+            // If the Guild couldn't be loaded redirect to Error page.
+            if (guild == null) return true;
+
+            Member member = guild.retrieveMemberById(oAuth2User.getId()).complete();
+
+            if (member != null && member.hasPermission(Permission.ADMINISTRATOR)) {
+                // Set the Guild.
+                model.addAttribute("guild", guild);
+
+                // Set the Identifier.
+                model.addAttribute("identifier", identifier);
+            } else {
+                return true;
+            }
+
+            return false;
+        } catch (Exception ignore) {}
+
+        return true;
     }
 
     //endregion

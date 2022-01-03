@@ -973,11 +973,34 @@ public class SQLWorker {
 
         // Check if there is a role in the database.
         if (isMuteSetup(guildId)) {
+
             // Replace the entry with the new Data.
             querySQL("UPDATE MuteRoles SET RID='" + roleId + "' WHERE GID='" + guildId + "'");
         } else {
             // Add a new entry into the Database.
             querySQL("INSERT INTO MuteRoles (GID, RID) VALUES ('" + guildId + "', '" + roleId + "');");
+        }
+    }
+
+    /**
+     * Remove the MuteRole from our Database.
+     *
+     * @param guildId the ID of the Guild.
+     * @param roleId  the ID of the Role.
+     */
+    public void removeMuteRole(String guildId, String roleId) {
+
+        // Check for SQL Statements to prevent SQL Injections.
+        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
+                roleId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return;
+        }
+
+        // Check if there is a role in the database.
+        if (isMuteSetup(guildId)) {
+
+            // Replace the entry with the new Data.
+            querySQL("DELETE FROM MuteRoles WHERE RID='" + roleId + "' AND GID='" + guildId + "'");
         }
     }
 
