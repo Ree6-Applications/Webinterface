@@ -110,7 +110,11 @@ public class FrontendController {
             UserLevel userLevel = new UserLevel(userIds, Server.getInstance().getSqlConnector().getSqlWorker().getChatXP(guildId, userIds));
 
             try {
-                userLevel.setUser(BotInfo.botInstance.retrieveUserById(userIds).complete());
+                if (BotInfo.botInstance.getUserById(userIds) != null) {
+                    userLevel.setUser(BotInfo.botInstance.getUserById(userIds));
+                } else {
+                    userLevel.setUser(BotInfo.botInstance.retrieveUserById(userIds).complete());
+                }
             } catch (Exception ignore) {
                 Server.getInstance().getSqlConnector().getSqlWorker().addChatXP(guildId, userIds, -userLevel.getXp());
             }
@@ -142,7 +146,11 @@ public class FrontendController {
             UserLevel userLevel = new UserLevel(userIds, Server.getInstance().getSqlConnector().getSqlWorker().getVoiceXP(guildId, userIds));
 
             try {
-                userLevel.setUser(BotInfo.botInstance.retrieveUserById(userIds).complete());
+                if (BotInfo.botInstance.getUserById(userIds) != null) {
+                    userLevel.setUser(BotInfo.botInstance.getUserById(userIds));
+                } else {
+                    userLevel.setUser(BotInfo.botInstance.retrieveUserById(userIds).complete());
+                }
             } catch (Exception ignore) {
                 Server.getInstance().getSqlConnector().getSqlWorker().addChatXP(guildId, userIds, -userLevel.getXp());
             }
