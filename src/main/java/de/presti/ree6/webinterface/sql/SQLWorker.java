@@ -7,16 +7,13 @@ import de.presti.ree6.webinterface.utils.Setting;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A Class to actually handle the SQL data.
  * Used to provide Data from the Database and to save Data into the Database.
  */
-@SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve", "unused", "DuplicatedCode", "SingleStatementInBlock"})
+@SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve", "unused", "SingleStatementInBlock"})
 public class SQLWorker {
 
     // Instance of the SQL Connector to actually access the SQL Database.
@@ -470,7 +467,7 @@ public class SQLWorker {
 
             // Delete the existing Webhook.
             BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
-                            webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
+                            webhook.getId().equalsIgnoreCase(getWelcomeWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getWelcomeWebhook(guildId)[1]))
                     .forEach(webhook -> webhook.delete().queue()));
 
             // Delete the entry.
@@ -563,7 +560,7 @@ public class SQLWorker {
 
             // Delete the existing Webhook.
             BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook -> webhook.getToken() != null).filter(webhook ->
-                            webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
+                            webhook.getId().equalsIgnoreCase(getNewsWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getNewsWebhook(guildId)[1]))
                     .forEach(webhook -> webhook.delete().queue()));
 
             // Delete the entry.
@@ -590,98 +587,6 @@ public class SQLWorker {
 
         // Creating a SQL Statement to get the Entry from the NewsWebhooks Table by the GuildID.
         try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM NewsWebhooks WHERE GID='" + guildId + "'").executeQuery()) {
-
-            // Return if there was a match.
-            return (rs != null && rs.next());
-        } catch (Exception ignore) {
-        }
-
-        // Return if there wasn't a match.
-        return false;
-    }
-
-    //endregion
-
-    //region Rainbow
-
-    /**
-     * Get the RainbowWebhooks data.
-     *
-     * @param guildId the ID of the Guild.
-     * @return {@link String[]} in the first index is the Webhook ID and in the second the Auth-Token.
-     */
-    public String[] getRainbowWebhook(String guildId) {
-
-        // Check for SQL Statements to prevent SQL Injections.
-        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
-            return new String[]{"0", "No setup!"};
-        }
-
-        if (isRainbowSetup(guildId)) {
-            // Creating a SQL Statement to get the Entry from the RainbowWebhooks Table by the GuildID.
-            try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM RainbowWebhooks WHERE GID='" + guildId + "'").executeQuery()) {
-
-                // Return if there was a match.
-                if (rs != null && rs.next()) {
-                    if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
-                        return new String[]{"0", "No setup!"};
-                    else
-                        return new String[]{rs.getString("CID"), rs.getString("TOKEN")};
-                }
-            } catch (Exception ignore) {
-            }
-        }
-
-        return new String[]{"0", "No setup!"};
-    }
-
-    /**
-     * Set the RainbowWebhooks in our Database.
-     *
-     * @param guildId   the ID of the Guild.
-     * @param webhookId the ID of the Webhook.
-     * @param authToken the Auth-token to verify the access.
-     */
-    public void setRainbowWebhook(String guildId, String webhookId, String authToken) {
-
-        // Check for SQL Statements to prevent SQL Injections.
-        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
-                webhookId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
-                authToken.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
-            return;
-        }
-
-        // Check if there is already a Webhook set.
-        if (isRainbowSetup(guildId)) {
-
-            // Delete the existing Webhook.
-            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
-                            webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
-                    .forEach(webhook -> webhook.delete().queue()));
-
-            querySQL("DELETE FROM RainbowWebhooks WHERE GID='" + guildId + "'");
-        }
-
-        // Add a new entry into the Database.
-        querySQL("INSERT INTO RainbowWebhooks (GID, CID, TOKEN) VALUES ('" + guildId + "', '" + webhookId + "', '" + authToken + "');");
-
-    }
-
-    /**
-     * Check if the Rainbow Webhook has been set in our Database for this Server.
-     *
-     * @param guildId the ID of the Guild.
-     * @return {@link Boolean} if true, it has been set | if false, it hasn't been set.
-     */
-    public boolean isRainbowSetup(String guildId) {
-
-        // Check for SQL Statements to prevent SQL Injections.
-        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
-            return false;
-        }
-
-        // Creating a SQL Statement to get the Entry from the WelcomeWebhooks Table by the GuildID.
-        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM RainbowWebhooks WHERE GID='" + guildId + "'").executeQuery()) {
 
             // Return if there was a match.
             return (rs != null && rs.next());
@@ -784,6 +689,7 @@ public class SQLWorker {
      * Get every Twitch-Notifier that has been setup for the given Guild.
      *
      * @param guildId the ID of the Guild.
+     *
      * @return {@link ArrayList<>} in the first index is the Webhook ID and in the second the Auth-Token.
      */
     public ArrayList<String> getAllTwitchNames(String guildId) {
@@ -796,7 +702,7 @@ public class SQLWorker {
         }
 
         // Creating a SQL Statement to get the Entry from the TwitchNotify Table by the GuildID.
-        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitchNotify AND GID='" + guildId + "'").executeQuery()) {
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitchNotify WHERE GID='" + guildId + "'").executeQuery()) {
 
             // Return if there was a match.
             while (rs != null && rs.next()) {
@@ -831,7 +737,7 @@ public class SQLWorker {
 
             // Delete the existing Webhook.
             BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
-                            webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
+                            webhook.getId().equalsIgnoreCase(getTwitchWebhook(guildId, twitchName)[0]) && webhook.getToken().equalsIgnoreCase(getTwitchWebhook(guildId, twitchName)[1]))
                     .forEach(webhook -> webhook.delete().queue()));
 
             // Delete the entry.
@@ -861,7 +767,7 @@ public class SQLWorker {
 
             // Delete the existing Webhook.
             BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
-                            webhook.getId().equalsIgnoreCase(getLogWebhook(guildId)[0]) && webhook.getToken().equalsIgnoreCase(getLogWebhook(guildId)[1]))
+                            webhook.getId().equalsIgnoreCase(getTwitchWebhook(guildId, twitchName)[0]) && webhook.getToken().equalsIgnoreCase(getTwitchWebhook(guildId, twitchName)[1]))
                     .forEach(webhook -> webhook.delete().queue()));
 
             // Delete the entry.
@@ -910,7 +816,237 @@ public class SQLWorker {
         }
 
         // Creating a SQL Statement to get the Entry from the WelcomeWebhooks Table by the GuildID.
-        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitchNotify WHERE GID='" + guildId + "' AND='" + twitchName + "'").executeQuery()) {
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitchNotify WHERE GID='" + guildId + "' AND NAME='" + twitchName + "'").executeQuery()) {
+
+            // Return if there was a match.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {
+        }
+
+        // Return if there wasn't a match.
+        return false;
+    }
+
+    //endregion
+
+    //region Twitter Notifer
+
+    /**
+     * Get the Twitter-Notify data.
+     *
+     * @param guildId    the ID of the Guild.
+     * @param twitterName the Username of the Twitter User.
+     * @return {@link String[]} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public String[] getTwitterWebhook(String guildId, String twitterName) {
+
+        // Check for SQL Statements to prevent SQL Injections.
+        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
+                twitterName.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return new String[]{"0", "No setup!"};
+        }
+
+        if (isTwitterSetup(guildId)) {
+            // Creating a SQL Statement to get the Entry from the RainbowWebhooks Table by the GuildID.
+            try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitterNotify WHERE GID='" + guildId + "' AND NAME='" + twitterName + "'").executeQuery()) {
+
+                // Return if there was a match.
+                if (rs != null && rs.next()) {
+                    if (rs.getString("CID").isEmpty() || rs.getString("TOKEN").isEmpty())
+                        return new String[]{"0", "No setup!"};
+                    else
+                        return new String[]{rs.getString("CID"), rs.getString("TOKEN")};
+                }
+            } catch (Exception ignore) {
+            }
+        }
+
+        return new String[]{"0", "No setup!"};
+    }
+
+    /**
+     * Get the TwitterNotify data.
+     *
+     * @param twitterName the Username of the Twitter User.
+     * @return {@link ArrayList<>} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public ArrayList<String[]> getTwitterWebhooksByName(String twitterName) {
+
+        ArrayList<String[]> webhooks = new ArrayList<>();
+
+        // Check for SQL Statements to prevent SQL Injections.
+        if (twitterName.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return webhooks;
+        }
+
+        // Creating a SQL Statement to get the Entry from the RainbowWebhooks Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitterNotify WHERE NAME='" + twitterName + "'").executeQuery()) {
+
+            // Return if there was a match.
+            while (rs != null && rs.next()) {
+                if (!rs.getString("CID").isEmpty() && !rs.getString("TOKEN").isEmpty())
+                    webhooks.add(new String[]{rs.getString("CID"), rs.getString("TOKEN")});
+            }
+        } catch (Exception ignore) {
+        }
+
+        return webhooks;
+    }
+
+    /**
+     * Get the all Twitter-Notifier.
+     *
+     * @return {@link ArrayList<>} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public ArrayList<String> getAllTwitterNames() {
+
+        ArrayList<String> userNames = new ArrayList<>();
+
+        // Creating a SQL Statement to get the Entry from the TwitterNotify Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitterNotify").executeQuery()) {
+
+            // Return if there was a match.
+            while (rs != null && rs.next()) {
+                userNames.add(rs.getString("NAME"));
+            }
+        } catch (Exception ignore) {
+        }
+
+        return userNames;
+    }
+
+    /**
+     * Get every Twitter-Notifier that has been set up for the given Guild.
+     *
+     * @param guildId the ID of the Guild.
+     *
+     * @return {@link ArrayList<>} in the first index is the Webhook ID and in the second the Auth-Token.
+     */
+    public ArrayList<String> getAllTwitterNames(String guildId) {
+
+        ArrayList<String> userNames = new ArrayList<>();
+
+        // Check for SQL Statements to prevent SQL Injections.
+        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return userNames;
+        }
+
+        // Creating a SQL Statement to get the Entry from the TwitchNotify Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitterNotify WHERE GID='" + guildId + "'").executeQuery()) {
+
+            // Return if there was a match.
+            while (rs != null && rs.next()) {
+                userNames.add(rs.getString("NAME"));
+            }
+        } catch (Exception ignore) {
+        }
+
+        return userNames;
+    }
+
+    /**
+     * Set the TwitterNotify in our Database.
+     *
+     * @param guildId    the ID of the Guild.
+     * @param webhookId  the ID of the Webhook.
+     * @param authToken  the Auth-token to verify the access.
+     * @param twitterName the Username of the Twitter User.
+     */
+    public void addTwitterWebhook(String guildId, String webhookId, String authToken, String twitterName) {
+
+        // Check for SQL Statements to prevent SQL Injections.
+        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
+                webhookId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
+                authToken.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
+                twitterName.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return;
+        }
+
+        // Check if there is already a Webhook set.
+        if (isTwitterSetup(guildId, twitterName)) {
+
+            // Delete the existing Webhook.
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
+                            webhook.getId().equalsIgnoreCase(getTwitterWebhook(guildId, twitterName)[0]) && webhook.getToken().equalsIgnoreCase(getTwitterWebhook(guildId, twitterName)[1]))
+                    .forEach(webhook -> webhook.delete().queue()));
+
+            // Delete the entry.
+            querySQL("DELETE FROM TwitterNotify WHERE GID='" + guildId + "' AND NAME='" + twitterName + "'");
+        }
+
+        // Add a new entry into the Database.
+        querySQL("INSERT INTO TwitterNotify (GID, NAME, CID, TOKEN) VALUES ('" + guildId + "', '" + twitterName + "', '" + webhookId + "', '" + authToken + "');");
+    }
+
+    /**
+     * Remove a Twitter Notifier entry from our Database.
+     *
+     * @param guildId    the ID of the Guild.
+     * @param twitterName the Name of the Twitter User.
+     */
+    public void removeTwitterWebhook(String guildId, String twitterName) {
+
+        // Check for SQL Statements to prevent SQL Injections.
+        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
+                twitterName.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return;
+        }
+
+        // Check if there is a Webhook set.
+        if (isTwitterSetup(guildId, twitterName)) {
+
+            // Delete the existing Webhook.
+            BotInfo.botInstance.getGuildById(guildId).retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook ->
+                            webhook.getId().equalsIgnoreCase(getTwitterWebhook(guildId, twitterName)[0]) && webhook.getToken().equalsIgnoreCase(getTwitterWebhook(guildId, twitterName)[1]))
+                    .forEach(webhook -> webhook.delete().queue()));
+
+            // Delete the entry.
+            querySQL("DELETE FROM TwitterNotify WHERE GID='" + guildId + "' AND NAME='" + twitterName + "'");
+        }
+    }
+
+    /**
+     * Check if the Twitter Webhook has been set in our Database for this Server.
+     *
+     * @param guildId the ID of the Guild.
+     * @return {@link Boolean} if true, it has been set | if false, it hasn't been set.
+     */
+    public boolean isTwitterSetup(String guildId) {
+
+        // Check for SQL Statements to prevent SQL Injections.
+        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return false;
+        }
+
+        // Creating a SQL Statement to get the Entry from the WelcomeWebhooks Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitterNotify WHERE GID='" + guildId + "'").executeQuery()) {
+
+            // Return if there was a match.
+            return (rs != null && rs.next());
+        } catch (Exception ignore) {
+        }
+
+        // Return if there wasn't a match.
+        return false;
+    }
+
+    /**
+     * Check if the Twitter Webhook has been set for the given User in our Database for this Server.
+     *
+     * @param guildId    the ID of the Guild.
+     * @param twitterName the Username of the Twitter User.
+     * @return {@link Boolean} if true, it has been set | if false, it hasn't been set.
+     */
+    public boolean isTwitterSetup(String guildId, String twitterName) {
+
+        // Check for SQL Statements to prevent SQL Injections.
+        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
+                twitterName.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return false;
+        }
+
+        // Creating a SQL Statement to get the Entry from the WelcomeWebhooks Table by the GuildID.
+        try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM TwitterNotify WHERE GID='" + guildId + "' AND NAME='" + twitterName + "'").executeQuery()) {
 
             // Return if there was a match.
             return (rs != null && rs.next());
@@ -973,7 +1109,6 @@ public class SQLWorker {
 
         // Check if there is a role in the database.
         if (isMuteSetup(guildId)) {
-
             // Replace the entry with the new Data.
             querySQL("UPDATE MuteRoles SET RID='" + roleId + "' WHERE GID='" + guildId + "'");
         } else {
@@ -1494,6 +1629,22 @@ public class SQLWorker {
     }
 
     /**
+     * Remove an entry from our Database.
+     *
+     * @param guildId       the ID of the Guild.
+     * @param inviteCode    the Code of the Invite.
+     */
+    public void removeInvite(String guildId, String inviteCode) {
+        // Check for SQL Statements to prevent SQL Injections.
+        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
+                inviteCode.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
+            return;
+        }
+
+        querySQL("DELETE FROM Invites WHERE GID='" + guildId + "' AND CODE='" + inviteCode + "'");
+    }
+
+    /**
      * Change the data of a saved Invite or create a new entry in our Database.
      *
      * @param guildId       the ID of the Guild.
@@ -1520,22 +1671,6 @@ public class SQLWorker {
             querySQL("INSERT INTO Invites (GID, UID, USES, CODE) VALUES ('" + guildId + "', '" + inviteCode + "', '" + inviteUsage + "', " +
                     "'" + inviteCode + "');");
         }
-    }
-
-    /**
-     * Remove an entry from our Database.
-     *
-     * @param guildId    the ID of the Guild.
-     * @param inviteCode the Code of the Invite.
-     */
-    public void removeInvite(String guildId, String inviteCode) {
-        // Check for SQL Statements to prevent SQL Injections.
-        if (guildId.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm") ||
-                inviteCode.matches("/\"((SELECT|DELETE|UPDATE|INSERT INTO) (\\*|[A-Z0-9_]+) (FROM) ([A-Z0-9_]+))( (WHERE) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?|\\$[A-Z]{1}[A-Z_]+)( (AND) ([A-Z0-9_]+) (=|<|>|>=|<=|==|!=) (\\?))?)?\"/igm")) {
-            return;
-        }
-
-        querySQL("DELETE FROM Invites WHERE GID='" + guildId + "' AND CODE='" + inviteCode + "'");
     }
 
     /**
@@ -1794,7 +1929,7 @@ public class SQLWorker {
             try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM Settings WHERE GID='" + guildId + "' AND NAME='" + settingName + "'").executeQuery()) {
 
                 // Return if found.
-                if (rs != null && rs.next()) return new Setting(settingName, rs.getObject("VALUE"));
+                if (rs != null && rs.next()) return new Setting(settingName, rs.getString("VALUE"));
             } catch (Exception ignore) {
             }
         } else {
@@ -2015,7 +2150,7 @@ public class SQLWorker {
             return 0L;
         }
 
-        // Creating a SQL Statement to get an entry in the CommandStats Table by Guild and Command name.
+        // Creating a SQL Statement to get an entry in the GuildStats Table by Guild and Command name.
         try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM GuildStats WHERE GID='" + guildId + "' AND COMMAND='" + command + "'").executeQuery()) {
 
             // Return if found.
@@ -2035,7 +2170,7 @@ public class SQLWorker {
             return statsMap;
         }
 
-        // Creating a SQL Statement to get every entry in the CommandStats Table by the Guild.
+        // Creating a SQL Statement to get every entry in the GuildStats Table by the Guild.
         try (ResultSet rs = sqlConnector.getConnection().prepareStatement("SELECT * FROM GuildStats WHERE GID='" + guildId + "' ORDER BY cast(uses as unsigned) DESC LIMIT 5;").executeQuery()) {
 
             // Return if found.
@@ -2165,7 +2300,7 @@ public class SQLWorker {
 
         // Check if there is an entry.
         if (isStatsSaved(guildId, command)) {
-            querySQL("UPDATE GuildStats SET USES='" + (getStatsCommandGlobal(command) + 1) + "' GID='" + guildId + "' AND WHERE COMMAND='" + command + "'");
+            querySQL("UPDATE GuildStats SET USES='" + (getStatsCommand(guildId, command) + 1) + "' WHERE GID='" + guildId + "' AND COMMAND='" + command + "'");
         } else {
             querySQL("INSERT INTO GuildStats (GID, COMMAND, USES) VALUES ('" + guildId + "', '" + command + "', '1')");
         }
@@ -2210,9 +2345,8 @@ public class SQLWorker {
 
         try (Statement statement = sqlConnector.getConnection().createStatement()) {
             statement.executeUpdate(sqlQuery);
-        } catch (Exception ignore) {
-            Server.getInstance().getLogger().error("Couldn't send Query to SQL-Server");
+        } catch (Exception exception) {
+            Server.getInstance().getLogger().error("Couldn't send Query to SQL-Server ( " + sqlQuery +" )", exception);
         }
     }
-
 }

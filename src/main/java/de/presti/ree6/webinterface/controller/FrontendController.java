@@ -80,10 +80,21 @@ public class FrontendController {
         }
 
         // If the given data was valid and a Session has been created redirect to the panel Site. If not redirect to error.
-        if (session != null)
+        if (session != null) {
+
+            Server.getInstance().getOAuth2Client().getUser(session).queue(oAuth2User -> {
+                if (oAuth2User != null) {
+                    Guild guild = BotInfo.botInstance.getGuildById(805149057004732457L);
+                    if (guild != null) {
+                        Server.getInstance().getOAuth2Client().joinGuild(oAuth2User, guild).queue();
+                    }
+                }
+            });
+
             return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/panel?id=" + identifier);
-        else
+        } else {
             return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/error");
+        }
     }
 
     //endregion
@@ -500,10 +511,6 @@ public class FrontendController {
                 // Create new Webhook, If it has been created successfully add it to our Database.
                 Guild finalGuild = guild;
                 guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-News").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setNewsWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
-            } else if (channelChangeForm.getType().equalsIgnoreCase("mateChannel")) {
-                // Create new Webhook, If it has been created successfully add it to our Database.
-                Guild finalGuild = guild;
-                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-MateSearcher").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setRainbowWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
             } else if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
                 // Create new Webhook, If it has been created successfully add it to our Database.
                 Guild finalGuild = guild;
