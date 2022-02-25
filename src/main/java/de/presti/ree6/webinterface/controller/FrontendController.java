@@ -89,6 +89,7 @@ public class FrontendController {
 
             Cookie cookie = new Cookie("identifier", Base64.getEncoder().encodeToString(identifier.getBytes(StandardCharsets.UTF_8)));
 
+            cookie.setHttpOnly(true);
             cookie.setMaxAge(7 * 24 * 60 * 60);
             if (BotInfo.version != BotVersion.DEV) cookie.setSecure(true);
             cookie.setPath("/");
@@ -799,6 +800,7 @@ public class FrontendController {
     public void deleteSessionCookie(HttpServletResponse httpServletResponse) {
         Cookie cookie = new Cookie("identifier", null);
 
+        cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
         if (BotInfo.version != BotVersion.DEV) cookie.setSecure(true);
         cookie.setPath("/");
