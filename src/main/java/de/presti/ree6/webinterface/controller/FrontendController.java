@@ -830,7 +830,7 @@ public class FrontendController {
      * @return true, if it is a valid identifier | false, if not.
      */
     public boolean checkIdentifier(String identifier) {
-        return identifier == null || identifier.equals("-1") || !identifier.matches("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$");
+        return identifier == null || identifier.equals("-1");
     }
 
     //endregion
