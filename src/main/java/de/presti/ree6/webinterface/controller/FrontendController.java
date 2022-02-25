@@ -816,9 +816,7 @@ public class FrontendController {
         try {
             identifier = new String(Base64.getDecoder().decode(identifier));
             return identifier;
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
+        } catch (Exception ignored) {}
 
         return null;
     }
