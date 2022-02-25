@@ -57,7 +57,7 @@ public class Server {
 
         // Create a new JDA Session.
         try {
-            BotUtil.createBot(BotVersion.PUBLIC, "1.6.0");
+            BotUtil.createBot(BotVersion.DEV, "1.6.0");
             logger.info("Service (JDA) has been started. Creation was successful.");
         } catch (Exception ignore) {
             //Inform if not successful.

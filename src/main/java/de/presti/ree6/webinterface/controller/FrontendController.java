@@ -22,7 +22,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,12 +66,13 @@ public class FrontendController {
     /**
      * The Request Mapper for the Discord Auth callback.
      *
-     * @param code  the OAuth2 Code from Discord.
-     * @param state the local State of the OAuth2 Session.
+     * @param httpServletResponse the HTTP Response.
+     * @param code                the OAuth2 Code from Discord.
+     * @param state               the local State of the OAuth2 Session.
      * @return {@link ModelAndView} with the redirect data.
      */
     @GetMapping(value = "/discord/auth/callback")
-    public ModelAndView discordLogin(@RequestParam String code, @RequestParam String state) {
+    public ModelAndView discordLogin(HttpServletResponse httpServletResponse, @RequestParam String code, @RequestParam String state) {
         Session session = null;
 
         // Generate a secure Base64 String for the Identifier.
@@ -82,16 +87,27 @@ public class FrontendController {
         // If the given data was valid and a Session has been created redirect to the panel Site. If not redirect to error.
         if (session != null) {
 
-            Server.getInstance().getOAuth2Client().getUser(session).queue(oAuth2User -> {
-                if (oAuth2User != null) {
-                    Guild guild = BotInfo.botInstance.getGuildById(805149057004732457L);
-                    if (guild != null) {
-                        Server.getInstance().getOAuth2Client().joinGuild(oAuth2User, guild).queue();
-                    }
-                }
-            });
+            Cookie cookie = new Cookie("identifier", Base64.getEncoder().encodeToString(identifier.getBytes(StandardCharsets.UTF_8)));
 
-            return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/panel?id=" + identifier);
+            cookie.setMaxAge(7 * 24 * 60 * 60);
+            if (BotInfo.version != BotVersion.DEV) cookie.setSecure(true);
+            cookie.setPath("/");
+
+            httpServletResponse.addCookie(cookie);
+
+            try {
+                Server.getInstance().getOAuth2Client().getUser(session).queue(oAuth2User -> {
+                    if (oAuth2User != null) {
+                        Guild guild = BotInfo.botInstance.getGuildById(805149057004732457L);
+                        if (guild != null) {
+                            Server.getInstance().getOAuth2Client().joinGuild(oAuth2User, guild).queue();
+                        }
+                    }
+                });
+            } catch (Exception ignore) {
+            }
+
+            return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/panel");
         } else {
             return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/error");
         }
@@ -185,7 +201,17 @@ public class FrontendController {
      * @return {@link String} for Thyme to the HTML Page.
      */
     @GetMapping(path = "/panel")
-    public String openPanel(@RequestParam String id, Model model) {
+    public String openPanel(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, Model model) {
+
+        // Check and decode the Identifier saved in the Cookies.
+        id = getIdentifier(id);
+
+        if (checkIdentifier(id)) {
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Session!");
+            deleteSessionCookie(httpServletResponse);
+            return "main/index";
+        }
 
         Session session = null;
         List<OAuth2Guild> guilds;
@@ -207,11 +233,14 @@ public class FrontendController {
             model.addAttribute("guilds", guilds);
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
-            if (session == null) return MAIN_PATH;
+            if (session == null) {
+                deleteSessionCookie(httpServletResponse);
+                return MAIN_PATH;
+            }
 
             // If the Session isn't null give the User a Notification that his Guilds couldn't be loaded.
             model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Guilds!");
+            model.addAttribute("error", "Couldn't load Session!");
         }
 
         // Return Panel Page.
@@ -225,16 +254,27 @@ public class FrontendController {
     /**
      * Request Mapper for the Server Panel Page.
      *
-     * @param id      the Session Identifier.
-     * @param guildID the ID of the selected Guild.
-     * @param model   the ViewModel.
+     * @param httpServletResponse the HTTP Response.
+     * @param id                  the Session Identifier.
+     * @param guildID             the ID of the selected Guild.
+     * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @GetMapping(path = "/panel/server")
-    public String openServerPanel(@RequestParam String id, @RequestParam String guildID, Model model) {
+    public String openServerPanel(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String guildID, Model model) {
+
+        // Check and decode the Identifier saved in the Cookies.
+        id = getIdentifier(id);
+
+        if (checkIdentifier(id)) {
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Session!");
+            deleteSessionCookie(httpServletResponse);
+            return "main/index";
+        }
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, guildID, id)) return ERROR_PATH;
+        if (setDefaultInformation(model, httpServletResponse, guildID, id)) return ERROR_PATH;
 
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("invites", Server.getInstance().getSqlConnector().getSqlWorker().getInvites(guildID));
@@ -264,16 +304,27 @@ public class FrontendController {
     /**
      * Request Mapper for the Moderation Panel Page.
      *
-     * @param id      the Session Identifier.
-     * @param guildID the ID of the selected Guild.
-     * @param model   the ViewModel.
+     * @param httpServletResponse the HTTP Response.
+     * @param id                  the Session Identifier.
+     * @param guildID             the ID of the selected Guild.
+     * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @GetMapping(path = "/panel/moderation")
-    public String openPanelModeration(@RequestParam String id, @RequestParam String guildID, Model model) {
+    public String openPanelModeration(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String guildID, Model model) {
+
+        // Check and decode the Identifier saved in the Cookies.
+        id = getIdentifier(id);
+
+        if (checkIdentifier(id)) {
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Session!");
+            deleteSessionCookie(httpServletResponse);
+            return "main/index";
+        }
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, guildID, id)) return ERROR_PATH;
+        if (setDefaultInformation(model, httpServletResponse, guildID, id)) return ERROR_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -319,15 +370,17 @@ public class FrontendController {
     /**
      * Request Mapper for the Moderation Role Change Panel.
      *
-     * @param roleChangeForm as the Form which contains the needed data.
-     * @param model          the ViewModel.
+     * @param httpServletResponse the HTTP Response.
+     * @param roleChangeForm      as the Form which contains the needed data.
+     * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @PostMapping(path = "/panel/moderation/role")
-    public String openPanelModeration(@ModelAttribute(name = "roleChangeForm") RoleChangeForm roleChangeForm, Model model) {
+    public String openPanelModeration(HttpServletResponse httpServletResponse, @ModelAttribute(name = "roleChangeForm") RoleChangeForm roleChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, roleChangeForm.getGuild(), roleChangeForm.getIdentifier())) return ERROR_PATH;
+        if (setDefaultInformation(model, httpServletResponse, roleChangeForm.getGuild(), roleChangeForm.getIdentifier()))
+            return ERROR_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -373,15 +426,16 @@ public class FrontendController {
     /**
      * Request Mapper for the Moderation Settings Change Panel.
      *
-     * @param settingChangeForm as the Form which contains the needed data.
-     * @param model             the ViewModel.
+     * @param httpServletResponse the HTTP Response.
+     * @param settingChangeForm   as the Form which contains the needed data.
+     * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @PostMapping(path = "/panel/moderation/settings")
-    public String openPanelModeration(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
+    public String openPanelModeration(HttpServletResponse httpServletResponse, @ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
+        if (setDefaultInformation(model, httpServletResponse, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
             return ERROR_PATH;
 
         // Get the Guild from the Model.
@@ -397,24 +451,17 @@ public class FrontendController {
             Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
         } else {
             switch (settingChangeForm.getSetting().getName()) {
-                case "addBadWord": {
+                case "addBadWord" -> {
                     Server.getInstance().getSqlConnector().getSqlWorker().addChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
-                    break;
                 }
-
-                case "removeBadWord": {
+                case "removeBadWord" -> {
                     Server.getInstance().getSqlConnector().getSqlWorker().removeChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
-                    break;
                 }
-
-                case "addAutoRole": {
+                case "addAutoRole" -> {
                     Server.getInstance().getSqlConnector().getSqlWorker().addAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
-                    break;
                 }
-
-                case "removeAutoRole": {
+                case "removeAutoRole" -> {
                     Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
-                    break;
                 }
             }
         }
@@ -454,16 +501,27 @@ public class FrontendController {
     /**
      * Request Mapper for the Social Panel Page.
      *
-     * @param id      the Session Identifier.
-     * @param guildID the ID of the selected Guild.
-     * @param model   the ViewModel.
+     * @param httpServletResponse the HTTP Response.
+     * @param id                  the Session Identifier.
+     * @param guildID             the ID of the selected Guild.
+     * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @GetMapping(path = "/panel/social")
-    public String openPanelSocial(@RequestParam String id, @RequestParam String guildID, Model model) {
+    public String openPanelSocial(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String guildID, Model model) {
+
+        // Check and decode the Identifier saved in the Cookies.
+        id = getIdentifier(id);
+
+        if (checkIdentifier(id)) {
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Session!");
+            deleteSessionCookie(httpServletResponse);
+            return "main/index";
+        }
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, guildID, id)) return ERROR_PATH;
+        if (setDefaultInformation(model, httpServletResponse, guildID, id)) return ERROR_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -485,15 +543,16 @@ public class FrontendController {
     /**
      * Request Mapper for the Social Channel Change Panel.
      *
-     * @param channelChangeForm as the Form which contains the needed data.
-     * @param model             the ViewModel.
+     * @param httpServletResponse the HTTP Response.
+     * @param channelChangeForm   as the Form which contains the needed data.
+     * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @PostMapping(path = "/panel/social/channel")
-    public String openPanelSocial(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
+    public String openPanelSocial(HttpServletResponse httpServletResponse, @ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, channelChangeForm.getGuild(), channelChangeForm.getIdentifier()))
+        if (setDefaultInformation(model, httpServletResponse, channelChangeForm.getGuild(), channelChangeForm.getIdentifier()))
             return ERROR_PATH;
 
         // Get the Guild from the Model.
@@ -529,15 +588,16 @@ public class FrontendController {
     /**
      * Request Mapper for the Social Setting Change Panel.
      *
-     * @param settingChangeForm as the Form which contains the needed data.
-     * @param model             the ViewModel.
+     * @param httpServletResponse the HTTP Response.
+     * @param settingChangeForm   as the Form which contains the needed data.
+     * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @PostMapping(path = "/panel/social/settings")
-    public String openPanelSocial(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
+    public String openPanelSocial(HttpServletResponse httpServletResponse, @ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
+        if (setDefaultInformation(model, httpServletResponse, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
             return ERROR_PATH;
 
         // Get the Guild from the Model.
@@ -570,16 +630,27 @@ public class FrontendController {
     /**
      * Request Mapper for the Logging Panel Page.
      *
-     * @param id      the Session Identifier.
-     * @param guildID the ID of the selected Guild.
-     * @param model   the ViewModel.
+     * @param httpServletResponse the HTTP Response.
+     * @param id                  the Session Identifier.
+     * @param guildID             the ID of the selected Guild.
+     * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @GetMapping(path = "/panel/logging")
-    public String openPanelLogging(@RequestParam String id, @RequestParam String guildID, Model model) {
+    public String openPanelLogging(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String guildID, Model model) {
+
+        // Check and decode the Identifier saved in the Cookies.
+        id = getIdentifier(id);
+
+        if (checkIdentifier(id)) {
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Session!");
+            deleteSessionCookie(httpServletResponse);
+            return "main/index";
+        }
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, guildID, id)) return ERROR_PATH;
+        if (setDefaultInformation(model, httpServletResponse, guildID, id)) return ERROR_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -600,15 +671,16 @@ public class FrontendController {
     /**
      * Request Mapper for the Logging Channel Change Panel.
      *
-     * @param channelChangeForm as the Form which contains the needed data.
-     * @param model             the ViewModel.
+     * @param httpServletResponse the HTTP Response.
+     * @param channelChangeForm   as the Form which contains the needed data.
+     * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @PostMapping(path = "/panel/logging/channel")
-    public String openPanelLogging(@ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
+    public String openPanelLogging(HttpServletResponse httpServletResponse, @ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, channelChangeForm.getGuild(), channelChangeForm.getIdentifier()))
+        if (setDefaultInformation(model, httpServletResponse, channelChangeForm.getGuild(), channelChangeForm.getIdentifier()))
             return ERROR_PATH;
 
         // Get the Guild from the Model.
@@ -638,15 +710,16 @@ public class FrontendController {
     /**
      * Request Mapper for the Logging Setting Change Panel.
      *
-     * @param settingChangeForm as the Form which contains the needed data.
-     * @param model             the ViewModel.
+     * @param httpServletResponse the HTTP Response.
+     * @param settingChangeForm   as the Form which contains the needed data.
+     * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @PostMapping(path = "/panel/logging/settings")
-    public String openPanelLogging(@ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
+    public String openPanelLogging(HttpServletResponse httpServletResponse, @ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
+        if (setDefaultInformation(model, httpServletResponse, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
             return ERROR_PATH;
 
         // Get the Guild from the Model.
@@ -674,15 +747,21 @@ public class FrontendController {
     /**
      * Set default information such as the Session Identifier and {@link Guild} Entity.
      *
-     * @param model      the View Model.
-     * @param guildId    the ID of the Guild
-     * @param identifier the Session Identifier.
+     * @param model               the View Model.
+     * @param httpServletResponse the HTTP Response.
+     * @param guildId             the ID of the Guild
+     * @param identifier          the Session Identifier.
      * @return true, if there was an error | false, if everything was alright.
      */
-    public boolean setDefaultInformation(Model model, String guildId, String identifier) {
+    public boolean setDefaultInformation(Model model, HttpServletResponse httpServletResponse, String guildId, String identifier) {
         try {
             // Try retrieving the Session from the Identifier.
             Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(identifier);
+
+            if (session == null) {
+                deleteSessionCookie(httpServletResponse);
+                return true;
+            }
 
             // Try retrieving the User from the Session.
             OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
@@ -706,9 +785,52 @@ public class FrontendController {
             }
 
             return false;
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
 
         return true;
+    }
+
+    /**
+     * Delete a Session Cookie that has been set.
+     *
+     * @param httpServletResponse the HTTP Response.
+     */
+    public void deleteSessionCookie(HttpServletResponse httpServletResponse) {
+        Cookie cookie = new Cookie("identifier", null);
+
+        cookie.setMaxAge(0);
+        if (BotInfo.version != BotVersion.DEV) cookie.setSecure(true);
+        cookie.setPath("/");
+
+        httpServletResponse.addCookie(cookie);
+    }
+
+    /**
+     * Get the Identifier out of the Cookie-Value.
+     *
+     * @param identifier the encoded Identifier.
+     * @return the decoded Identifier.
+     */
+    public String getIdentifier(String identifier) {
+        try {
+            identifier = new String(Base64.getDecoder().decode(identifier));
+            return identifier;
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if a String is a valid identifier.
+     *
+     * @param identifier the "identifier".
+     * @return true, if it is a valid identifier | false, if not.
+     */
+    public boolean checkIdentifier(String identifier) {
+        return identifier == null || identifier.equals("-1") || !identifier.matches("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$");
     }
 
     //endregion
