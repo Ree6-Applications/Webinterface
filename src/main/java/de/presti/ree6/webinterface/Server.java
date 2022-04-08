@@ -2,8 +2,8 @@ package de.presti.ree6.webinterface;
 
 import com.mindscapehq.raygun4java.core.RaygunClient;
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
-import de.presti.ree6.webinterface.bot.BotUtil;
-import de.presti.ree6.webinterface.bot.BotVersion;
+import de.presti.ree6.webinterface.bot.BotWorker;
+import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.sql.SQLConnector;
 import de.presti.ree6.webinterface.utils.Config;
 import org.slf4j.Logger;
@@ -53,11 +53,11 @@ public class Server {
         config.init();
 
         // Add Raygun for external Exceptions Information.
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> new RaygunClient(config.getConfig().getString("raygun.apitoken")).send(e));
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> new RaygunClient(config.getConfiguration().getString("raygun.apitoken")).send(e));
 
         // Create a new JDA Session.
         try {
-            BotUtil.createBot(BotVersion.PUBLIC, "1.6.3");
+            BotWorker.createBot(BotVersion.PUBLIC, "1.7.3");
             logger.info("Service (JDA) has been started. Creation was successful.");
         } catch (Exception ignore) {
             //Inform if not successful.
@@ -65,11 +65,11 @@ public class Server {
         }
 
         // Creating OAuth2 Instance.
-        oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfig().getLong("discord.client.id")).setClientSecret(config.getConfig().getString("discord.client.secret")).build();
+        oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfiguration().getLong("discord.client.id")).setClientSecret(config.getConfiguration().getString("discord.client.secret")).build();
 
         // Creating a new SQL-Connector Instance.
-        sqlConnector = new SQLConnector(config.getConfig().getString("mysql.user"), config.getConfig().getString("mysql.db"),
-                config.getConfig().getString("mysql.pw"), config.getConfig().getString("mysql.host"), config.getConfig().getInt("mysql.port"));
+        sqlConnector = new SQLConnector(config.getConfiguration().getString("mysql.user"), config.getConfiguration().getString("mysql.db"),
+                config.getConfiguration().getString("mysql.pw"), config.getConfiguration().getString("mysql.host"), config.getConfiguration().getInt("mysql.port"));
 
         // Add onShutdown as call methode when Shutdown.
         Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
@@ -80,7 +80,7 @@ public class Server {
      */
     public void onShutdown() {
         // Shutdown Bot Instance.
-        BotUtil.shutdown();
+        BotWorker.shutdown();
 
         // Shutdown the SQL Connection.
         getSqlConnector().close();

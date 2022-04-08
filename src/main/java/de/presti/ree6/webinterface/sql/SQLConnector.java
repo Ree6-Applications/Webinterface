@@ -73,11 +73,11 @@ public class SQLConnector {
 
         try {
             // Create a new Connection by using the SQL DriverManager and the MariaDB Java Driver and notify if successful.
-            connection = DriverManager.getConnection("jdbc:mysql://" + databaseServerIP + ":" + databaseServerPort + "/" + databaseName + "?autoReconnect=true", databaseUser, databasePassword);
+            connection = DriverManager.getConnection("jdbc:mariadb://" + databaseServerIP + ":" + databaseServerPort + "/" + databaseName + "?autoReconnect=true", databaseUser, databasePassword);
             Server.getInstance().getLogger().info("Service (MariaDB) has been started. Connection was successful.");
-        } catch (Exception ignore) {
+        } catch (Exception exception) {
             // Notify if there was an error.
-            Server.getInstance().getLogger().error("Service (MariaDB) couldn't be started. Connection was unsuccessful.");
+            Server.getInstance().getLogger().error("Service (MariaDB) couldn't be started. Connection was unsuccessful.", exception);
         }
     }
 
@@ -94,10 +94,10 @@ public class SQLConnector {
         tables.put("CommandStats", "(COMMAND VARCHAR(40), USES VARCHAR(50))");
         tables.put("GuildStats", "(GID VARCHAR(40), COMMAND VARCHAR(40), USES VARCHAR(50))");
         tables.put("TwitchNotify", "(GID VARCHAR(40), NAME VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        tables.put("TwitterNotify", "(GID VARCHAR(40), NAME VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
         tables.put("LogWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
         tables.put("WelcomeWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
         tables.put("NewsWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
-        tables.put("RainbowWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
         tables.put("JoinMessage", "(GID VARCHAR(40), MSG VARCHAR(250))");
         tables.put("MuteRoles", "(GID VARCHAR(40), RID VARCHAR(40))");
         tables.put("ChatProtector", "(GID VARCHAR(40), WORD VARCHAR(40))");
@@ -112,12 +112,12 @@ public class SQLConnector {
         for (Map.Entry<String, String> entry : tables.entrySet()) {
 
             // Create a Table based on the key.
-            try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + entry.getKey() + " " + entry.getValue())) {
-                ps.executeUpdate();
-            } catch (SQLException ignore) {
+            try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + entry.getKey() + entry.getValue())) {
+                ps.executeQuery();
+            } catch (SQLException exception) {
 
                 // Notify if there was an error.
-                Server.getInstance().getLogger().error("Couldn't create {0} Table.", entry.getKey());
+                Server.getInstance().getLogger().error("Couldn't create " + entry.getKey() + " Table.", exception);
             }
         }
 

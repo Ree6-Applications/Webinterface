@@ -32,7 +32,7 @@ import com.jagrosh.jdautilities.oauth2.session.SessionController;
 import com.jagrosh.jdautilities.oauth2.session.SessionData;
 import com.jagrosh.jdautilities.oauth2.state.DefaultStateController;
 import com.jagrosh.jdautilities.oauth2.state.StateController;
-import de.presti.ree6.webinterface.bot.BotInfo;
+import de.presti.ree6.webinterface.bot.BotWorker;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.exceptions.HttpException;
 import net.dv8tion.jda.internal.requests.Method;
@@ -204,7 +204,7 @@ public class OAuth2ClientImpl implements OAuth2Client
         return new OAuth2Action<>(this, Method.PUT, OAuth2URL.GUILD_JOIN.compile(guild.getId(), user.getId())) {
             @Override
             protected Headers getHeaders() {
-                return Headers.of("Authorization", "Bot " + BotInfo.TOKEN, "Content-Type", "application/json");
+                return Headers.of("Authorization", "Bot " + BotWorker.getToken(), "Content-Type", "application/json");
             }
 
             @Override

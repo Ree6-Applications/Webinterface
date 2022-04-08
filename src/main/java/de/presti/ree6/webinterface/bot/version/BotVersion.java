@@ -1,4 +1,4 @@
-package de.presti.ree6.webinterface.bot;
+package de.presti.ree6.webinterface.bot.version;
 
 /**
  * Class with every Version.

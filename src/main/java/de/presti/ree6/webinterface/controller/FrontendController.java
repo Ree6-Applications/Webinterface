@@ -5,12 +5,12 @@ import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2User;
 import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.webinterface.Server;
-import de.presti.ree6.webinterface.bot.BotInfo;
-import de.presti.ree6.webinterface.bot.BotVersion;
+import de.presti.ree6.webinterface.bot.BotWorker;
+import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.controller.forms.ChannelChangeForm;
 import de.presti.ree6.webinterface.controller.forms.RoleChangeForm;
 import de.presti.ree6.webinterface.controller.forms.SettingChangeForm;
-import de.presti.ree6.webinterface.level.UserLevel;
+import de.presti.ree6.webinterface.sql.entities.UserLevel;
 import de.presti.ree6.webinterface.utils.RandomUtil;
 import de.presti.ree6.webinterface.utils.Setting;
 import net.dv8tion.jda.api.Permission;
@@ -60,7 +60,7 @@ public class FrontendController {
      */
     @GetMapping("/discord/auth")
     public ModelAndView startDiscordAuth() {
-        return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL((BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
+        return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL((BotWorker.getVersion() != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
     }
 
     /**
@@ -91,7 +91,7 @@ public class FrontendController {
 
             cookie.setHttpOnly(true);
             cookie.setMaxAge(7 * 24 * 60 * 60);
-            if (BotInfo.version != BotVersion.DEV) cookie.setSecure(true);
+            if (BotWorker.getVersion() != BotVersion.DEV) cookie.setSecure(true);
             cookie.setPath("/");
 
             httpServletResponse.addCookie(cookie);
@@ -99,7 +99,7 @@ public class FrontendController {
             try {
                 Server.getInstance().getOAuth2Client().getUser(session).queue(oAuth2User -> {
                     if (oAuth2User != null) {
-                        Guild guild = BotInfo.botInstance.getGuildById(805149057004732457L);
+                        Guild guild = BotWorker.getShardManager().getGuildById(805149057004732457L);
                         if (guild != null) {
                             Server.getInstance().getOAuth2Client().joinGuild(oAuth2User, guild).queue();
                         }
@@ -108,9 +108,9 @@ public class FrontendController {
             } catch (Exception ignore) {
             }
 
-            return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/panel");
+            return new ModelAndView("redirect:" + (BotWorker.getVersion() != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/panel");
         } else {
-            return new ModelAndView("redirect:" + (BotInfo.version != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/error");
+            return new ModelAndView("redirect:" + (BotWorker.getVersion() != BotVersion.DEV ? "https://cp.ree6.de" : "http://localhost:8888") + "/error");
         }
     }
 
@@ -128,23 +128,21 @@ public class FrontendController {
     @GetMapping(value = "/leaderboard/chat")
     public String getLeaderboardChat(@RequestParam String guildId, Model model) {
 
-        Guild guild = BotInfo.botInstance.getGuildById(guildId);
+        Guild guild = BotWorker.getShardManager().getGuildById(guildId);
 
         if (guild != null) model.addAttribute("guild", guild);
 
         int i = 1;
-        for (String userIds : Server.getInstance().getSqlConnector().getSqlWorker().getTopChat(guildId, 5)) {
-
-            UserLevel userLevel = new UserLevel(userIds, Server.getInstance().getSqlConnector().getSqlWorker().getChatXP(guildId, userIds));
-
+        for (UserLevel userLevel : Server.getInstance().getSqlConnector().getSqlWorker().getTopChat(guildId, 5)) {
             try {
-                if (BotInfo.botInstance.getUserById(userIds) != null) {
-                    userLevel.setUser(BotInfo.botInstance.getUserById(userIds));
+                if (BotWorker.getShardManager().getUserById(userLevel.getUserId()) != null) {
+                    userLevel.setUser(BotWorker.getShardManager().getUserById(userLevel.getUserId()));
                 } else {
-                    userLevel.setUser(BotInfo.botInstance.retrieveUserById(userIds).complete());
+                    userLevel.setUser(BotWorker.getShardManager().retrieveUserById(userLevel.getUserId()).complete());
                 }
             } catch (Exception ignore) {
-                Server.getInstance().getSqlConnector().getSqlWorker().addChatXP(guildId, userIds, -userLevel.getXp());
+                userLevel.setExperience(0);
+                Server.getInstance().getSqlConnector().getSqlWorker().addChatLevelData(guildId, userLevel);
             }
 
             model.addAttribute("user" + i, userLevel);
@@ -164,23 +162,21 @@ public class FrontendController {
     @GetMapping(value = "/leaderboard/voice")
     public String getLeaderboardVoice(@RequestParam String guildId, Model model) {
 
-        Guild guild = BotInfo.botInstance.getGuildById(guildId);
+        Guild guild = BotWorker.getShardManager().getGuildById(guildId);
 
         if (guild != null) model.addAttribute("guild", guild);
 
         int i = 1;
-        for (String userIds : Server.getInstance().getSqlConnector().getSqlWorker().getTopVoice(guildId, 5)) {
-
-            UserLevel userLevel = new UserLevel(userIds, Server.getInstance().getSqlConnector().getSqlWorker().getVoiceXP(guildId, userIds));
-
+        for (UserLevel userLevel : Server.getInstance().getSqlConnector().getSqlWorker().getTopVoice(guildId, 5)) {
             try {
-                if (BotInfo.botInstance.getUserById(userIds) != null) {
-                    userLevel.setUser(BotInfo.botInstance.getUserById(userIds));
+                if (BotWorker.getShardManager().getUserById(userLevel.getUserId()) != null) {
+                    userLevel.setUser(BotWorker.getShardManager().getUserById(userLevel.getUserId()));
                 } else {
-                    userLevel.setUser(BotInfo.botInstance.retrieveUserById(userIds).complete());
+                    userLevel.setUser(BotWorker.getShardManager().retrieveUserById(userLevel.getUserId()).complete());
                 }
             } catch (Exception ignore) {
-                Server.getInstance().getSqlConnector().getSqlWorker().addChatXP(guildId, userIds, -userLevel.getXp());
+                userLevel.setExperience(0);
+                Server.getInstance().getSqlConnector().getSqlWorker().addChatLevelData(guildId, userLevel);
             }
 
             model.addAttribute("user" + i, userLevel);
@@ -359,7 +355,7 @@ public class FrontendController {
         try {
             muteRole = guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guildID));
         } catch (Exception ignore) {
-            Server.getInstance().getSqlConnector().getSqlWorker().removeMuteRole(guildID, Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guildID));
+            Server.getInstance().getSqlConnector().getSqlWorker().removeMuteRole(guildID);
         }
 
         model.addAttribute("muterole", muteRole);
@@ -416,7 +412,7 @@ public class FrontendController {
         try {
             muteRole = guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId()));
         } catch (Exception ignore) {
-            Server.getInstance().getSqlConnector().getSqlWorker().removeMuteRole(guild.getId(), Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId()));
+            Server.getInstance().getSqlConnector().getSqlWorker().removeMuteRole(guild.getId());
         }
 
         model.addAttribute("muterole", muteRole);
@@ -487,7 +483,7 @@ public class FrontendController {
         try {
             muteRole = guild.getRoleById(Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId()));
         } catch (Exception ignore) {
-            Server.getInstance().getSqlConnector().getSqlWorker().removeMuteRole(guild.getId(), Server.getInstance().getSqlConnector().getSqlWorker().getMuteRole(guild.getId()));
+            Server.getInstance().getSqlConnector().getSqlWorker().removeMuteRole(guild.getId());
         }
 
         model.addAttribute("muterole", muteRole);
@@ -768,7 +764,7 @@ public class FrontendController {
             OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
 
             // Retrieve the Guild by its giving ID.
-            Guild guild = BotInfo.botInstance.getGuildById(guildId);
+            Guild guild = BotWorker.getShardManager().getGuildById(guildId);
 
             // If the Guild couldn't be loaded redirect to Error page.
             if (guild == null) return true;
@@ -802,7 +798,7 @@ public class FrontendController {
 
         cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
-        if (BotInfo.version != BotVersion.DEV) cookie.setSecure(true);
+        if (BotWorker.getVersion() != BotVersion.DEV) cookie.setSecure(true);
         cookie.setPath("/");
 
         httpServletResponse.addCookie(cookie);

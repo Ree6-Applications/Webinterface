@@ -17,7 +17,7 @@ package com.jagrosh.jdautilities.oauth2.entities.impl;
 
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
-import de.presti.ree6.webinterface.bot.BotInfo;
+import de.presti.ree6.webinterface.bot.BotWorker;
 import net.dv8tion.jda.api.Permission;
 
 import java.util.EnumSet;
@@ -46,7 +46,7 @@ public class OAuth2GuildImpl implements OAuth2Guild
     }
 
     @Override
-    public boolean botJoined() { return BotInfo.botInstance.getGuildById(getIdLong()) != null; }
+    public boolean botJoined() { return BotWorker.getShardManager().getGuildById(getIdLong()) != null; }
 
     @Override
     public OAuth2Client getClient()
