@@ -27,7 +27,9 @@
                   <li class="nav-item"></li>
                   <li class="nav-item"></li>
                </ul>
-               <span class="navbar-text actions"> <a class="btn btn-dark action-button" role="button" href="https://cp.ree6.de/auth/discord">Login</a></span>
+               <span class="navbar-text actions">
+                  <a class="btn btn-dark action-button" role="button" th:value="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth">Login</a>
+               </span>
             </div>
          </div>
       </nav>

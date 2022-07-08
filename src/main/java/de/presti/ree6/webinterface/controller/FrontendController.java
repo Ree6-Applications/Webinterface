@@ -148,6 +148,8 @@ public class FrontendController {
                 return ERROR_PATH;
             }
 
+            model.addAttribute("isLogged", true);
+
             // Try retrieving the User from the Session.
             OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
 
@@ -226,6 +228,8 @@ public class FrontendController {
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_PATH;
             }
+
+            model.addAttribute("isLogged", true);
 
             // Try retrieving the User from the Session.
             OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
@@ -317,6 +321,8 @@ public class FrontendController {
 
             // Add the Guilds as Attribute to the ViewModel.
             model.addAttribute("guilds", guilds);
+
+            model.addAttribute("isLogged", true);
         } catch (Exception e) {
             // If the Session is null just return to the default Page.
             if (session == null) {
@@ -840,6 +846,8 @@ public class FrontendController {
                 deleteSessionCookie(httpServletResponse);
                 return true;
             }
+
+            model.addAttribute("isLogged", true);
 
             // Try retrieving the User from the Session.
             OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
