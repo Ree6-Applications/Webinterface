@@ -28,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controller for the Frontend to manage what the user sees.
@@ -46,7 +45,21 @@ public class FrontendController {
      * @return {@link String} for Thyme to the HTML Page.
      */
     @GetMapping("/")
-    public String main() {
+    public String main(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, Model model) {
+
+        // Check and decode the Identifier saved in the Cookies.
+        id = getIdentifier(id);
+
+        try {
+            if (!checkIdentifier(id)) {
+                // Try retrieving the Session from the Identifier.
+                Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+                if (session != null) {
+                    model.addAttribute("isLogged", true);
+                }
+            }
+        } catch (Exception ignore) {
+        }
         return MAIN_PATH;
     }
 
@@ -132,7 +145,7 @@ public class FrontendController {
 
         if (checkIdentifier(id)) {
             model.addAttribute("title", "Insufficient Permissions");
-            model.addAttribute("message", new String[] { "Please check if you are logged in!" });
+            model.addAttribute("message", new String[]{"Please check if you are logged in!"});
             deleteSessionCookie(httpServletResponse);
             return ERROR_PATH;
         }
@@ -143,7 +156,7 @@ public class FrontendController {
 
             if (session == null) {
                 model.addAttribute("title", "Insufficient Permissions");
-                model.addAttribute("message", new String[] { "Please check if you are logged in!" });
+                model.addAttribute("message", new String[]{"Please check if you are logged in!"});
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_PATH;
             }
@@ -159,7 +172,7 @@ public class FrontendController {
             // If the Guild couldn't be loaded redirect to Error page.
             if (guild == null) {
                 model.addAttribute("title", "Invalid Guild");
-                model.addAttribute("message", new String[] { "The requested Guild is Invalid or not recognized!" });
+                model.addAttribute("message", new String[]{"The requested Guild is Invalid or not recognized!"});
                 return ERROR_PATH;
             }
 
@@ -167,14 +180,14 @@ public class FrontendController {
 
             if (member == null) {
                 model.addAttribute("title", "Insufficient Permissions");
-                model.addAttribute("message", new String[] { "You are not part of this Guild!" });
+                model.addAttribute("message", new String[]{"You are not part of this Guild!"});
                 return ERROR_PATH;
             }
 
             model.addAttribute("guild", guild);
         } catch (Exception exception) {
             model.addAttribute("title", "Unexpected Error, please Report!");
-            model.addAttribute("message", new String[] { "We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")" });
+            model.addAttribute("message", new String[]{"We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")"});
             return ERROR_PATH;
         }
 
@@ -213,7 +226,7 @@ public class FrontendController {
 
         if (checkIdentifier(id)) {
             model.addAttribute("title", "Insufficient Permissions");
-            model.addAttribute("message", new String[] { "Please check if you are logged in!" });
+            model.addAttribute("message", new String[]{"Please check if you are logged in!"});
             deleteSessionCookie(httpServletResponse);
             return ERROR_PATH;
         }
@@ -224,7 +237,7 @@ public class FrontendController {
 
             if (session == null) {
                 model.addAttribute("title", "Insufficient Permissions");
-                model.addAttribute("message", new String[] { "Please check if you are logged in!" });
+                model.addAttribute("message", new String[]{"Please check if you are logged in!"});
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_PATH;
             }
@@ -240,7 +253,7 @@ public class FrontendController {
             // If the Guild couldn't be loaded redirect to Error page.
             if (guild == null) {
                 model.addAttribute("title", "Invalid Guild");
-                model.addAttribute("message", new String[] { "The requested Guild is Invalid or not recognized!" });
+                model.addAttribute("message", new String[]{"The requested Guild is Invalid or not recognized!"});
                 return ERROR_PATH;
             }
 
@@ -248,14 +261,14 @@ public class FrontendController {
 
             if (member == null) {
                 model.addAttribute("title", "Insufficient Permissions");
-                model.addAttribute("message", new String[] { "You are not part of this Guild!" });
+                model.addAttribute("message", new String[]{"You are not part of this Guild!"});
                 return ERROR_PATH;
             }
 
             model.addAttribute("guild", guild);
         } catch (Exception exception) {
             model.addAttribute("title", "Unexpected Error, please Report!");
-            model.addAttribute("message", new String[] { "We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")" });
+            model.addAttribute("message", new String[]{"We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")"});
             return ERROR_PATH;
         }
 
@@ -543,10 +556,14 @@ public class FrontendController {
             Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getGuild(), settingChangeForm.getSetting());
         } else {
             switch (settingChangeForm.getSetting().getName()) {
-                case "addBadWord" -> Server.getInstance().getSqlConnector().getSqlWorker().addChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
-                case "removeBadWord" -> Server.getInstance().getSqlConnector().getSqlWorker().removeChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
-                case "addAutoRole" -> Server.getInstance().getSqlConnector().getSqlWorker().addAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
-                case "removeAutoRole" -> Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                case "addBadWord" ->
+                        Server.getInstance().getSqlConnector().getSqlWorker().addChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                case "removeBadWord" ->
+                        Server.getInstance().getSqlConnector().getSqlWorker().removeChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                case "addAutoRole" ->
+                        Server.getInstance().getSqlConnector().getSqlWorker().addAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                case "removeAutoRole" ->
+                        Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
             }
         }
 
@@ -903,7 +920,8 @@ public class FrontendController {
         try {
             identifier = new String(Base64.getDecoder().decode(identifier));
             return identifier;
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         return null;
     }
@@ -912,7 +930,7 @@ public class FrontendController {
      * Check if a String is a valid identifier.
      *
      * @param identifier the "identifier".
-     * @return true, if it is a valid identifier | false, if not.
+     * @return true, if it is an invalid identifier | false, if not.
      */
     public boolean checkIdentifier(String identifier) {
         return identifier == null || identifier.equals("-1");
