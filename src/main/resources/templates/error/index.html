@@ -13,7 +13,7 @@
     <a href="https://cp.ree6.de"><img src="https://ree6.de/assets/img/ree6-icon.png" id="boticon" alt="ree6-bot-icon"></a>
     <div style="flex: 1"></div>
     <span id="loginbutton">
-         <a th:value="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth">Login</a>
+         <a th:text="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth">Login</a>
     </span>
 </div>
 <div class="container" id="name-desc" style="flex-direction: column; justify-content: center; height: fit-content;">
