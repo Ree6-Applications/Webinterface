@@ -17,6 +17,6 @@ As of right now, you can login via the Discord 2Oauth and select a Server that y
 ## Disclaimer
 Please be aware that im a Student and can't work full-time on the Bot, and that I am paying for every costs that comes up to keep this Project alive! Im thankful for every donation that I receive on [Ko-fi](https://ko-fi.com/presti).
 
-# Used APIs.
+# Used Tools.
 - [JDA](https://github.com/DV8FromTheWorld/JDA)
-- [SpringBoot](https://github.com/spring-projects/spring-boot) (Ik, it is a Framework)
+- [SpringBoot](https://github.com/spring-projects/spring-boot)

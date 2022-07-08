@@ -1,11 +1,7 @@
 package de.presti.ree6.webinterface;
 
-import org.springframework.boot.Banner;
-import org.springframework.boot.ImageBanner;
-import org.springframework.boot.ResourceBanner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.core.io.Resource;
 
 /**
  * Base class used by SpringBoot to boot up the Application.

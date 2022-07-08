@@ -15,6 +15,8 @@
  */
 package com.jagrosh.jdautilities.oauth2.entities.impl;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
 import com.jagrosh.jdautilities.oauth2.Scope;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
@@ -30,6 +32,8 @@ import com.jagrosh.jdautilities.oauth2.session.SessionController;
 import com.jagrosh.jdautilities.oauth2.session.SessionData;
 import com.jagrosh.jdautilities.oauth2.state.DefaultStateController;
 import com.jagrosh.jdautilities.oauth2.state.StateController;
+import de.presti.ree6.webinterface.bot.BotWorker;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.exceptions.HttpException;
 import net.dv8tion.jda.internal.requests.Method;
 import net.dv8tion.jda.internal.utils.Checks;
@@ -187,6 +191,35 @@ public class OAuth2ClientImpl implements OAuth2Client
                         obj.getLong("permissions")));
                 }
                 return list;
+            }
+        };
+    }
+
+    @Override
+    public OAuth2Action<OAuth2User> joinGuild(OAuth2User user, Guild guild)
+    {
+        if(!Scope.contains(user.getSession().getScopes(), Scope.GUILDS_JOIN))
+            throw new MissingScopeException("Join a Guild from a Session", Scope.GUILDS_JOIN);
+
+        return new OAuth2Action<>(this, Method.PUT, OAuth2URL.GUILD_JOIN.compile(guild.getId(), user.getId())) {
+            @Override
+            protected Headers getHeaders() {
+                return Headers.of("Authorization", "Bot " + BotWorker.getToken(), "Content-Type", "application/json");
+            }
+
+            @Override
+            protected RequestBody getBody() {
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("access_token", user.getSession().getAccessToken());
+                return RequestBody.create(MediaType.parse("application/json"), new GsonBuilder().create().toJson(jsonObject));
+            }
+
+            @Override
+            protected OAuth2User handle(Response response) throws IOException {
+                if (!response.isSuccessful())
+                    throw failure(response);
+
+                return user;
             }
         };
     }

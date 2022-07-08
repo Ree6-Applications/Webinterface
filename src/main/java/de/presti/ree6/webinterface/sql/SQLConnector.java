@@ -31,6 +31,9 @@ public class SQLConnector {
     // An Instance of the SQL-Worker which works with the Data in the Database.
     private final SQLWorker sqlWorker;
 
+    // A boolean to keep track if there was at least one valid connection.
+    private boolean connectedOnce = false;
+
     // A HashMap with every Table Name as key and the values as value.
     private final HashMap<String, String> tables = new HashMap<>();
 
@@ -58,9 +61,9 @@ public class SQLConnector {
      * Try to open a connection to the SQL Server with the given data.
      */
     public void connectToSQLServer() {
-
+        Server.getInstance().getLogger().info("Connecting to SQl-Service (MariaDB).");
         // Check if there is already an open Connection.
-        if (IsConnected()) {
+        if (isConnected()) {
             try {
                 // Close if there is and notify.
                 connection.close();
@@ -73,11 +76,12 @@ public class SQLConnector {
 
         try {
             // Create a new Connection by using the SQL DriverManager and the MariaDB Java Driver and notify if successful.
-            connection = DriverManager.getConnection("jdbc:mysql://" + databaseServerIP + ":" + databaseServerPort + "/" + databaseName + "?autoReconnect=true", databaseUser, databasePassword);
+            connection = DriverManager.getConnection("jdbc:mariadb://" + databaseServerIP + ":" + databaseServerPort + "/" + databaseName + "?autoReconnect=true", databaseUser, databasePassword);
             Server.getInstance().getLogger().info("Service (MariaDB) has been started. Connection was successful.");
-        } catch (Exception ignore) {
+            connectedOnce = true;
+        } catch (Exception exception) {
             // Notify if there was an error.
-            Server.getInstance().getLogger().error("Service (MariaDB) couldn't be started. Connection was unsuccessful.");
+            Server.getInstance().getLogger().error("Service (MariaDB) couldn't be started. Connection was unsuccessful.", exception);
         }
     }
 
@@ -87,17 +91,17 @@ public class SQLConnector {
     public void createTables() {
 
         // Check if there is an open Connection if not, skip.
-        if (!IsConnected()) return;
+        if (!isConnected()) return;
 
         // Registering the tables and values.
         tables.put("Settings", "(GID VARCHAR(40), NAME VARCHAR(40), VALUE VARCHAR(50))");
         tables.put("CommandStats", "(COMMAND VARCHAR(40), USES VARCHAR(50))");
         tables.put("GuildStats", "(GID VARCHAR(40), COMMAND VARCHAR(40), USES VARCHAR(50))");
         tables.put("TwitchNotify", "(GID VARCHAR(40), NAME VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
+        tables.put("TwitterNotify", "(GID VARCHAR(40), NAME VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
         tables.put("LogWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
         tables.put("WelcomeWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
         tables.put("NewsWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
-        tables.put("RainbowWebhooks", "(GID VARCHAR(40), CID VARCHAR(40), TOKEN VARCHAR(68))");
         tables.put("JoinMessage", "(GID VARCHAR(40), MSG VARCHAR(250))");
         tables.put("MuteRoles", "(GID VARCHAR(40), RID VARCHAR(40))");
         tables.put("ChatProtector", "(GID VARCHAR(40), WORD VARCHAR(40))");
@@ -112,23 +116,21 @@ public class SQLConnector {
         for (Map.Entry<String, String> entry : tables.entrySet()) {
 
             // Create a Table based on the key.
-            try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + entry.getKey() + " " + entry.getValue())) {
-                ps.executeUpdate();
-            } catch (SQLException ignore) {
+            try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + entry.getKey() + entry.getValue())) {
+                ps.executeQuery();
+            } catch (SQLException exception) {
 
                 // Notify if there was an error.
-                Server.getInstance().getLogger().error("Couldn't create {0} Table.", entry.getKey());
+                Server.getInstance().getLogger().error("Couldn't create " + entry.getKey() + " Table.", exception);
             }
         }
-
-
     }
 
     /**
      * Check if there is an open connection to the Database Server.
      * @return boolean If the connection is opened.
      */
-    public boolean IsConnected() {
+    public boolean isConnected() {
         try {
             return connection != null && !connection.isClosed();
         } catch (Exception ignore) {}
@@ -141,7 +143,7 @@ public class SQLConnector {
      */
     public void close() {
         // Check if there is already an open Connection.
-        if (IsConnected()) {
+        if (isConnected()) {
             try {
                 // Close if there is and notify.
                 connection.close();
@@ -174,4 +176,12 @@ public class SQLConnector {
      * @return {@link HashMap} with all Tables as Key and all values as value.
      */
     public HashMap<String, String> getTables() { return tables; }
+
+    /**
+     * Check if there was at least one successful Connection to the Database Server.
+     * @return boolean If there was at least one successful Connection.
+     */
+    public boolean connectedOnce() {
+        return connectedOnce;
+    }
 }

@@ -4,7 +4,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.presti.ree6.webinterface.Server;
-import de.presti.ree6.webinterface.bot.BotInfo;
+import de.presti.ree6.webinterface.bot.BotWorker;
+import de.presti.ree6.webinterface.sql.entities.UserLevel;
 import net.dv8tion.jda.api.entities.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,17 +39,17 @@ public class BackendController {
 
         JsonArray voiceLeaderboardArray = new JsonArray();
 
-        for (String entry : Server.getInstance().getSqlConnector().getSqlWorker().getTopChat(guildId, count)) {
+        for (UserLevel userLevel : Server.getInstance().getSqlConnector().getSqlWorker().getTopChat(guildId, count)) {
             JsonObject userObject = new JsonObject();
 
-            User user = BotInfo.botInstance.getUserById(entry);
+            User user = BotWorker.getShardManager().getUserById(userLevel.getUserId());
 
             if (user == null) continue;
 
             userObject.addProperty("user.name", user.getName());
             userObject.addProperty("user.tag", user.getAsTag());
 
-            long xp = Server.getInstance().getSqlConnector().getSqlWorker().getChatXP(guildId, entry);
+            long xp = userLevel.getExperience();
 
             userObject.addProperty("xp",
                     xp);
@@ -65,17 +66,17 @@ public class BackendController {
             chatLeaderboardArray.add(userObject);
         }
 
-        for (String entry : Server.getInstance().getSqlConnector().getSqlWorker().getTopVoice(guildId, count)) {
+        for (UserLevel userLevel : Server.getInstance().getSqlConnector().getSqlWorker().getTopVoice(guildId, count)) {
             JsonObject userObject = new JsonObject();
 
-            User user = BotInfo.botInstance.getUserById(entry);
+            User user = BotWorker.getShardManager().getUserById(userLevel.getUserId());
 
             if (user == null) continue;
 
             userObject.addProperty("user.name", user.getName());
             userObject.addProperty("user.tag", user.getAsTag());
 
-            long xp = Server.getInstance().getSqlConnector().getSqlWorker().getVoiceXP(guildId, entry);
+            long xp = userLevel.getExperience();
 
             userObject.addProperty("xp",
                     xp);
@@ -112,7 +113,7 @@ public class BackendController {
 
         JsonObject voiceJsonObject = new JsonObject();
 
-        long xp = Server.getInstance().getSqlConnector().getSqlWorker().getVoiceXP(guildID, userID);
+        long xp = Server.getInstance().getSqlConnector().getSqlWorker().getVoiceLevelData(guildID, userID).getExperience();
 
         int level = 1;
 
@@ -127,7 +128,7 @@ public class BackendController {
 
         JsonObject chatJsonObject = new JsonObject();
 
-        xp = Server.getInstance().getSqlConnector().getSqlWorker().getChatXP(guildID, userID);
+        xp = Server.getInstance().getSqlConnector().getSqlWorker().getChatLevelData(guildID, userID).getExperience();
 
         level = 1;
 
@@ -174,8 +175,8 @@ public class BackendController {
     public String getStatsGlobal() {
         JsonObject jsonObject = new JsonObject();
 
-        for (Map.Entry<String, Long> entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStatsGlobal().entrySet()) {
-            jsonObject.addProperty(entrySet.getKey(), entrySet.getValue());
+        for (String[] entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStatsGlobal()) {
+            jsonObject.addProperty(entrySet[0], entrySet[1]);
         }
 
         return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
@@ -210,8 +211,8 @@ public class BackendController {
     public String getStatsGuildAll(@RequestParam String guildID) {
         JsonObject jsonObject = new JsonObject();
 
-        for (Map.Entry<String, Long> entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildID).entrySet()) {
-            jsonObject.addProperty(entrySet.getKey(), entrySet.getValue());
+        for (String[] entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildID)) {
+            jsonObject.addProperty(entrySet[0], entrySet[1]);
         }
 
         return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
