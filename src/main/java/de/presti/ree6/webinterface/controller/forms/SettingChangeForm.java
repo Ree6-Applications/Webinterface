@@ -1,6 +1,6 @@
 package de.presti.ree6.webinterface.controller.forms;
 
-import de.presti.ree6.webinterface.utils.Setting;
+import de.presti.ree6.webinterface.sql.entities.Setting;
 
 /**
  * Class called to give info about the Setting change to the FrontendController.
@@ -32,7 +32,7 @@ public class SettingChangeForm {
      * @return {@link Setting} as Setting.
      */
     public Setting getSetting() {
-        return new Setting(name, value);
+        return new Setting(guildSession, name, value);
     }
 
     /**

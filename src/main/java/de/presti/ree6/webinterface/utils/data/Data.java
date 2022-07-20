@@ -1,9 +1,11 @@
-package de.presti.ree6.webinterface;
+package de.presti.ree6.webinterface.utils.data;
 
 /**
  * Utility class to save long term used Data.
  */
 public class Data {
+
+    // Completely remove this, and migrate it into the main class.
 
     /**
      * Constructor for the Data Utility class.
@@ -18,3 +20,4 @@ public class Data {
     // Advertisement, because of Sponsors.
     public static final String ADVERTISEMENT = "powered by Tube-Hosting";
 }
+

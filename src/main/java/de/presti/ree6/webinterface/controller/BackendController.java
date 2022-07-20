@@ -5,13 +5,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.bot.BotWorker;
-import de.presti.ree6.webinterface.sql.entities.UserLevel;
+import de.presti.ree6.webinterface.sql.entities.level.UserLevel;
+import de.presti.ree6.webinterface.sql.entities.stats.Stats;
 import net.dv8tion.jda.api.entities.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 /**
  * Used as an BackendController for API Request for Ree6.
@@ -162,7 +161,7 @@ public class BackendController {
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.addProperty("command", command);
-        jsonObject.addProperty("usage", Server.getInstance().getSqlConnector().getSqlWorker().getStatsCommandGlobal(command));
+        jsonObject.addProperty("usage", Server.getInstance().getSqlConnector().getSqlWorker().getStatsCommandGlobal(command).getUses());
 
         return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
     }
@@ -175,8 +174,8 @@ public class BackendController {
     public String getStatsGlobal() {
         JsonObject jsonObject = new JsonObject();
 
-        for (String[] entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStatsGlobal()) {
-            jsonObject.addProperty(entrySet[0], entrySet[1]);
+        for (Stats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStatsGlobal()) {
+            jsonObject.addProperty(entry.getCommand(), entry.getUses());
         }
 
         return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
@@ -197,7 +196,7 @@ public class BackendController {
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.addProperty("command", command);
-        jsonObject.addProperty("usage", Server.getInstance().getSqlConnector().getSqlWorker().getStatsCommand(guildID, command));
+        jsonObject.addProperty("usage", Server.getInstance().getSqlConnector().getSqlWorker().getStatsCommand(guildID, command).getUses());
 
         return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
     }
@@ -211,8 +210,8 @@ public class BackendController {
     public String getStatsGuildAll(@RequestParam String guildID) {
         JsonObject jsonObject = new JsonObject();
 
-        for (String[] entrySet : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildID)) {
-            jsonObject.addProperty(entrySet[0], entrySet[1]);
+        for (Stats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildID)) {
+            jsonObject.addProperty(entry.getCommand(), entry.getUses());
         }
 
         return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);

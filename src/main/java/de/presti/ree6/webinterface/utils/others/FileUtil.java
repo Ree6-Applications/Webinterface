@@ -1,7 +1,7 @@
-package de.presti.ree6.webinterface.utils;
+package de.presti.ree6.webinterface.utils.others;
 
 import de.presti.ree6.webinterface.Server;
-import de.presti.ree6.webinterface.bot.*;
+import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 
 public class FileUtil {
@@ -11,9 +11,9 @@ public class FileUtil {
     }
 
     public static String getToken() {
-        if (BotWorker.getVersion() == BotVersion.DEV) {
+        if (BotWorker.getVersion() == BotVersion.DEVELOPMENT_BUILD) {
             return Server.getInstance().getConfig().getConfiguration().getString("discord.bot.tokens.dev");
-        } else if (BotWorker.getVersion() == BotVersion.PUBLIC || BotWorker.getVersion() == BotVersion.PRERELASE) {
+        } else if (BotWorker.getVersion() == BotVersion.RELEASE || BotWorker.getVersion() == BotVersion.PRE_RELEASE) {
             return Server.getInstance().getConfig().getConfiguration().getString("discord.bot.tokens.rel");
         } else {
             return "error";

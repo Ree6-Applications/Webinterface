@@ -30,26 +30,38 @@ public class BotWorker {
         throw new IllegalStateException("Utility class");
     }
 
-    // Current state of the Bot.
+    /**
+     * Current Bot state.
+     */
     private static BotState state;
 
-    // Current Bot Version-Typ.
+    /**
+     * Current Bot version.
+     */
     private static BotVersion version;
 
-    // Instance of the JDA ShardManager.
+    /**
+     * Current {@link ShardManager}.
+     */
     private static ShardManager shardManager;
 
-    // The used Bot-Token.
+    /**
+     * Current Bot-Token.
+     */
     private static String token;
 
-    // The current build / version.
+    /**
+     * Current Bot build.
+     */
     private static String build;
 
-    // Start time of the Bot.
+    /**
+     * Bot start time.
+     */
     private static long startTime;
 
     /**
-     * Create a new {@link JDA} instance and set the rest information for later use.
+     * Create a new {@link net.dv8tion.jda.api.JDA} instance and set the rest information for later use.
      *
      * @param version1 the current Bot Version "typ".
      * @param build1   the current Bot Version.
@@ -57,11 +69,14 @@ public class BotWorker {
      */
     public static void createBot(BotVersion version1, String build1) throws LoginException {
         version = version1;
-        token = BotWorker.version == BotVersion.DEV ? Server.getInstance().getConfig().getConfiguration().getString("discord.bot.tokens.dev") : Server.getInstance().getConfig().getConfiguration().getString("discord.bot.tokens.rel");
+        token = BotWorker.version == BotVersion.DEVELOPMENT_BUILD ? Server.getInstance().getConfig().getConfiguration().getString("bot.tokens.dev") : Server.getInstance().getConfig().getConfiguration().getString("bot.tokens.rel");
         state = BotState.INIT;
         build = build1;
 
-        shardManager = DefaultShardManagerBuilder.createDefault(token).setShardsTotal(10).enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_WEBHOOKS, GatewayIntent.GUILD_INVITES).setMemberCachePolicy(MemberCachePolicy.ALL).disableCache(CacheFlag.EMOTE, CacheFlag.ACTIVITY).build();
+        shardManager = DefaultShardManagerBuilder.createDefault(token).setShardsTotal(getVersion() == BotVersion.DEVELOPMENT_BUILD ? 1 : 10)
+                .enableIntents(GatewayIntent.GUILD_INVITES, GatewayIntent.GUILD_INVITES, GatewayIntent.GUILD_WEBHOOKS,
+                GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_BANS).setMemberCachePolicy(MemberCachePolicy.ALL)
+                .disableCache(CacheFlag.EMOJI, CacheFlag.ACTIVITY).build();
     }
 
     /**
@@ -161,6 +176,14 @@ public class BotWorker {
     }
 
     /**
+     * Get the Bot Token.
+     * @return the Token.
+     */
+    public static String getToken() {
+        return token;
+    }
+
+    /**
      * Set the start Time of the Bot.
      * @param startTime1 the new start Time.
      */
@@ -174,13 +197,5 @@ public class BotWorker {
      */
     public static long getStartTime() {
         return startTime;
-    }
-
-    /**
-     * Get the current Bot Token.
-     * @return the Bot Token.
-     */
-    public static String getToken() {
-        return token;
     }
 }

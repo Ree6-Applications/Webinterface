@@ -1,11 +1,11 @@
 package de.presti.ree6.webinterface;
 
-import com.mindscapehq.raygun4java.core.RaygunClient;
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
+import com.mindscapehq.raygun4java.core.RaygunClient;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.sql.SQLConnector;
-import de.presti.ree6.webinterface.utils.Config;
+import de.presti.ree6.webinterface.utils.data.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +57,7 @@ public class Server {
 
         // Create a new JDA Session.
         try {
-            BotWorker.createBot(BotVersion.PUBLIC, "1.7.3");
+            BotWorker.createBot(BotVersion.RELEASE, "1.8.0");
             logger.info("Service (JDA) has been started. Creation was successful.");
         } catch (Exception exception) {
             //Inform if not successful.
