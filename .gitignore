@@ -21,6 +21,7 @@ target/
 *.ipr
 *.log
 *.MF
+*.gz
 
 ### NetBeans ###
 /nbproject/private/
