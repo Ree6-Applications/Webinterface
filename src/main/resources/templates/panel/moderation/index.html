@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+      <title>Ree6 - Moderation</title>
+      <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
+      <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
+      <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
+      <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
+      <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.6.3/css/ionicons.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.2/iconfont/material-icons.min.css">
+      <link rel="stylesheet" href="https://ree6.de/assets/fonts/fontawesome5-overrides.min.css">
+      <link rel="stylesheet" href="https://ree6.de/assets/css/styles.min.css">
+      <link rel="stylesheet" href="https://ree6.de/css/custom.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+   </head>
+   <body style="color: rgb(33,109,186);background: rgb(64,90,157);">
+      <!-- Start: Navigation with Button -->
+      <nav class="navbar navbar-light navbar-expand-lg bg-dark navigation-clean-button" style="background: rgb(97,100,177);color: rgb(191,74,187);">
+         <div class="container">
+            <a class="navbar-brand link-success" href="#"><img class="rounded-circle img-fluid" src="https://ree6.de/assets/img/ree6.png" loading="lazy" width="100"></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+               <ul class="navbar-nav me-auto">
+                  <li class="nav-item"></li>
+                  <li class="nav-item"></li>
+               </ul>
+               <span class="navbar-text actions"> <a class="btn btn-dark action-button" role="button"
+                                                     th:href="@{'/panel/server?guildID=' + ${guild.getIdLong()}}">Back</a></span>
+            </div>
+         </div>
+      </nav>
+      <!-- End: Navigation with Button -->
+      <main>
+         <section id="info" style="background: var(--bs-gray-900);">
+            <div class="container" style="background: rgba(0,0,0,0);">
+               <h1 class="d-xl-flex justify-content-xl-center align-items-xl-center" style="font-size: 60px;color: #ffffff;">Ree6</h1>
+               <h1 class="display-5 d-xl-flex justify-content-xl-center align-items-xl-center" style="color: #ffffff;font-size: 20px;">The alternative to Mee6!</h1>
+               <hr style="background: rgba(0,0,0,0);height: 50px;">
+            </div>
+         </section>
+         <section id="server-info">
+            <hr style="background: rgba(0,0,0,0);height: 50px;">
+            <div class="container justify-content-center align-items-center align-content-center align-self-center m-auto">
+               <img th:src="${guild.getIconUrl()}" class="rounded-circle d-flex d-xl-flex justify-content-center align-items-center align-content-center align-self-center m-auto" loading="lazy" width="100">
+               <h1 class="d-flex justify-content-center align-items-center d-xl-flex justify-content-xl-center align-items-xl-center" style="color: #ffffff;" th:text="${guild.getName()}">Servername</h1>
+            </div>
+            <hr style="background: rgba(0,0,0,0);height: 50px;">
+         </section>
+         <section id="moderation">
+            <div class="container">
+               <hr style="background: rgba(0,0,0,0);height: 50px;"><!-- Start: Intro -->
+               <div class="intro">
+                  <h2 class="text-center" style="color: rgb(255,255,255);">Moderation</h2>
+                  <hr style="background: rgba(0,0,0,0);">
+               </div><!-- End: Intro -->
+               <!-- Start: Features -->
+               <div class="row d-inline-flex features" style="margin-left: -24px;margin-right: -24px;margin-top: 15px;margin-bottom: 15px;">
+                  <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-pencil d-flex d-xl-flex justify-content-center align-items-center mx-auto icon" style="width: 50px;height: 50px;color: #ffffff;">
+                     <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"></path>
+                  </svg>
+                     <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">Prefix</h3>
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" id="settingChangeForm" class="d-flex justify-content-center flex-wrap" method="post">
+                        <input type="hidden" name="name" value="chatprefix" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <div class="mb-3">
+                           <input class="form-control" type="text" name="value" th:value="${prefixSetting.getStringValue()}" placeholder="Prefix (default, ree!)" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" autocomplete="off">
+                        </div>
+                        <div class="mb-3">
+                           <button class="btn btn-primary" type="submit" form="settingChangeForm" style="background: var(--bs-blue);">Change</button>
+                        </div>
+                     </form>
+                  </div>
+                  <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="far fa-file-word d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 40px;"></i>
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" method="post" id="liForm">
+                        <input type="hidden" id="liFormName" name="name" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <input type="hidden" id="liFormValue" name="value" />
+                     </form>
+                     <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: #ffffff;">Blacklist</h3>
+                     <ul class="list-unstyled border rounded border-dark flex-row justify-content-start flex-nowrap justify-content-xl-start align-items-xl-center" style="min-height: 40px; color: var(--bs-white);background: var(--bs-gray-700);font-size: 12px;">
+                        <li th:each="word: ${words}" class="border rounded border-dark" style="pointer-events: auto; display: inline-block;color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin: 5px;" th:text="${word}" th:attr="onclick='(function () {
+                        document.getElementById(\'liFormName\').value = \'removeBadWord\';
+                        document.getElementById(\'liFormValue\').value = \'' + ${word} + '\';
+                        document.forms[\'liForm\'].submit();
+                        })()'">Test
+                        </li>
+                     </ul>
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" class="d-flex justify-content-center flex-wrap" method="post">
+                        <input type="hidden" name="name" value="addBadWord" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <div class="mb-3"><input class="form-control" type="text" name="value" placeholder="Word" style="width: 200px;height: 38px;font-size: 12px;border-color: var(--bs-blue);background: var(--bs-gray-700);color: var(--bs-white);" maxlength="200" minlength="2" autocomplete="off" required=""></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Add</button></div>
+                     </form>
+                  </div>
+                  <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="far fa-user d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;"></i>
+                     <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: #ffffff;">Autoroles</h3>
+                     <ul class="list-unstyled border rounded border-dark flex-row justify-content-start flex-nowrap justify-content-xl-start align-items-xl-center" style="min-height: 40px; color: var(--bs-white);background: var(--bs-gray-700);font-size: 12px;">
+                        <li th:each="role: ${autoroles}" class="border rounded border-dark" style="display: inline-block;color: var(--bs-white);padding-right: 5px;padding-left: 5px;margin: 5px;" th:value="${role.getId()}" th:text="${role.getName()}" th:attr="onclick='(function () {
+                        document.getElementById(\'liFormName\').value = \'removeAutoRole\';
+                        document.getElementById(\'liFormValue\').value = \'' + ${role.getId()} + '\';
+                        document.forms[\'liForm\'].submit();
+                        })()'">Item</li>
+                     </ul>
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" class="d-flex justify-content-center flex-wrap" method="post">
+                        <input type="hidden" name="name" value="addAutoRole" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <div class="mb-3"><select name="value" class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
+                           <option th:each="role: ${roles}" th:value="${role.getId()}" th:text="${role.getName()}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
+                        </select></div>
+                        <div class="mb-3"><button class="btn btn-primary" type="submit" style="background: var(--bs-blue);">Add</button></div>
+                     </form>
+                  </div>
+                  <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mic-mute d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;" viewBox="0 0 16 16">
+                        <path d="M13 8c0 .564-.094 1.107-.266 1.613l-.814-.814A4.02 4.02 0 0 0 12 8V7a.5.5 0 0 1 1 0v1zm-5 4c.818 0 1.578-.245 2.212-.667l.718.719a4.973 4.973 0 0 1-2.43.923V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 1 0v1a4 4 0 0 0 4 4zm3-9v4.879l-1-1V3a2 2 0 0 0-3.997-.118l-.845-.845A3.001 3.001 0 0 1 11 3z"/>
+                        <path d="m9.486 10.607-.748-.748A2 2 0 0 1 6 8v-.878l-1-1V8a3 3 0 0 0 4.486 2.607zm-7.84-9.253 12 12 .708-.708-12-12-.708.708z"/>
+                     </svg>
+                     <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: rgb(255,255,255);">Muterole</h3>
+                        <form th:action="@{/panel/moderation/role}" th:object="${roleChangeForm}" id="roleForm" class="d-flex justify-content-center flex-wrap" method="post">
+                           <input type="hidden" id="type" name="type" value="muteRole" />
+                           <input type="hidden" id="guildSession" name="guildSession" th:value="${guild.getId()}" />
+                           <input type="hidden" id="identifierSession" name="identifierSession" th:value="${identifier}" />
+
+                           <div class="mb-3">
+                              <select name="role" class="border-dark form-select d-flex d-xl-flex flex-row justify-content-xl-start align-items-xl-center" style="background: var(--bs-gray-700);color: var(--bs-white);font-size: 12px;border-color: var(--bs-blue);height: 38px;width: 200px;">
+                                 <option value="0" selected class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">None</option>
+                                 <option th:each="role: ${roles}" th:value="${role.getId()}" th:text="${role.getName()}" th:selected="${role == muterole}" class="border border-dark" style="background: var(--bs-gray-700);text-align: center;color: #ffffff;">Placeholder</option>
+                              </select>
+                           </div>
+                        </form>
+                        <div class="mb-3"><button class="btn btn-primary d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center" type="submit" form="roleForm" style="background: var(--bs-blue);">Change</button></div>
+                  </div>
+                  <div th:each="command: ${commands}" class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="material-icons d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">border_color</i>
+                     <h3 class="d-flex d-xl-flex justify-content-center align-items-center mx-auto justify-content-xl-center align-items-xl-center name" style="color: #ffffff;" th:text="${command.getName().substring(8)}">Command</h3>
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" th:id="${command.getName()}" class="d-flex justify-content-center flex-wrap" method="post" th:if="${!command.getBooleanValue()}">
+                        <input type="hidden" name="name" th:value="${command.getName()}" />
+                        <input type="hidden" name="value" th:value="${!command.getBooleanValue()}" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-green);" title="Activate"><i class="fas fa-check"></i></button></div>
+                     </form>
+                     <form th:action="@{/panel/moderation/settings}" th:object="${settingChangeForm}" th:id="${command.getName()}" class="d-flex justify-content-center flex-wrap" method="post" th:if="${command.getBooleanValue()}">
+                        <input type="hidden" name="name" th:value="${command.getName()}" />
+                        <input type="hidden" name="value" th:value="${!command.getBooleanValue()}" />
+                        <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                        <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                        <div class="d-flex d-lg-flex justify-content-center align-items-center justify-content-lg-center align-items-lg-center mb-3"><button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" data-bs-toggle="tooltip" data-bss-tooltip="" type="submit" style="background: var(--bs-red);" title="Deactivate"><i class="fas fa-times"></i></button></div>
+                     </form>
+                  </div>
+               </div><!-- End: Features -->
+            </div>
+            <hr style="background: rgba(0,0,0,0);height: 50px;">
+         </section>
+      </main>
+      <!-- Start: Footer Dark -->
+      <footer class="footer-dark" style="background: rgb(40, 45, 50);">
+         <div class="container">
+            <div class="row">
+               <!-- Start: Services -->
+               <div class="col-sm-6 col-md-3 item">
+                  <h3>Legal</h3>
+                  <ul>
+                     <li><a href="https://ree6.de/legal/pp.html">Privacy Policy</a></li>
+                     <li><a href="https://ree6.de/legal/impresum.html">Impresum</a></li>
+                     <li><a href="https://ree6.de/legal/datenschutz.html">Data protection</a></li>
+                     <li><a href="mailto:legal@ree6.de">Legal Contact</a></li>
+                     <li></li>
+                  </ul>
+               </div>
+               <!-- End: Services --><!-- Start: About -->
+               <div class="col-sm-6 col-md-3 item">
+                  <h3>About</h3>
+                  <ul>
+                     <li><a href="#team">Team</a></li>
+                  </ul>
+               </div>
+               <!-- End: About --><!-- Start: Footer Text -->
+               <div class="col-md-6 item text">
+                  <h3>Ree6</h3>
+                  <p>Ree6 has been made to support users and give them enough tools to support and manage their Guild. We don't like how most of the Discord Bots want you to pay for special "features". So we decided to change that.</p>
+               </div>
+               <!-- End: Footer Text --><!-- Start: Social Icons -->
+               <div class="col item social"><a href="https://support.ree6.de"><i class="fab fa-discord"></i></a><a href="https://twitter.com/ree6bot"><i class="icon ion-social-twitter"></i></a><a href="https://github.com/Ree6-Applications/Ree6"><i class="icon ion-social-github"></i></a><a href="mailto:support@ree6.de"><i class="icon ion-android-mail"></i></a></div>
+               <!-- End: Social Icons -->
+            </div>
+            <!-- Start: Copyright -->
+            <p class="lead copyright">Ree6 © 2022<br>powered by Tube-Hosting</p>
+            <!-- End: Copyright -->
+         </div>
+      </footer>
+      <!-- End: Footer Dark --><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script><script src="https://ree6.de/assets/js/script.min.js?h=9835d25fd6c4deffb06abf0eb8c5c27f"></script>
+      <div th:if="${IsError}" id="window" class="window window-open">
+         <div class="content">
+            <h3 style="color: red;">Error</h3>
+            <p th:text="${error}">This is just some info text. Idk what to put here. It will open by using code later anyways.</p>
+            <button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" id="close-window">Close</button>
+         </div>
+      </div>
+      <script>
+         const closeWindowBtn = document.getElementById('close-window');
+
+         const barWindow = document.getElementById('window');
+         closeWindowBtn.addEventListener('click', () => {
+            barWindow.classList.remove('window-open');
+         });
+      </script>
+   </body>
+</html>

@@ -15,6 +15,8 @@
  */
 package com.jagrosh.jdautilities.oauth2.entities.impl;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
 import com.jagrosh.jdautilities.oauth2.Scope;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
@@ -30,17 +32,17 @@ import com.jagrosh.jdautilities.oauth2.session.SessionController;
 import com.jagrosh.jdautilities.oauth2.session.SessionData;
 import com.jagrosh.jdautilities.oauth2.state.DefaultStateController;
 import com.jagrosh.jdautilities.oauth2.state.StateController;
+import de.presti.ree6.webinterface.bot.BotWorker;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.exceptions.HttpException;
 import net.dv8tion.jda.internal.requests.Method;
 import net.dv8tion.jda.internal.utils.Checks;
 import net.dv8tion.jda.internal.utils.EncodingUtil;
 import net.dv8tion.jda.internal.utils.IOUtil;
-import net.dv8tion.jda.internal.utils.JDALogger;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,16 +56,14 @@ import java.util.List;
  */
 public class OAuth2ClientImpl implements OAuth2Client
 {
-    private static final Logger LOG = JDALogger.getLog(OAuth2Client.class);
-    
     private final long clientId;
     private final String clientSecret;
-    private final SessionController sessionController;
+    private final SessionController<?> sessionController;
     private final StateController stateController;
     private final OkHttpClient httpClient;
     private final OAuth2Requester requester;
 
-    public OAuth2ClientImpl(long clientId, String clientSecret, SessionController sessionController,
+    public OAuth2ClientImpl(long clientId, String clientSecret, SessionController<?> sessionController,
                             StateController stateController, OkHttpClient httpClient)
     {
         Checks.check(clientId >= 0, "Invalid Client ID");
@@ -188,9 +188,38 @@ public class OAuth2ClientImpl implements OAuth2Client
                     obj = body.getJSONObject(i);
                     list.add(new OAuth2GuildImpl(OAuth2ClientImpl.this, obj.getLong("id"),
                         obj.getString("name"), obj.optString("icon", null), obj.getBoolean("owner"),
-                        obj.getInt("permissions")));
+                        obj.getLong("permissions")));
                 }
                 return list;
+            }
+        };
+    }
+
+    @Override
+    public OAuth2Action<OAuth2User> joinGuild(OAuth2User user, Guild guild)
+    {
+        if(!Scope.contains(user.getSession().getScopes(), Scope.GUILDS_JOIN))
+            throw new MissingScopeException("Join a Guild from a Session", Scope.GUILDS_JOIN);
+
+        return new OAuth2Action<>(this, Method.PUT, OAuth2URL.GUILD_JOIN.compile(guild.getId(), user.getId())) {
+            @Override
+            protected Headers getHeaders() {
+                return Headers.of("Authorization", "Bot " + BotWorker.getToken(), "Content-Type", "application/json");
+            }
+
+            @Override
+            protected RequestBody getBody() {
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("access_token", user.getSession().getAccessToken());
+                return RequestBody.create(MediaType.parse("application/json"), new GsonBuilder().create().toJson(jsonObject));
+            }
+
+            @Override
+            protected OAuth2User handle(Response response) throws IOException {
+                if (!response.isSuccessful())
+                    throw failure(response);
+
+                return user;
             }
         };
     }

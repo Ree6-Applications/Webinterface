@@ -2,36 +2,58 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.0</version>
+        <version>2.7.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
     <groupId>de.presti.ree6</groupId>
     <artifactId>Webinterface</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>2.3.0-RELEASE</version>
     <name>Webinterface</name>
     <description>Webinterface</description>
+
     <properties>
-        <java.version>11</java.version>
+        <sonar.organization>ree6-applications</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
+
     <repositories>
         <repository>
-            <id>dv8tion</id>
-            <name>m2-dv8tion</name>
-            <url>https://m2.dv8tion.net/releases</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.10.2</version>
+        </dependency>
+        <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.3.0_346</version>
+            <version>5.0.0-alpha.17</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
@@ -40,28 +62,29 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>me.carleslc.Simple-YAML</groupId>
+            <artifactId>Simple-Yaml</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20210307</version>
+            <version>20220320</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>com.mindscapehq</groupId>
+            <artifactId>core</artifactId>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
+            <groupId>com.mindscapehq</groupId>
+            <artifactId>webprovider</artifactId>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
+            <version>3.0.6</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -70,14 +93,14 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.9.0</version>
         </dependency>
     </dependencies>
 
@@ -89,7 +112,7 @@
                 <configuration>
                     <excludes>
                         <exclude>
-                            <groupId>org.projectlombok</groupId>
+                            <groupId>org.project-lombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
@@ -97,5 +120,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

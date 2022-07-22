@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Ree6 - Leaderboard</title>
+    <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
+    <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
+    <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
+    <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
+    <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.6.3/css/ionicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.2/iconfont/material-icons.min.css">
+    <link rel="stylesheet" href="https://ree6.de/assets/fonts/fontawesome5-overrides.min.css">
+    <link rel="stylesheet" href="https://ree6.de/assets/css/styles.min.css">
+    <link rel="stylesheet" href="https://ree6.de/css/custom.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body style="color: rgb(33,109,186);background: rgb(64,90,157);">
+<!-- Start: Navigation with Button -->
+<nav class="navbar navbar-light navbar-expand-lg bg-dark navigation-clean-button" style="background: rgb(97,100,177);color: rgb(191,74,187);">
+    <div class="container">
+        <a class="navbar-brand link-success" href="#"><img class="rounded-circle img-fluid" src="https://ree6.de/assets/img/ree6.png" loading="lazy" width="100"></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navcol-1">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"></li>
+                <li class="nav-item"></li>
+            </ul>
+            <span class="navbar-text actions">
+                <a class="btn btn-dark action-button" role="button" th:text="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth">Login</a>
+            </span>
+        </div>
+    </div>
+</nav>
+<!-- End: Navigation with Button -->
+<main>
+    <section id="info" style="background: var(--bs-gray-900);">
+        <div class="container" style="background: rgba(0,0,0,0);">
+            <h1 class="d-xl-flex justify-content-xl-center align-items-xl-center" style="font-size: 60px;color: #ffffff;">Ree6</h1>
+            <h1 class="display-5 d-xl-flex justify-content-xl-center align-items-xl-center" style="color: #ffffff;font-size: 20px;">The alternative to Mee6!</h1>
+            <hr style="background: rgba(0,0,0,0);height: 50px;">
+        </div>
+    </section>
+    <section id="server-info" style="background: #405a9d;">
+        <hr style="background: rgba(0,0,0,0);height: 50px;">
+        <div th:if="${guild != null}" class="container" style="background: rgba(0,0,0,0);">
+            <img class="rounded-circle img-fluid d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" th:src="${guild.getIconUrl()}" loading="lazy" width="100">
+            <h1 class="d-xl-flex justify-content-xl-center align-items-xl-center" style="color: #ffffff;" th:text="${guild.getName()}">Servername</h1>
+        </div>
+        <hr style="background: rgba(0,0,0,0);height: 50px;">
+    </section>
+    <section id="leaderboard">
+        <div class="container">
+            <hr style="background: rgba(0,0,0,0);height: 50px;">
+            <!-- Start: Intro -->
+            <div class="intro">
+                <h2 class="text-center" style="color: rgb(255,255,255);">Leaderboard</h2>
+                <hr style="background: rgba(0,0,0,0);">
+            </div>
+            <!-- End: Intro -->
+            <hr style="background: rgba(0,0,0,0);">
+            <div th:if="${user1 != null && user1.getUser() != null}" class="row" style="border-style: solid;border-color: #282d32;">
+                <div class="col-auto d-flex d-xl-flex my-auto"><i class="fas fa-crown" style="color: var(--bs-yellow);"></i></div>
+                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user1.getUser().getEffectiveAvatarUrl()}" src="https://ree6.de/assets/img/ree6.png" loading="lazy" width="100"></div>
+                <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
+                    <h4 style="border-color: #ffffff;color: #ffffff;" th:text="${user1.getUser().getName()}">Name</h4>
+                </div>
+                <div class="col d-xl-flex">
+                    <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:aria-valuenow="${user1.getProgress()}" aria-valuemin="0" aria-valuemax="100" th:style="@{'width:' + ${user1.getProgress()} + '%'}" th:text="@{${user1.getProgress()} + '%'}">10%</div>
+                    </div>
+                </div>
+                <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level: ' + ${user1.getLevel()}}">Level:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP: ' + ${user1.getExperience()}}">XP:</p>
+                </div>
+            </div>
+            <hr style="background: rgba(0,0,0,0);">
+            <div th:if="${user2 != null && user2.getUser() != null}" class="row" style="border-style: solid;border-color: #282d32;">
+                <div class="col-auto d-flex d-xl-flex my-auto"><i class="fas fa-crown" style="color: #a2a8ae;border-color: var(--bs-gray-600);"></i></div>
+                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user2.getUser().getEffectiveAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png" loading="lazy" width="100"></div>
+                <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
+                    <h4 style="border-color: #ffffff;color: #ffffff;" th:text="${user2.getUser().getName()}">Name</h4>
+                </div>
+                <div class="col d-xl-flex">
+                    <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:aria-valuenow="${user2.getProgress()}" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" th:style="@{'width:' + ${user2.getProgress()} + '%'}" th:text="@{${user2.getProgress()} + '%'}">10%</div>
+                    </div>
+                </div>
+                <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level: ' + ${user2.getLevel()}}">Level:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP: ' + ${user2.getExperience()}}">XP:</p>
+                </div>
+            </div>
+            <hr style="background: rgba(0,0,0,0);">
+            <div th:if="${user3 != null && user3.getUser() != null}" class="row" style="border-style: solid;border-color: #282d32;">
+                <div class="col-auto d-flex d-xl-flex my-auto"><i class="fas fa-crown" style="color: #D2691E;border-color: var(--bs-gray-600);"></i></div>
+                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user3.getUser().getEffectiveAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png" loading="lazy" width="100"></div>
+                <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
+                    <h4 style="border-color: #ffffff;color: #ffffff;" th:text="${user3.getUser().getName()}">Name</h4>
+                </div>
+                <div class="col d-xl-flex">
+                    <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:aria-valuenow="${user3.getProgress()}" aria-valuemin="0" aria-valuemax="100" th:style="@{'width:' + ${user3.getProgress()} + '%'}" th:text="@{${user3.getProgress()} + '%'}">10%</div>
+                    </div>
+                </div>
+                <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level: ' + ${user3.getLevel()}}">Level:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP: ' + ${user3.getExperience()}}">XP:</p>
+                </div>
+            </div>
+            <hr style="background: rgba(0,0,0,0);">
+            <div th:if="${user4 != null && user4.getUser() != null}" class="row" style="border-style: solid;border-color: #282d32;">
+                <div class="col-auto d-flex d-xl-flex my-auto"><i class="material-icons" style="color: var(--bs-white);border-color: var(--bs-gray-600);">looks_4</i></div>
+                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user4.getUser().getEffectiveAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png" loading="lazy" width="100"></div>
+                <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
+                    <h4 style="border-color: #ffffff;color: #ffffff;" th:text="${user4.getUser().getName()}">Name</h4>
+                </div>
+                <div class="col d-xl-flex">
+                    <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:aria-valuenow="${user4.getProgress()}" aria-valuemin="0" aria-valuemax="100" th:style="@{'width:' + ${user4.getProgress()} + '%'}" th:text="@{${user4.getProgress()} + '%'}">10%</div>
+                    </div>
+                </div>
+                <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level: ' + ${user4.getLevel()}}">Level:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP: ' + ${user4.getExperience()}}">XP:</p>
+                </div>
+            </div>
+            <hr style="background: rgba(0,0,0,0);">
+            <div th:if="${user5 != null && user5.getUser() != null}" class="row" style="border-style: solid;border-color: #282d32;">
+                <div class="col-auto d-flex d-xl-flex my-auto"><i class="material-icons" style="color: var(--bs-white);border-color: var(--bs-gray-600);">looks_5</i></div>
+                <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><img class="rounded-circle img-fluid float-start" th:src="${user5.getUser().getEffectiveAvatarUrl()}"  src="https://ree6.de/assets/img/ree6.png" loading="lazy" width="100"></div>
+                <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
+                    <h4 style="border-color: #ffffff;color: #ffffff;" th:text="${user5.getUser().getName()}">Name</h4>
+                </div>
+                <div class="col d-xl-flex">
+                    <div class="progress float-end d-xl-flex align-self-end justify-content-xl-start align-items-xl-start" style="width: 500px;margin-bottom: 5px;margin-left: 5px;background: var(--bs-gray-700);">
+                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" th:aria-valuenow="${user5.getProgress()}" aria-valuemin="0" aria-valuemax="100" th:style="@{'width:' + ${user5.getProgress()} + '%'}" th:text="@{${user5.getProgress()} + '%'}">10%</div>
+                    </div>
+                </div>
+                <div class="col d-xl-flex justify-content-xl-end align-items-xl-center">
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'Level: ' + ${user5.getLevel()}}">Level:</p>
+                    <p class="d-xl-flex me-auto align-items-xl-center" style="border-color: #ffffff;color: #ffffff;" th:text="@{'XP: ' + ${user5.getExperience()}}">XP:</p>
+                </div>
+            </div>
+            <hr style="background: rgba(0,0,0,0);">
+        </div>
+    </section>
+</main>
+<!-- Start: Footer Dark -->
+<footer class="footer-dark" style="background: rgb(40, 45, 50);">
+    <div class="container">
+        <div class="row">
+            <!-- Start: Services -->
+            <div class="col-sm-6 col-md-3 item">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="https://ree6.de/legal/pp.html">Privacy Policy</a></li>
+                    <li><a href="https://ree6.de/legal/impresum.html">Impresum</a></li>
+                    <li><a href="https://ree6.de/legal/datenschutz.html">Data protection</a></li>
+                    <li><a href="mailto:legal@ree6.de">Legal Contact</a></li>
+                    <li></li>
+                </ul>
+            </div>
+            <!-- End: Services --><!-- Start: About -->
+            <div class="col-sm-6 col-md-3 item">
+                <h3>About</h3>
+                <ul>
+                    <li><a href="#team">Team</a></li>
+                </ul>
+            </div>
+            <!-- End: About --><!-- Start: Footer Text -->
+            <div class="col-md-6 item text">
+                <h3>Ree6</h3>
+                <p>Ree6 has been made to support users and give them enough tools to support and manage their Guild. We don't like how most of the Discord Bots want you to pay for special "features". So we decided to change that.</p>
+            </div>
+            <!-- End: Footer Text --><!-- Start: Social Icons -->
+            <div class="col item social"><a href="https://support.ree6.de"><i class="fab fa-discord"></i></a><a href="https://twitter.com/ree6bot"><i class="icon ion-social-twitter"></i></a><a href="https://github.com/Ree6-Applications/Ree6"><i class="icon ion-social-github"></i></a><a href="mailto:support@ree6.de"><i class="icon ion-android-mail"></i></a></div>
+            <!-- End: Social Icons -->
+        </div>
+        <!-- Start: Copyright -->
+        <p class="lead copyright">Ree6 © 2022<br>powered by Tube-Hosting</p>
+        <!-- End: Copyright -->
+    </div>
+</footer>
+<div th:if="${IsError}" id="window" class="window window-open">
+    <div class="content">
+        <h3 style="color: red;">Error</h3>
+        <p th:text="${error}">This is just some info text. Idk what to put here. It will open by using code later anyways.</p>
+        <button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" id="close-window">Close</button>
+    </div>
+</div>
+<script>
+    const closeWindowBtn = document.getElementById('close-window');
+
+    const barWindow = document.getElementById('window');
+    closeWindowBtn.addEventListener('click', () => {
+        barWindow.classList.remove('window-open');
+    });
+</script>
+<!-- End: Footer Dark --><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script><script src="https://ree6.de/assets/js/script.min.js?h=9835d25fd6c4deffb06abf0eb8c5c27f"></script>
+</body>
+</html>
