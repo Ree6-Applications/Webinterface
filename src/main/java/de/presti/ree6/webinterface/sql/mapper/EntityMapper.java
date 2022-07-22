@@ -4,7 +4,7 @@ import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.sql.base.annotations.Property;
 import de.presti.ree6.webinterface.sql.base.data.SQLEntity;
 import de.presti.ree6.webinterface.sql.base.data.SQLResponse;
-import de.presti.ree6.webinterface.utils.data.StoredResultSet;
+import de.presti.ree6.webinterface.sql.base.data.StoredResultSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;

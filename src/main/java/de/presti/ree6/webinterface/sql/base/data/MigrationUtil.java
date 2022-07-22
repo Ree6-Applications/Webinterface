@@ -1,4 +1,4 @@
-package de.presti.ree6.webinterface.utils.data;
+package de.presti.ree6.webinterface.sql.base.data;
 
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.sql.SQLConnector;

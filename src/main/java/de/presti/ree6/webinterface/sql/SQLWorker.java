@@ -7,6 +7,7 @@ import de.presti.ree6.webinterface.sql.base.annotations.Table;
 import de.presti.ree6.webinterface.sql.base.data.SQLEntity;
 import de.presti.ree6.webinterface.sql.base.data.SQLParameter;
 import de.presti.ree6.webinterface.sql.base.data.SQLResponse;
+import de.presti.ree6.webinterface.sql.base.data.SQLUtil;
 import de.presti.ree6.webinterface.sql.entities.Blacklist;
 import de.presti.ree6.webinterface.sql.entities.Invite;
 import de.presti.ree6.webinterface.sql.entities.Setting;
@@ -18,7 +19,6 @@ import de.presti.ree6.webinterface.sql.entities.roles.VoiceAutoRole;
 import de.presti.ree6.webinterface.sql.entities.stats.GuildStats;
 import de.presti.ree6.webinterface.sql.entities.stats.Stats;
 import de.presti.ree6.webinterface.sql.entities.webhook.*;
-import de.presti.ree6.webinterface.utils.data.SQLUtil;
 import net.dv8tion.jda.api.entities.Guild;
 import org.reflections.Reflections;
 

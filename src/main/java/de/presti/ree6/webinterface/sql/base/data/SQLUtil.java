@@ -1,12 +1,15 @@
-package de.presti.ree6.webinterface.utils.data;
+package de.presti.ree6.webinterface.sql.base.data;
 
+import com.google.gson.*;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.sql.base.annotations.Property;
 import de.presti.ree6.webinterface.sql.base.annotations.Table;
-import de.presti.ree6.webinterface.sql.base.data.SQLEntity;
-import de.presti.ree6.webinterface.sql.base.data.SQLParameter;
 
+import javax.sql.rowset.serial.SerialBlob;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +18,11 @@ import java.util.List;
  * SQLUtil class to help with SQL-Queries.
  */
 public class SQLUtil {
+
+    /**
+     * The Gson Instance.
+     */
+    static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     /**
      * Constructor for the SqlUtil class.
@@ -54,6 +62,9 @@ public class SQLUtil {
         } else if (javaObjectClass.isAssignableFrom(Byte.class) ||
                 javaObjectClass.isAssignableFrom(byte.class)) {
             return "TINYINT";
+        } else if (javaObjectClass.isAssignableFrom(byte[].class) ||
+                javaObjectClass.isAssignableFrom(Byte[].class)) {
+            return "MEDIUMTEXT";
         } else if (javaObjectClass.isAssignableFrom(Character.class) ||
                 javaObjectClass.isAssignableFrom(char.class)) {
             return "CHAR(1)";
@@ -65,7 +76,7 @@ public class SQLUtil {
             return "TIME";
         } else if (javaObjectClass.isAssignableFrom(java.sql.Timestamp.class)) {
             return "TIMESTAMP";
-        } else if (javaObjectClass.isAssignableFrom(java.sql.Blob.class)) {
+        } else if (javaObjectClass.isAssignableFrom(Blob.class)) {
             return "BLOB";
         } else if (javaObjectClass.isAssignableFrom(java.sql.Clob.class)) {
             return "CLOB";
@@ -81,6 +92,9 @@ public class SQLUtil {
             return "NCLOB";
         } else if (javaObjectClass.isAssignableFrom(java.sql.RowId.class)) {
             return "ROWID";
+        } else if (javaObjectClass.getSuperclass() != null &&
+                javaObjectClass.getSuperclass().isAssignableFrom(JsonElement.class)) {
+            return "MEDIUMBLOB";
         }
 
         throw new IllegalArgumentException("Unsupported Java-Type: " + javaObjectClass.getName());
@@ -169,7 +183,7 @@ public class SQLUtil {
                             if (field.get(entity) == null)
                                 continue;
                         } catch (Exception exception) {
-                            Server.getInstance().getLogger().debug("Could not get value of field: " + field.getName(), exception);
+                            Server.getInstance().getLogger().error("Could not get value of field: " + field.getName(), exception);
                         }
                     }
 
@@ -193,7 +207,7 @@ public class SQLUtil {
                         if (field.get(entity) == null)
                             continue;
                     } catch (Exception exception) {
-                        Server.getInstance().getLogger().debug("Could not get value of field: " + field.getName(), exception);
+                        Server.getInstance().getLogger().error("Could not get value of field: " + field.getName(), exception);
                     }
                 }
 
@@ -263,5 +277,44 @@ public class SQLUtil {
         }).forEach(args::add);
 
         return args;
+    }
+
+    /**
+     * Convert a Blob to a {@link JsonElement}
+     * @param blob the Blob to convert.
+     * @return the {@link JsonElement} or {@link JsonNull} if the Blob is null.
+     */
+    public static JsonElement convertBlobToJSON(Blob blob) {
+        if (blob == null)
+            return JsonNull.INSTANCE;
+
+        StringBuilder content = new StringBuilder();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(blob.getBinaryStream()));
+
+            for (String read; (read = reader.readLine()) != null; ) {
+                content.append(read);
+            }
+        } catch (Exception ignore) {
+        }
+
+        if (content.length() == 0)
+            return JsonNull.INSTANCE;
+
+        return JsonParser.parseString(content.toString());
+    }
+
+    /**
+     * Convert a {@link JsonElement} to a Blob.
+     * @param jsonElement the {@link JsonElement} to convert.
+     * @return the Blob or null if the {@link JsonElement} is null.
+     */
+    public static Blob convertJSONToBlob(JsonElement jsonElement) {
+        try {
+            return new SerialBlob(gson.toJson(jsonElement).getBytes());
+        } catch (Exception ignore) {
+        }
+
+        return null;
     }
 }

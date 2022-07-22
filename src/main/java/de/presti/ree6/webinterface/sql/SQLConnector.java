@@ -1,14 +1,17 @@
 package de.presti.ree6.webinterface.sql;
 
+import com.google.gson.JsonElement;
 import de.presti.ree6.webinterface.Server;
+import de.presti.ree6.webinterface.sql.base.data.MigrationUtil;
 import de.presti.ree6.webinterface.sql.base.data.SQLEntity;
+import de.presti.ree6.webinterface.sql.base.data.SQLUtil;
+import de.presti.ree6.webinterface.sql.base.data.StoredResultSet;
 import de.presti.ree6.webinterface.sql.mapper.EntityMapper;
 import de.presti.ree6.webinterface.sql.seed.SeedManager;
-import de.presti.ree6.webinterface.utils.data.MigrationUtil;
-import de.presti.ree6.webinterface.utils.data.StoredResultSet;
 import org.reflections.Reflections;
 
 import java.sql.*;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -131,11 +134,11 @@ public class SQLConnector {
         Reflections reflections = new Reflections("de.presti.ree6");
         Set<Class<? extends SQLEntity>> classes = reflections.getSubTypesOf(SQLEntity.class);
         for (Class<? extends SQLEntity> aClass : classes) {
-            Server.getInstance().getLogger().debug("Creating Table " + aClass.getSimpleName());
+            Server.getInstance().getLogger().info("Creating Table {}", aClass.getSimpleName());
             // Create a Table based on the key.
             try {
                 if (!sqlWorker.createTable(aClass)) {
-                    Server.getInstance().getLogger().warn("Couldn't create " + aClass.getSimpleName() + " Table.");
+                    Server.getInstance().getLogger().warn("Couldn't create {} Table.", aClass.getSimpleName());
                 }
             } catch (Exception exception) {
 
@@ -185,6 +188,10 @@ public class SQLConnector {
                     preparedStatement.setObject(index++, obj, Types.DOUBLE);
                 } else if (obj instanceof Boolean) {
                     preparedStatement.setObject(index++, obj, Types.BOOLEAN);
+                } else if (obj instanceof JsonElement jsonElement) {
+                    preparedStatement.setObject(index++, SQLUtil.convertJSONToBlob(jsonElement), Types.BLOB);
+                } else if (obj instanceof byte[] byteArray) {
+                    preparedStatement.setObject(index++, Base64.getEncoder().encodeToString(byteArray), Types.VARCHAR);
                 }
             }
 
@@ -204,7 +211,13 @@ public class SQLConnector {
                 if (storedResultSet.hasResults()) {
                     while (resultSet.next()) {
                         for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                            storedResultSet.setValue(resultSet.getRow() - 1, i, resultSet.getObject(i));
+                            Object rowObject = resultSet.getObject(i);
+
+                            if (rowObject instanceof Blob) {
+                                rowObject = SQLUtil.convertBlobToJSON((Blob) rowObject);
+                            }
+
+                            storedResultSet.setValue(resultSet.getRow() - 1, i, rowObject);
                         }
                     }
                 }
