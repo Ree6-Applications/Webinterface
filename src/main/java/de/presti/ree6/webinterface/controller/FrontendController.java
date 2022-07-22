@@ -855,26 +855,27 @@ public class FrontendController {
         List<OAuth2Guild> guilds;
 
         try {
-            SQLResponse sqlResponse = Server.getInstance().getSqlConnector().getSqlWorker().getEntity(Recording.class, "SELECT * FROM Recording WHERE ID=?",
-                    recordIdentifier);
-
-
-            if (!sqlResponse.isSuccess()) {
-                return ERROR_PATH;
-            }
-
             // Try retrieving the Session from the Identifier.
             session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
-
-            // Try retrieving the Guilds of the OAuth2 User.
-            guilds = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
-
-            user = Server.getInstance().getOAuth2Client().getUser(session).complete();
 
             // Set the Identifier.
             model.addAttribute("identifier", id);
 
             model.addAttribute("isLogged", true);
+
+            SQLResponse sqlResponse = Server.getInstance().getSqlConnector().getSqlWorker().getEntity(Recording.class, "SELECT * FROM Recording WHERE ID=?",
+                    recordIdentifier);
+
+            if (!sqlResponse.isSuccess()) {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "Couldn't find the requested Recording!");
+                return MAIN_PATH;
+            }
+
+            // Try retrieving the Guilds of the OAuth2 User.
+            guilds = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
+
+            user = Server.getInstance().getOAuth2Client().getUser(session).complete();
 
             Recording recording = (Recording) sqlResponse.getEntity();
 
@@ -907,15 +908,13 @@ public class FrontendController {
                 return MAIN_PATH;
             }
         } catch (Exception e) {
-            // If the Session is null just return to the default Page.
-            if (session == null) {
-                deleteSessionCookie(httpServletResponse);
-                return MAIN_PATH;
-            }
-
             // If the Session isn't null give the User a Notification that his Guilds couldn't be loaded.
             model.addAttribute("IsError", true);
             model.addAttribute("error", "Couldn't load Session!");
+            if (session == null) {
+                // If the Session is null just return to the default Page.
+                deleteSessionCookie(httpServletResponse);
+            }
         }
 
         // Return Panel Page.
