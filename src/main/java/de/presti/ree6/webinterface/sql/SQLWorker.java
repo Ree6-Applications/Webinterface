@@ -1758,8 +1758,8 @@ public record SQLWorker(SQLConnector sqlConnector) {
             query.append("= ? AND ");
         });
 
-        if (query.indexOf("AND", query.length() - 3) != -1) {
-            query.delete(query.length() - 3, query.length());
+        if (query.indexOf("AND", query.length() - 4) != -1) {
+            query.delete(query.length() - 5, query.length());
         }
 
         try {
