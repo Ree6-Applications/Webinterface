@@ -69,7 +69,7 @@ public class BotWorker {
      */
     public static void createBot(BotVersion version1, String build1) throws LoginException {
         version = version1;
-        token = BotWorker.version == BotVersion.DEVELOPMENT_BUILD ? Server.getInstance().getConfig().getConfiguration().getString("bot.tokens.dev") : Server.getInstance().getConfig().getConfiguration().getString("bot.tokens.rel");
+        token = BotWorker.version == BotVersion.DEVELOPMENT_BUILD ? Server.getInstance().getConfig().getConfiguration().getString("discord.bot.tokens.dev") : Server.getInstance().getConfig().getConfiguration().getString("discord.bot.tokens.rel");
         state = BotState.INIT;
         build = build1;
 

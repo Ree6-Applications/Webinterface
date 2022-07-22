@@ -5,9 +5,14 @@ import com.mindscapehq.raygun4java.core.RaygunClient;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.sql.SQLConnector;
+import de.presti.ree6.webinterface.sql.base.data.SQLResponse;
+import de.presti.ree6.webinterface.sql.entities.Recording;
 import de.presti.ree6.webinterface.utils.data.Config;
+import de.presti.ree6.webinterface.utils.others.ThreadUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.Duration;
 
 /**
  * The "Main" Class used to store Instance of the needed Classes.
@@ -57,7 +62,7 @@ public class Server {
 
         // Create a new JDA Session.
         try {
-            BotWorker.createBot(BotVersion.RELEASE, "1.8.0");
+            BotWorker.createBot(BotVersion.DEVELOPMENT_BUILD, "1.8.0");
             logger.info("Service (JDA) has been started. Creation was successful.");
         } catch (Exception exception) {
             //Inform if not successful.
@@ -73,6 +78,17 @@ public class Server {
 
         // Add onShutdown as call methode when Shutdown.
         Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
+
+        ThreadUtil.createNewThread(x -> {
+            SQLResponse sqlResponse = sqlConnector.getSqlWorker().getEntity(Recording.class, "SELECT * FROM Recording");
+            if (sqlResponse.isSuccess()) {
+                for (Recording recording : sqlResponse.getEntities().stream().map(Recording.class::cast).toList()) {
+                    if (recording.getCreation() < System.currentTimeMillis() - Duration.ofDays(1).toMillis()) {
+                        sqlConnector.getSqlWorker().deleteEntity(recording);
+                    }
+                }
+            }
+        }, throwable -> logger.error("Failed running Data clear Thread", throwable), Duration.ofMinutes(30), true, false);
     }
 
     /**

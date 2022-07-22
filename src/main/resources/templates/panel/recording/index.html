@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Ree6 - Error</title>
+    <title>Ree6 - Records</title>
     <link rel="stylesheet" href="https://ree6.de/css/Main.css">
     <link rel="stylesheet" href="https://ree6.de/css/Error.css">
     <link rel="icon" type="image/png" sizes="64x64" href="https://ree6.de/assets/img/ree6-icon.png">
@@ -22,19 +22,11 @@
 </div>
 <!--Error Message-->
 <div class="content">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="erroricon">
-        !--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-        <path fill="red" d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM232 152C232 138.8 242.8 128 256 128s24 10.75 24 24v128c0 13.25-10.75 24-24 24S232 293.3 232 280V152zM256 400c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 385.9 273.4 400 256 400z"/>
-    </svg>
-    <h2 class="section-header" th:value="${title == null} ? 'Internal Error' : ${title}">Internal Error</h2>
-    <div th:if="${message != null}" class="container" style="text-align: center; justify-content:center; flex-direction: column;">
-        <p th:each="msg: ${message}" class="errormessage" th:text="${msg}">Our system ran into a problem while processing your request!</p>
-    </div>
-    <div th:if="${message == null}" class="container" style="text-align: center; justify-content:center; flex-direction: column;">
-        <p class="errormessage">Our system ran into a problem while processing your request!</p>
-        <p class="errormessage">Please check if the requested page exists.</p>
-        <p class="errormessage">If you were on the dashboard before, and was sent to this Page, please login again and try again!</p>
-        <p class="errormessage">If you still have problems, please join our support discord!</p>
+    <h2 class="section-header">Your Voice-Recording!</h2>
+    <div class="container" style="text-align: center; justify-content:center; flex-direction: column;">
+        <p class="errormessage">Please mind that your recording has been deleted from our Server!<br>Which means this is the only time you can download it!</p>
+        <br>
+        <audio controls autoplay loop style="align-self: center" th:src="'data:audio/wav;base64,' + ${recording}">WAV Audio not supported by browser!</audio>
     </div>
 </div>
 <!--Footer-->

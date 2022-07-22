@@ -37,20 +37,11 @@ public class Config {
             yamlFile.addDefault("mysql.pw", "yourpw");
             yamlFile.addDefault("mysql.host", "localhost");
             yamlFile.addDefault("mysql.port", 3306);
-            yamlFile.addDefault("giphy.apitoken", "yourgiphytokenherepog");
-            yamlFile.addDefault("dagpi.apitoken", "yourdagpixyztokenhere");
             yamlFile.addDefault("raygun.apitoken", "yourrayguntokenherepog");
-            yamlFile.addDefault("spotify.client.id", "yourspotifyclientid");
-            yamlFile.addDefault("spotify.client.secret", "yourspotifyclientsecret");
-            yamlFile.addDefault("twitch.client.id", "yourtwitchclientidhere");
-            yamlFile.addDefault("twitch.client.secret", "yourtwitchclientsecrethere");
-            yamlFile.addDefault("twitter.consumer.key", "yourTwitterConsumerKey");
-            yamlFile.addDefault("twitter.consumer.secret", "yourTwitterConsumerSecret");
-            yamlFile.addDefault("twitter.access.key", "yourTwitterAccessKey");
-            yamlFile.addDefault("twitter.access.secret", "yourTwitterAccessSecret");
-            yamlFile.addDefault("youtube.api.key", "youryoutubeapikey");
-            yamlFile.addDefault("bot.tokens.rel", "ReleaseTokenhere");
-            yamlFile.addDefault("bot.tokens.dev", "DevTokenhere");
+            yamlFile.addDefault("discord.bot.tokens.rel", "ReleaseTokenhere");
+            yamlFile.addDefault("discord.bot.tokens.dev", "DevTokenhere");
+            yamlFile.addDefault("discord.client.id", 0);
+            yamlFile.addDefault("discord.client.secret", "yourDiscordClientSecrethere");
 
             try {
                 yamlFile.save(getFile());

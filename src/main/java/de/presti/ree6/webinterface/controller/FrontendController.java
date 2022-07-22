@@ -1,5 +1,7 @@
 package de.presti.ree6.webinterface.controller;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.jagrosh.jdautilities.oauth2.Scope;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2User;
@@ -10,6 +12,8 @@ import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.controller.forms.ChannelChangeForm;
 import de.presti.ree6.webinterface.controller.forms.RoleChangeForm;
 import de.presti.ree6.webinterface.controller.forms.SettingChangeForm;
+import de.presti.ree6.webinterface.sql.base.data.SQLResponse;
+import de.presti.ree6.webinterface.sql.entities.Recording;
 import de.presti.ree6.webinterface.sql.entities.Setting;
 import de.presti.ree6.webinterface.sql.entities.level.ChatUserLevel;
 import de.presti.ree6.webinterface.sql.entities.level.VoiceUserLevel;
@@ -39,7 +43,13 @@ import java.util.List;
 public class FrontendController {
 
     // Paths to Thymeleaf Templates.
-    private static final String MAIN_PATH = "main/index", ERROR_PATH = "error/index", MODERATION_PATH = "panel/moderation/index", SOCIAL_PATH = "panel/social/index", LOGGING_PATH = "panel/logging/index";
+    private static final String
+            MAIN_PATH = "main/index",
+            ERROR_PATH = "error/index",
+            MODERATION_PATH = "panel/moderation/index",
+            SOCIAL_PATH = "panel/social/index",
+            LOGGING_PATH = "panel/logging/index",
+            RECORDING_PATH = "panel/recording/index";
 
     /**
      * A Get Mapper for the Main Page.
@@ -814,6 +824,102 @@ public class FrontendController {
 
         // Return to the Logging Panel Page.
         return LOGGING_PATH;
+    }
+
+    //endregion
+
+    //region Recording
+
+    /**
+     * Request Mapper for the Server selection Panel.
+     *
+     * @param id    the Session Identifier.
+     * @param model the ViewModel.
+     * @return {@link String} for Thyme to the HTML Page.
+     */
+    @GetMapping(path = "/recording")
+    public String openRecordingView(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "recordId") String recordIdentifier, Model model) {
+
+        // Check and decode the Identifier saved in the Cookies.
+        id = getIdentifier(id);
+
+        if (checkIdentifier(id)) {
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Session!");
+            deleteSessionCookie(httpServletResponse);
+            return MAIN_PATH;
+        }
+
+        Session session = null;
+        OAuth2User user;
+        List<OAuth2Guild> guilds;
+
+        try {
+            SQLResponse sqlResponse = Server.getInstance().getSqlConnector().getSqlWorker().getEntity(Recording.class, "SELECT * FROM Recording WHERE ID=?",
+                    recordIdentifier);
+
+
+            if (!sqlResponse.isSuccess()) {
+                return ERROR_PATH;
+            }
+
+            // Try retrieving the Session from the Identifier.
+            session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+
+            // Try retrieving the Guilds of the OAuth2 User.
+            guilds = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
+
+            user = Server.getInstance().getOAuth2Client().getUser(session).complete();
+
+            // Set the Identifier.
+            model.addAttribute("identifier", id);
+
+            model.addAttribute("isLogged", true);
+
+            Recording recording = (Recording) sqlResponse.getEntity();
+
+            if (guilds.stream().map(OAuth2Guild::getId).anyMatch(g -> g.equalsIgnoreCase(recording.getGuildId()))) {
+                boolean found = false;
+
+                for (JsonElement element : recording.getJsonArray()) {
+                    if (found) break;
+
+                    if (element.isJsonPrimitive()) {
+                        JsonPrimitive primitive = element.getAsJsonPrimitive();
+                        if (primitive.isString() && primitive.getAsString().equalsIgnoreCase(user.getId())) {
+                            found = true;
+                        }
+                    }
+                }
+
+                if (found) {
+                    model.addAttribute("recording", Base64.getEncoder().encodeToString(recording.getRecording()));
+                    Server.getInstance().getSqlConnector().getSqlWorker().deleteEntity(recording);
+                    return RECORDING_PATH;
+                } else {
+                    model.addAttribute("IsError", true);
+                    model.addAttribute("error", "You are not allowed to view this Recording!");
+                    return MAIN_PATH;
+                }
+            } else {
+                model.addAttribute("IsError", true);
+                model.addAttribute("error", "You are not allowed to access this Recording!");
+                return MAIN_PATH;
+            }
+        } catch (Exception e) {
+            // If the Session is null just return to the default Page.
+            if (session == null) {
+                deleteSessionCookie(httpServletResponse);
+                return MAIN_PATH;
+            }
+
+            // If the Session isn't null give the User a Notification that his Guilds couldn't be loaded.
+            model.addAttribute("IsError", true);
+            model.addAttribute("error", "Couldn't load Session!");
+        }
+
+        // Return Panel Page.
+        return MAIN_PATH;
     }
 
     //endregion
