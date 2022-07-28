@@ -26,7 +26,7 @@
     <div class="container" style="text-align: center; justify-content:center; flex-direction: column;">
         <p class="errormessage">Please mind that your recording has been deleted from our Server!<br>Which means this is the only time you can download it!</p>
         <br>
-        <audio controls autoplay loop style="align-self: center" th:src="'data:audio/wav;base64,' + ${recording}">WAV Audio not supported by browser!</audio>
+        <audio id="recording" controls autoplay loop style="align-self: center" src="https://utils.ree6.de/placeholder/placeholder.mp3">WAV Audio not supported by browser!</audio>
     </div>
 </div>
 <!--Footer-->
@@ -78,3 +78,16 @@
 </div>
 </body>
 </html>
+
+<script>
+    const recordingAsBase64 = "[[${recording}]]";
+    const byteCharacters = atob(recordingAsBase64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    let blob = new Blob([new Uint8Array(byteNumbers)], {type: "audio/wav"});
+    const audioUrl = URL.createObjectURL(blob);
+    document.getElementById("recording").src = audioUrl;
+</script>

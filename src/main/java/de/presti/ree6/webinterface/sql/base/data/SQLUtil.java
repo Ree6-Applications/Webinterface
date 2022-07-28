@@ -225,7 +225,7 @@ public class SQLUtil {
      * @param entityClass     the Entity.
      * @param entityInstance  the Entity instance.
      * @param onlyUpdateField if fields with the updateQuery value set to false should still be included.
-     * @param ignoreNull     if null values should be ignored.
+     * @param ignoreNull      if null values should be ignored.
      * @return {@link List} of {@link Object} as the {@link SQLParameter} value.
      */
     public static List<Object> getValuesFromSQLEntity(Class<?> entityClass, Object entityInstance, boolean onlyUpdateField, boolean ignoreNull) {
@@ -279,7 +279,7 @@ public class SQLUtil {
         }).map(field -> {
             try {
                 if (!field.canAccess(entityInstance)) field.trySetAccessible();
-                
+
                 Property property = field.getAnnotation(Property.class);
 
                 Object value = field.get(entityInstance);
@@ -310,6 +310,7 @@ public class SQLUtil {
 
     /**
      * Convert a Blob to a {@link JsonElement}
+     *
      * @param blob the Blob to convert.
      * @return the {@link JsonElement} or {@link JsonNull} if the Blob is null.
      */
@@ -335,12 +336,23 @@ public class SQLUtil {
 
     /**
      * Convert a {@link JsonElement} to a Blob.
+     *
      * @param jsonElement the {@link JsonElement} to convert.
      * @return the Blob or null if the {@link JsonElement} is null.
      */
     public static Blob convertJSONToBlob(JsonElement jsonElement) {
+        return convertByteArrayToBlob(gson.toJson(jsonElement).getBytes());
+    }
+
+    /**
+     * Convert a {@link Byte[]} to a Blob.
+     *
+     * @param bytes the {@link Byte[]} to convert.
+     * @return the Blob or null if the {@link Byte[]} is null.
+     */
+    public static Blob convertByteArrayToBlob(byte[] bytes) {
         try {
-            return new SerialBlob(gson.toJson(jsonElement).getBytes());
+            return new SerialBlob(bytes);
         } catch (Exception ignore) {
         }
 
