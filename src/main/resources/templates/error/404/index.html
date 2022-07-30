@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://ree6.de/styles/style.css" />
     <link rel="icon" href="https://ree6.de/imgs/logo.png" />
-    <title>REE6 | Unknown Error</title>
+    <title>REE6 | 404</title>
     <style>
         footer {
             padding-top: 150px;
@@ -35,12 +35,9 @@
                 position: relative;
             }
         }
-        @media only screen and (max-width: 525px) {
+        @media only screen and (max-width: 485px) {
             .hero-statement .hero-descrip {
                 font-size: 10px;
-            }
-            .hero-statement h1 {
-                letter-spacing: 5px;
             }
         }
     </style>
@@ -76,27 +73,18 @@
     <section id="home">
         <div data-parallax data-xaxis="0" data-yaxis="0" class="hero-statement">
             <h1 data-parallax data-xaxis="0.7" data-yaxis="0">
-                Error<span class="dim-text">.???</span>
+                Error<span class="dim-text">.404</span>
             </h1>
             <div
                     data-parallax
-                    data-xaxis="0.2"
+                    data-xaxis="0.5"
                     data-yaxis="0"
                     class="hero-descrip"
             >
-                <div
-                        data-parallax
-                        data-xaxis="0.5"
-                        data-yaxis="0"
-                        class="hero-descrip"
-                >
-                    <strong>Ree6</strong> apologizes for this Issue please try again later.
-                    <p th:if="${errorMessage != null}" th:text="${errorMessage}">Message</p>
-                </div>
+                <strong>Ree6</strong> apologizes for the broken link.
+                <p th:if="${errorMessage != null}" th:text="${errorMessage}">Message</p>
             </div>
-            <a href="https://cp.ree6.de" data-highlight="" class="hero-cta"
-            >Ree6 Respawn</a
-            >
+            <a href="/" data-highlight="" class="hero-cta">Ree6 Respawn</a>
         </div>
     </section>
 </main>

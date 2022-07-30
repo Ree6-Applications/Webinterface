@@ -1,187 +1,544 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" dir="ltr">
 <head>
-   <meta charset="utf-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-   <title>Ree6 - Home</title>
-   <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
-   <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
-   <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
-   <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
-   <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.6.3/css/ionicons.min.css">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.2/iconfont/material-icons.min.css">
-   <link rel="stylesheet" href="https://ree6.de/assets/fonts/fontawesome5-overrides.min.css">
-   <link rel="stylesheet" href="https://ree6.de/assets/css/styles.min.css">
-   <link rel="stylesheet" href="https://ree6.de/css/custom.css">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
-</head>
+   <meta charset="UTF-8" />
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <link rel="stylesheet" href="https://ree6.de/styles/style.css" />
+   <link rel="icon" href="https://ree6.de/imgs/logo.png" />
+   <style>
+      @media only screen and (max-width: 1650px) {
+         section#home {
+            grid-template-columns: 1fr 0.85fr;
+         }
+         .hero-statement {
+            margin-right: 1vw;
+         }
+      }
 
-<body style="color: rgb(33,109,186);background: rgb(64,90,157);">
-<!-- Start: Navigation with Button -->
-<nav class="navbar navbar-light navbar-expand-lg bg-dark navigation-clean-button" style="background: rgb(97,100,177);color: rgb(191,74,187);">
-   <div class="container"><a class="navbar-brand link-success" href="#"><img class="rounded-circle img-fluid" src="https://ree6.de/assets/img/ree6.png" loading="lazy" width="100"></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-      <div class="collapse navbar-collapse" id="navcol-1">
-         <ul class="navbar-nav me-auto">
-            <li class="nav-item"></li>
-            <li class="nav-item"></li>
-         </ul>
-         <span class="navbar-text actions">
-            <a class="btn btn-dark action-button" role="button" th:text="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth">Login</a>
-         </span>
+      @media only screen and (max-width: 1150px) {
+         section#home {
+            grid-template-columns: 1fr;
+         }
+         .hero-statement {
+            margin: auto;
+         }
+         .hero-statement .img-wrapper {
+            margin: 50px 0;
+         }
+         nav.desktop-nav {
+            margin: auto;
+         }
+      }
+
+      @media only screen and (max-width: 900px) {
+         .hero-statement .img-wrapper {
+            margin: 50px auto;
+         }
+      }
+   </style>
+   <title>REE6 | Discord Bot</title>
+</head>
+<body>
+<div class="transition-fade"></div>
+<div class="cursor"></div>
+<div class="inner-cursor"></div>
+<div class="cursor-modal"></div>
+<header>
+   <nav class="desktop-nav">
+      <a href="/#home" aria-disabled="true">Home</a>
+      <a href="/#features" aria-disabled="true">Features</a>
+      <a href="/#team" aria-disabled="true">Team</a>
+      <a href="https://ree6.de/#invite" aria-disabled="true">Invite</a>
+      <a th:text="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth">Login</a>
+   </nav>
+   <button class="hamburger-button">
+      <span class="line-one"></span>
+      <span class="line-two"></span>
+   </button>
+   <nav class="hamburger-wrapper">
+      <div class="hamburger-container">
+         <a href="https://ree6.de/#home" aria-disabled="true"><span>Home</span></a>
+         <a href="https://ree6.de/#features" aria-disabled="true"><span>Features</span></a>
+         <a href="https://ree6.de/#team" aria-disabled="true"><span>Team</span></a>
+         <a href="https://ree6.de/#invite" aria-disabled="true"><span>Invite</span></a>
+         <a th:text="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth"><span>Login</span></a>
       </div>
-   </div>
-</nav><!-- End: Navigation with Button -->
+   </nav>
+</header>
 <main>
-   <section id="info" style="background: var(--bs-gray-900);">
-      <div class="container" style="background: rgba(0,0,0,0);">
-         <h1 class="d-xl-flex justify-content-xl-center align-items-xl-center" style="font-size: 60px;color: #ffffff;">Ree6</h1>
-         <h1 class="display-5 d-xl-flex justify-content-xl-center align-items-xl-center" style="color: #ffffff;font-size: 20px;">The alternative to Mee6!</h1>
-         <hr style="background: rgba(0,0,0,0);height: 50px;">
+   <section id="home" class="fade-in">
+      <div data-parallax data-xaxis="0" data-yaxis="0" class="hero-statement">
+         <h1 data-parallax data-xaxis="0.7" data-yaxis="0">
+            Ree6<span class="dim-text">.de</span>
+         </h1>
+         <div
+                 data-parallax
+                 data-xaxis="0.5"
+                 data-yaxis="0"
+                 class="hero-descrip"
+         >
+            The <strong>Enhanced</strong> Mee6
+         </div>
+         <div
+                 class="img-wrapper"
+                 data-highlight=""
+                 data-parallax
+                 data-xaxis="0.1"
+                 data-yaxis="0.1"
+                 data-color-background="#ea0f77"
+         >
+            <img src="https://ree6.de/imgs/ree6-logo.png" alt="REE6 Avatar Image" />
+         </div>
+         <a
+                 href="https://invite.ree6.de"
+                 target="_blank"
+                 data-highlight=""
+                 data-color-dot="#fff"
+                 data-color-background="#5865F2"
+                 rel="noopener noreferrer"
+                 class="hero-cta"
+         >Upgrade to Ree6</a
+         >
+      </div>
+      <div
+              class="img-container"
+              data-highlight=""
+              data-parallax
+              data-xaxis="0"
+              data-yaxis="0.12"
+              data-color-background="#ea0f77"
+      >
+         <img src="https://ree6.de/imgs/ree6-logo.png" alt="REE6 Avatar Image" />
       </div>
    </section>
    <section id="features">
-      <div class="container">
-         <hr style="background: rgba(0,0,0,0);height: 50px;"><!-- Start: Intro -->
-         <div class="intro">
-            <h2 class="text-center" style="color: rgb(255,255,255);">Features</h2>
-            <hr style="background: rgba(0,0,0,0);">
-         </div><!-- End: Intro -->
-         <!-- Start: Features -->
-         <div class="row d-inline-flex features" style="margin-left: -24px;margin-right: -24px;margin-top: 15px;margin-bottom: 15px;">
-            <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-shield-check float-end d-xl-flex justify-content-xl-center align-items-xl-center icon" style="width: 50px;height: 50px;color: #ffffff;">
-               <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"></path>
-               <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"></path>
-            </svg>
-               <h3 class="name" style="color: rgb(255,255,255);">Moderation</h3>
-               <p class="description" style="color: rgb(255,255,255);">Support in moderation is not lacking at ree6.<br>Thanks to a sophisticated moderation system, you can sit back relax and punish rule breakers with a single command. Included are: mute, kick, ban and automatic moderativ actions.</p>
+      <div class="features-wrapper fade-in">
+         <span class="line"></span>
+         <button
+                 data-feature="moderation"
+                 data-highlight=""
+                 data-color-background="#ea0f77"
+         >
+            <div class="inner-img-wrapper feature-active">
+               <img src="https://ree6.de/imgs/moderation.svg" alt="Moderation Icon" />
             </div>
-            <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="material-icons float-end d-xl-flex justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">music_note</i>
-               <h3 class="name" style="color: #ffffff;">Music</h3>
-               <p class="description" style="color: #ffffff;">With our built-in Music Player you can play Music from Websites such as Spotify, YouTube, Vimeo, Bandcamp, SoundCloud and even custom MP3 Files!<br></p>
+         </button>
+         <span
+                 class="text right feature-active-text"
+                 data-label="feature"
+                 aria-label="moderation"
+         >Moderation</span
+         >
+         <span class="text left" data-label="feature" aria-label="music"
+         >Music</span
+         >
+         <button
+                 data-feature="music"
+                 data-highlight=""
+                 data-color-background="#ea0f77"
+         >
+            <div class="inner-img-wrapper">
+               <img src="https://ree6.de/imgs/music.svg" alt="Music Icon" />
             </div>
-            <div class="col-sm-6 col-lg-4 item" style="margin-bottom: 5px;margin-top: 5px;"><i class="far fa-laugh float-end d-xl-flex justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;"></i>
-               <h3 class="name" style="color: #ffffff;">Fun-Commands</h3>
-               <p class="description" style="color: #ffffff;">By using different APIs Ree6 has the ability to give your Random Facts, Dog Images and Cat Images! We even have Commands such as slap and kiss!<br></p>
+         </button>
+         <button
+                 data-feature="commands"
+                 data-highlight=""
+                 data-color-background="#ea0f77"
+         >
+            <div class="inner-img-wrapper">
+               <img src="https://ree6.de/imgs/funcommands.svg" alt="Fun Commands Icon" />
             </div>
-            <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="material-icons float-end d-xl-flex justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">description</i>
-               <h3 class="name" style="color: #ffffff;">Advanced Logging</h3>
-               <p class="description" style="color: #ffffff;">Ree6 offers varied audit logging in a clearer, more clearly structured style. All possible changes to the server are displayed (invite logging, role changes, channel switching and many more).<br></p>
+         </button>
+         <span class="text right" data-label="feature" aria-label="commands"
+         >Fun-Commands</span
+         >
+         <span class="text left" data-label="feature" aria-label="logging"
+         >Advanced Logging</span
+         >
+         <button
+                 data-feature="logging"
+                 data-highlight=""
+                 data-color-background="#ea0f77"
+         >
+            <div class="inner-img-wrapper">
+               <img src="https://ree6.de/imgs/logging.svg" alt="Advanced Logging Icon" />
             </div>
-            <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="far fa-comments float-end d-xl-flex justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;"></i>
-               <h3 class="name" style="color: #ffffff;">Chat and Voice leveling</h3>
-               <p class="description" style="color: #ffffff;">The bot offers a constructed level system. Right now we're referring to this as chat leveling. Rank queries and a leaderboard are also included and work perfectly.<br></p>
+         </button>
+         <button
+                 data-feature="voice"
+                 data-highlight=""
+                 data-color-background="#ea0f77"
+         >
+            <div class="inner-img-wrapper">
+               <img src="https://ree6.de/imgs/voice.svg" alt="Voice Icon" />
             </div>
-            <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;"><i class="material-icons float-end d-xl-flex justify-content-xl-center align-items-xl-center icon" style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">settings</i>
-               <h3 class="name" style="color: #ffffff;">Configuration</h3>
-               <p class="description" style="color: #ffffff;">The bot will offer a newly built Configuration System for our users.</p>
+         </button>
+         <span class="text right" data-label="feature" aria-label="voice"
+         >Chat & Voice Leveling</span
+         >
+         <span
+                 class="text left"
+                 data-label="feature"
+                 aria-label="configuration"
+         >Configuration</span
+         >
+         <button
+                 data-feature="configuration"
+                 data-highlight=""
+                 data-color-background="#ea0f77"
+         >
+            <div class="inner-img-wrapper">
+               <img src="https://ree6.de/imgs/configure.svg" alt="Configuration Icon" />
             </div>
-         </div><!-- End: Features -->
+         </button>
       </div>
-      <hr style="background: rgba(0,0,0,0);height: 50px;">
-   </section>
-   <section id="team" style="background: #282d32;">
-      <hr style="background: rgba(0,0,0,0);color: rgba(0,0,0,0.1);height: 50px;border-color: rgba(0,0,0,0);">
-      <div class="container">
-         <!-- Start: Intro -->
-         <div class="intro">
-            <h2 class="text-center" style="color: #ffffff;">Team </h2>
-            <p class="text-center" style="color: #ffffff;">The Team behind Ree6!</p>
-         </div><!-- End: Intro -->
-         <!-- Start: People -->
-         <div class="row people">
-            <div class="col-md-6 col-lg-4 item"><img class="rounded-circle d-xl-flex justify-content-xl-center align-items-xl-center mx-xl-auto mx-xxl-auto" src="https://images.ree6.de/presti" style="width: 320px;height: 320px;text-align: center;margin: 5px;">
-               <h3 class="name" style="color: #ffffff;">Presti</h3>
-               <p class="title" style="color: #7139cc;">Lead Dev</p>
-               <p class="description" style="color: #ffffff;">I'm Presti the Lead Developer of Ree6! I'm 16 years old and a Java/C# Developer which has over 4 years of Experience. My Job on Ree6 is the implementation of Features, Ideas and the Managment of our Monitoring System such as our Databank and the error output by Ree6!<br></p>
-               <div class="social"><a href="https://www.youtube.com/channel/UCg9sQ_VRxgLKCSpuAeqaIBQ" style="margin: 10px;"><i class="fab fa-youtube" style="color: #ffffff;"></i></a><a href="https://twitter.com/memerinoto" style="margin: 10 px;"><i class="fa fa-twitter" style="color: #ffffff;"></i></a><a href="https://www.instagram.com/unknown._.pog/" style="margin: 10px;"><i class="fa fa-instagram" style="color: #ffffff;"></i></a></div>
+      <div class="summary">
+         <span class="count fade-in">01</span>
+         <h2 class="fade-in">Moderation</h2>
+         <p class="fade-in">
+            Support in moderation is not lacking at ree6. Thanks to a
+            sophisticated moderation system, you can sit back relax and punish
+            rule breakers with a single command. Included are: mute, kick, ban
+            and automatic moderative actions.
+         </p>
+         <a
+                 href="https://invite.ree6.de"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="fade-in"
+         >
+            <span class="inner-text">Authorize with Ree6</span>
+            <div class="arrow-container">
+               <div class="arrow-wrapper">
+                  <span class="circle"></span>
+                  <div class="arrow">
+                     <span class="line-one"></span>
+                     <span class="line-two"></span>
+                     <span class="line-three"></span>
+                  </div>
+               </div>
             </div>
-            <div class="col-md-6 col-lg-4 item"><img class="rounded-circle d-xl-flex align-self-center mx-auto justify-content-xl-center align-items-xl-center mx-xl-auto mx-xxl-auto" src="https://images.ree6.de/xasus" style="width: 320px;height: 320px;text-align: center;margin: 5px;">
-               <h3 class="name" style="color: #ffffff;">xazed</h3>
-               <p class="title" style="color: var(--bs-red);">Supportiv Dev</p>
-               <p class="description" style="color: #ffffff;">I'm xazed and 14 years old, I'm a junior developer that codes mostly in Java and I am learning C++, I have over 2 years of experience in Java. My job on Ree6 is fixing bugs and other.<br></p>
-               <div class="social"><a href="https://www.youtube.com/c/XAZED" style="margin: 10px;"><i class="fab fa-youtube" style="color: #ffffff;"></i></a><a href="https://twitter.com/SolastisDev" style="margin: 10px;"><i class="fa fa-twitter" style="color: #ffffff;"></i></a></div>
-            </div>
-            <div class="col-md-6 col-lg-4 item"><img class="rounded-circle d-xl-flex mx-auto justify-content-xl-center align-items-xl-center mx-xl-auto mx-xxl-auto" src="https://images.ree6.de/da" style="width: 320px;height: 320px;text-align: center;margin: 5px;">
-               <h3 class="name" style="color: #ffffff;">david</h3>
-               <p class="title" style="color: var(--bs-red);">Supportiv Dev</p>
-               <p class="description" style="color: #ffffff;">I'm David, 15 years old, java developer and I hate C#<br></p>
-               <div class="social"><a href="https://www.youtube.com/channel/UCJ4LOYs_BtHAcy4vhs1MQFA" style="margin: 10px;"><i class="fab fa-youtube" style="color: #ffffff;"></i></a><a href="https://twitter.com/davidjordan2006" style="margin: 10px;"><i class="fa fa-twitter" style="color: #ffffff;"></i></a></div>
-            </div>
-         </div><!-- End: People -->
+         </a>
       </div>
-      <hr style="background: rgba(0,0,0,0);color: rgba(0,0,0,0.1);height: 50px;border-color: rgba(0,0,0,0);">
-   </section>
-   <section id="invite">
-      <div class="container">
-         <!-- Start: Intro -->
-         <div class="intro">
-            <hr style="background: rgba(0,0,0,0);height: 50px;">
-            <h2 class="text-center" style="color: rgb(255,255,255);">Invite</h2>
-            <h6 class="d-xl-flex justify-content-xl-center align-items-xl-center" style="color: #ffffff;text-align: center;">Did we convince you?</h6>
-            <hr style="background: rgba(0,0,0,0);">
-            <p class="d-xl-flex justify-content-center align-items-center align-content-center align-self-center justify-content-xl-center" style="color: rgb(255,255,255);text-align: center;">If so press the button below to Invite Ree6!</p>
-         </div><!-- End: Intro -->
-         <hr style="background: rgba(0,0,0,0);height: 10px;"><a class="btn btn-primary d-flex float-none d-xl-flex justify-content-center align-items-center align-content-center align-self-center mx-auto justify-content-xl-center align-items-xl-center" role="button" style="width: 100px;height: 50px;background: var(--bs-gray-dark);" href="https://discord.com/oauth2/authorize?client_id=723655291681505380&amp;scope=bot&amp;permissions=808709182">Click me</a>
-         <hr style="background: rgba(0,0,0,0);height: 50px;">
+      <div
+              class="mobile-features fade-in"
+              data-highlight=""
+              data-color-background="#ea0f77"
+      >
+         <button class="mobile-feature-active">
+            <span class="inner-circle"></span>
+         </button>
+         <button>
+            <span class="inner-circle"></span>
+         </button>
+         <button>
+            <span class="inner-circle"></span>
+         </button>
+         <button>
+            <span class="inner-circle"></span>
+         </button>
+         <button>
+            <span class="inner-circle"></span>
+         </button>
+         <button>
+            <span class="inner-circle"></span>
+         </button>
       </div>
    </section>
-</main><!-- Start: Footer Dark -->
-<footer class="footer-dark" style="background: rgb(40, 45, 50);">
-   <div class="container">
-      <div class="row">
-         <!-- Start: Services -->
-         <div class="col-sm-6 col-md-3 item">
-            <h3>Legal</h3>
-            <ul>
-               <li><a href="https://ree6.de/legal/pp.html">Privacy Policy</a></li>
-               <li><a href="https://ree6.de/legal/impresum.html">Impresum</a></li>
-               <li><a href="https://ree6.de/legal/datenschutz.html">Data protection</a></li>
-               <li><a href="mailto:legal@ree6.de">Legal Contact</a></li>
-               <li></li>
-            </ul>
-         </div><!-- End: Services -->
-         <!-- Start: About -->
-         <div class="col-sm-6 col-md-3 item">
-            <h3>About</h3>
-            <ul>
-               <li><a href="#team">Team</a></li>
-            </ul>
-         </div><!-- End: About -->
-         <!-- Start: Footer Text -->
-         <div class="col-md-6 item text">
-            <h3>Ree6</h3>
-            <p>Ree6 has been made to support users and give them enough tools to support and manage their Guild. We don't like how most of the Discord Bots want you to pay for special "features". So we decided to change that.</p>
-         </div><!-- End: Footer Text -->
-         <!-- Start: Social Icons -->
-         <div class="col item social"><a href="https://support.ree6.de"><i class="fab fa-discord"></i></a><a href="https://twitter.com/ree6bot"><i class="icon ion-social-twitter"></i></a><a href="https://github.com/Ree6-Applications/Ree6"><i class="icon ion-social-github"></i></a><a href="mailto:support@ree6.de"><i class="icon ion-android-mail"></i></a></div><!-- End: Social Icons -->
-      </div><!-- Start: Copyright -->
-      <p class="lead copyright">Ree6 © 2022<br>powered by Tube-Hosting</p><!-- End: Copyright -->
+   <section id="team">
+      <h1 class="fade-in"><span class="desktop">Meet The</span> Team</h1>
+      <div
+              class="team-member-wrapper"
+              aria-roledescription="I'm Presti the Lead Developer of Ree6! I'm a Java/C# Developer with years of Experience under my belt. My Job on Ree6 is the implementation of Features, Ideas and the Managment of our Monitoring System such as our Databank and the error output by Ree6!"
+      >
+         <div class="contact">
+            <a
+                    href="https://www.youtube.com/channel/UCg9sQ_VRxgLKCSpuAeqaIBQ"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-highlight=""
+                    data-color-background="#ff0000"
+                    data-color-dot="#fff"
+                    class="fade-in"
+            >
+               <img src="https://ree6.de/imgs/yt.svg" alt="YouTube Logo" />
+            </a>
+            <a
+                    href="https://twitter.com/memerinoto"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-highlight=""
+                    data-color-background="#1D9BF0"
+                    data-color-dot="#fff"
+                    class="fade-in"
+            >
+               <img src="https://ree6.de/imgs/twitter.svg" alt="Twitter Logo" />
+            </a>
+            <a
+                    href="https://www.instagram.com/unknown._.pog/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-highlight=""
+                    data-color-background="#E1306C"
+                    data-color-dot="#fff"
+                    class="fade-in"
+            >
+               <img src="https://ree6.de/imgs/ig.svg" alt="Instagram Logo" />
+            </a>
+         </div>
+         <div class="avatar-wrapper fade-in">
+            <img src="https://ree6.de/imgs/presti.jpg" alt="Presti Avatar" />
+         </div>
+         <div class="member-info">
+            <h2 class="fade-in">
+               Presti
+               <span class="check-mark"
+               ><img src="https://ree6.de/imgs/check.svg" alt="Check Mark"
+               /></span>
+            </h2>
+            <div class="avatar-wrapper fade-in">
+               <img src="https://ree6.de/imgs/presti.jpg" alt="Presti Avatar" />
+            </div>
+            <div class="stats fade-in">
+               <div class="age fade-in">
+                  <strong
+                  ><em>Age <span data-time="2005"></span></em
+                  ></strong>
+               </div>
+               <div class="fade-in">Lead Developer</div>
+               <div class="fade-in">
+                  <span data-time="2017"></span>yrs Experience
+               </div>
+               <div class="fade-in">Java/C#</div>
+            </div>
+         </div>
+      </div>
+      <div
+              class="team-member-wrapper"
+              aria-roledescription="I'm xazed and I'm a junior developer that codes mostly in Java and I am learning C++, I have years of experience in Java. My job on Ree6 is fixing bugs and other."
+      >
+         <div class="contact">
+            <a
+                    href="https://www.youtube.com/c/XAZED"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-highlight=""
+                    data-color-background="#ff0000"
+                    data-color-dot="#fff"
+                    class="fade-in"
+            >
+               <img src="https://ree6.de/imgs/yt.svg" alt="YouTube Logo" />
+            </a>
+            <a
+                    href="https://twitter.com/SolastisDev"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-highlight=""
+                    data-color-background="#1D9BF0"
+                    data-color-dot="#fff"
+                    class="fade-in"
+            >
+               <img src="https://ree6.de/imgs/twitter.svg" alt="Twitter Logo" />
+            </a>
+         </div>
+         <div class="avatar-wrapper fade-in">
+            <img src="https://ree6.de/imgs/xasus.jpg" alt="Xazed Avatar" />
+         </div>
+         <div class="member-info">
+            <h2 class="fade-in">
+               xazed
+               <span class="check-mark"
+               ><img src="https://ree6.de/imgs/check.svg" alt="Check Mark"
+               /></span>
+            </h2>
+            <div class="avatar-wrapper fade-in">
+               <img src="https://ree6.de/imgs/xasus.jpg" alt="Xazed Avatar" />
+            </div>
+            <div class="stats fade-in">
+               <div class="age fade-in">
+                  <strong
+                  ><em>Age <span data-time="2006"></span></em
+                  ></strong>
+               </div>
+               <div class="fade-in">Junior Developer</div>
+               <div class="fade-in">
+                  <span data-time="2019"></span>yrs Experience
+               </div>
+               <div class="fade-in">Java/C++</div>
+            </div>
+         </div>
+      </div>
+      <div
+              class="team-member-wrapper"
+              aria-roledescription="I'm David, a java developer and I hate C#"
+      >
+         <div class="contact">
+            <a
+                    href="https://www.youtube.com/channel/UCJ4LOYs_BtHAcy4vhs1MQFA"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-highlight=""
+                    data-color-background="#ff0000"
+                    data-color-dot="#fff"
+                    class="fade-in"
+            >
+               <img src="https://ree6.de/imgs/yt.svg" alt="YouTube Logo" />
+            </a>
+            <a
+                    href="https://twitter.com/davidjordan2006"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-highlight=""
+                    data-color-background="#1D9BF0"
+                    data-color-dot="#fff"
+                    class="fade-in"
+            >
+               <img src="https://ree6.de/imgs/twitter.svg" alt="Twitter Logo" />
+            </a>
+         </div>
+         <div class="avatar-wrapper fade-in">
+            <img src="https://ree6.de/imgs/david.jpg" alt="David Avatar" />
+         </div>
+         <div class="member-info">
+            <h2 class="fade-in">
+               david
+               <span class="check-mark"
+               ><img src="https://ree6.de/imgs/check.svg" alt="Check Mark"
+               /></span>
+            </h2>
+            <div class="avatar-wrapper fade-in">
+               <img src="https://ree6.de/imgs/david.jpg" alt="David Avatar" />
+            </div>
+            <div class="stats fade-in">
+               <div class="age fade-in">
+                  <strong
+                  ><em>Age <span data-time="2006"></span></em
+                  ></strong>
+               </div>
+               <div class="fade-in">Lead Developer</div>
+               <div class="fade-in">
+                  <span data-time="2019"></span>yrs Experience
+               </div>
+               <div class="fade-in">Java/C#</div>
+            </div>
+         </div>
+      </div>
+   </section>
+   <section id="invite" class="fade-in">
+      <h1 data-parallax data-xaxis="0.5" data-yaxis="0">
+         Ree6 <strong>Advances</strong>
+      </h1>
+      <h2 data-parallax data-xaxis="0.3" data-yaxis="0">Will You?</h2>
+      <a
+              href="https://invite.ree6.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-highlight=""
+              data-color-dot="#fff"
+              data-color-background="#5865F2"
+      >
+         <span class="inner-text">Invite</span>
+         <span class="background"></span>
+         <div class="arrow-container">
+            <div class="arrow-wrapper">
+               <span class="circle"></span>
+               <div class="arrow">
+                  <span class="line-one"></span>
+                  <span class="line-two"></span>
+                  <span class="line-three"></span>
+               </div>
+            </div>
+         </div>
+      </a>
+   </section>
+</main>
+<footer class="fade-in">
+   <p>
+      Ree6 has been made to support users and give them enough tools to
+      support and manage their Guild. We don't like how most of the Discord
+      Bots want you to pay for special "features". So we decided to change
+      that.
+   </p>
+   <div class="footer-nav">
+      <div class="nav-list">
+         <strong>Navigation</strong>
+         <a href="https://ree6.de/#home" aria-disabled="true">Home</a>
+         <a href="https://ree6.de/#features" aria-disabled="true">Features</a>
+         <a href="https://ree6.de/#team" aria-disabled="true">Team</a>
+         <a
+                 data-color-background="#5865F2"
+                 data-color-dot="#fff"
+                 href="https://invite.ree6.de"
+                 target="_blank"
+                 rel="noopener noreferrer"
+         >Invite</a
+         >
+      </div>
+      <div class="nav-list">
+         <strong>Legal</strong>
+         <a href="https://ree6.de/privacy/">Privacy Policy</a>
+         <a href="https://ree6.de/impressum/">Impressum</a>
+         <a href="https://ree6.de/protection/">Data Protection</a>
+         <button
+                 data-color-background="#ef2222"
+                 data-color-dot="#fff"
+                 data-copy="legal@ree6.de"
+         >
+            legal@ree6.de
+         </button>
+      </div>
+      <div class="nav-list">
+         <strong>Contact</strong>
+         <a
+                 href="https://support.ree6.de"
+                 target="_blank"
+                 rel="noopener noreferrer"
+         >Discord</a
+         >
+         <a
+                 href="https://twitter.com/ree6bot"
+                 target="_blank"
+                 rel="noopener noreferrer"
+         >Twitter</a
+         >
+         <a
+                 href="https://github.com/DxsSucuk/Ree6"
+                 target="_blank"
+                 rel="noopener noreferrer"
+         >Github</a
+         >
+         <button
+                 data-copy="support@ree6.de"
+                 data-color-background="#ef2222"
+                 data-color-dot="#fff"
+         >
+            support@ree6.de
+         </button>
+      </div>
    </div>
-</footer><!-- End: Footer Dark -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-<script src="https://ree6.de/assets/js/script.min.js"></script>
-<div th:if="${IsError}" id="window" class="window window-open">
-   <div class="content">
-      <h3 style="color: red;">Error</h3>
-      <p th:text="${error}">This is just some info text. Idk what to put here. It will open by using code later anyways.</p>
-      <button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" id="close-window">Close</button>
+   <div class="copyright">
+      <span class="desktop">Developed and Designed by</span>
+      <a
+              href="https://www.presti.me/"
+              target="_blank"
+              rel="noopener noreferrer"
+      >Presti</a
+      >
+      <span class="desktop">&</span>
+      <a
+              href="https://creeperbuddy.github.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+      >Creeper Buddy</a
+      >
+      ©Ree6 <span data-time="0"></span>
    </div>
-</div>
-<script>
-   const closeWindowBtn = document.getElementById('close-window');
-
-   const barWindow = document.getElementById('window');
-   closeWindowBtn.addEventListener('click', () => {
-      barWindow.classList.remove('window-open');
-   });
-</script>
+   <script src="https://ree6.de/js/time.js"></script>
+   <script src="https://ree6.de/js/navigation.js"></script>
+   <script src="https://ree6.de/js/cursor.js"></script>
+   <script src="https://ree6.de/js/observer.js"></script>
+</footer>
 </body>
-
 </html>

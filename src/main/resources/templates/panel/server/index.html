@@ -1,188 +1,267 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" dir="ltr">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Ree6 - Server</title>
-    <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
-    <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
-    <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
-    <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
-    <link rel="icon" type="image/png" sizes="1024x1024" href="https://ree6.de/assets/img/ree6.png">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.6.3/css/ionicons.min.css">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.2/iconfont/material-icons.min.css">
-    <link rel="stylesheet" href="https://ree6.de/assets/fonts/fontawesome5-overrides.min.css">
-    <link rel="stylesheet" href="https://ree6.de/assets/css/styles.min.css">
-    <link rel="stylesheet" href="https://ree6.de/css/custom.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://ree6.de/styles/style.css" />
+    <link rel="icon" href="https://ree6.de/imgs/logo.png" />
+    <title>REE6 | Server Stats</title>
+    <style>
+        footer {
+            padding-top: 150px;
+        }
+        #home .img-wrapper {
+            height: 200px;
+            width: 200px;
+        }
+        #home .img-container {
+            width: 25vw;
+            height: 25vw;
+            margin: auto;
+            overflow: hidden;
+            margin-left: 5vw;
+            border-radius: 100%;
+        }
+        #home .img-wrapper:hover img {
+            transform: scale(1.1);
+        }
+        #home .img-container:hover img {
+            transform: scale(1.1);
+        }
+        .hamburger-container {
+            height: 90%;
+        }
+        @media only screen and (max-width: 1350px) {
+            .hero-statement {
+                margin-right: 0;
+            }
+        }
+        @media only screen and (max-width: 1150px) {
+            .hero-statement {
+                margin-right: auto;
+            }
+        }
+        @media only screen and (max-height: 650px) {
+            .hamburger-container a {
+                font-size: 11px;
+            }
+        }
+        @media only screen and (max-height: 425px) {
+            .hamburger-container a {
+                font-size: 9px;
+            }
+        }
+    </style>
 </head>
-
-<body style="color: rgb(33,109,186);background: rgb(64,90,157);">
-<!-- Start: Navigation with Button -->
-<nav class="navbar navbar-light navbar-expand-lg bg-dark navigation-clean-button"
-     style="background: rgb(97,100,177);color: rgb(191,74,187);">
-    <div class="container"><a class="navbar-brand link-success" href="#"><img class="rounded-circle img-fluid"
-                                                                              src="https://ree6.de/assets/img/ree6.png"
-                                                                              loading="lazy" width="100"></a>
-        <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span
-                class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="navcol-1">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item"></li>
-                <li class="nav-item"></li>
-            </ul>
-            <span class="navbar-text actions"> <a class="btn btn-dark action-button" role="button"
-                                                  th:href="@{'/panel?guildID=' + ${guild.getIdLong()}}">Back</a></span>
+<body>
+<div class="transition-fade"></div>
+<div class="cursor"></div>
+<div class="inner-cursor"></div>
+<div class="cursor-modal"></div>
+<header id="float-home">
+    <nav class="desktop-nav">
+        <a href="/panel/">Panel</a>
+        <a th:href="@{'/server?guildId=' + ${guild.getId()}}" class="slide-active">Server</a>
+        <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
+        <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
+        <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
+        <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
+    </nav>
+    <button class="hamburger-button">
+        <span class="line-one"></span>
+        <span class="line-two"></span>
+    </button>
+    <nav class="hamburger-wrapper">
+        <div class="hamburger-container">
+            <a href="/panel/"><span>Panel</span></a>
+            <a th:href="@{'/server?guildId=' + ${guild.getId()}}"><span>Server</span></a>
+            <a th:href="@{'/logging?guildId=' + ${guild.getId()}}"><span>Logging</span></a>
+            <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}"><span>Moderation</span></a>
+            <a th:href="@{'/social?guildId=' + ${guild.getId()}}"><span>Social</span></a>
+            <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}"><span>Leaderboard</span></a>
+            <a href="/"><span>Home</span></a>
+        </div>
+    </nav>
+</header>
+<a href="/" class="nav-arrow">
+    <div class="arrow-container">
+        <div class="arrow-wrapper">
+            <span class="circle"></span>
+            <div class="arrow">
+                <span class="line-one"></span>
+                <span class="line-two"></span>
+                <span class="line-three"></span>
+            </div>
         </div>
     </div>
-</nav><!-- End: Navigation with Button -->
+    <span class="inner-text">Back to Home</span>
+</a>
 <main>
-    <section id="info" style="background: var(--bs-gray-900);">
-        <div class="container" style="background: rgba(0,0,0,0);">
-            <h1 class="d-xl-flex justify-content-xl-center align-items-xl-center"
-                style="font-size: 60px;color: #ffffff;">Ree6</h1>
-            <h1 class="display-5 d-xl-flex justify-content-xl-center align-items-xl-center"
-                style="color: #ffffff;font-size: 20px;">The alternative to Mee6!</h1>
-            <hr style="background: rgba(0,0,0,0);height: 50px;">
-        </div>
-    </section><!-- Start: Sidebar -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4" style="width: 150px;">
-                <hr style="background: rgba(0,0,0,0);height: 150px;">
-                <a th:href="@{'/panel/moderation?guildID=' + ${guild.getIdLong()}}"
-                   class="d-xxl-flex justify-content-xxl-center" href="#" title="Moderation" style="margin: 20px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                         viewBox="0 0 16 16" class="bi bi-shield-check d-xxl-flex" data-bs-toggle="tooltip"
-                         data-bss-tooltip="" data-aos="fade-down" data-aos-duration="1000" data-aos-once="true"
-                         style="color: var(--bs-white);font-size: 50px;margin-bottom: 50px;" title="Moderation">
-                        <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"></path>
-                        <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"></path>
-                    </svg>
-                </a>
-                <a th:href="@{'/panel/social?guildID=' + ${guild.getIdLong()}}"
-                   class="d-xxl-flex justify-content-xxl-center" href="#"
-                   style="color: rgba(0,0,0,0);margin: 20px;"><i class="far fa-smile d-xxl-flex"
-                                                                 data-bs-toggle="tooltip" data-bss-tooltip=""
-                                                                 data-aos="fade-down" data-aos-duration="1000"
-                                                                 data-aos-once="true"
-                                                                 style="color: var(--bs-white);font-size: 50px;margin-bottom: 25px;"
-                                                                 title="Social"></i></a>
-                <a th:href="@{'/panel/logging?guildID=' + ${guild.getIdLong()}}"
-                   class="d-xxl-flex justify-content-xxl-center" href="#" style="margin: 20px;color: rgba(0,0,0,0);"
-                   title="Logging"><i class="material-icons d-xxl-flex" data-bs-toggle="tooltip" data-bss-tooltip=""
-                                      data-aos="fade-down" data-aos-duration="1000" data-aos-once="true"
-                                      style="color: var(--bs-white);font-size: 50px;margin-bottom: 25px;margin-top: 25px;"
-                                      title="Logging">description</i></a>
+    <section id="home">
+        <div data-parallax data-xaxis="0" data-yaxis="0" class="hero-statement">
+            <h1 data-parallax data-xaxis="0.7" data-yaxis="0">
+                Sta<span class="dim-text">.ts</span>
+            </h1>
+            <div
+                    data-parallax
+                    data-xaxis="0.5"
+                    data-yaxis="0"
+                    class="hero-descrip"
+            >
+                Server <strong>Statistics</strong>
             </div>
-            <div class="col-auto col-md-8 m-auto">
-                <section id="features">
-                    <div class="container">
-                        <hr style="background: rgba(0,0,0,0);height: 50px;"><!-- Start: Intro -->
-                        <div class="intro">
-                            <h2 class="text-center" style="color: rgb(255,255,255);">Server Stats</h2>
-                            <hr style="background: rgba(0,0,0,0);">
-                        </div><!-- End: Intro -->
-                        <!-- Start: Features -->
-                        <div class="row d-inline-flex features"
-                             style="margin-left: -24px;margin-right: -24px;margin-top: 15px;margin-bottom: 15px;">
-                            <div class="col-sm-6 col-lg-4 col-xxl-4 item" style="margin-bottom: 5px;margin-top: 5px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                                     viewBox="0 0 16 16"
-                                     class="bi bi-save float-end d-xl-flex justify-content-xl-center align-items-xl-center icon"
-                                     style="width: 50px;height: 50px;color: #ffffff;">
-                                    <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"></path>
-                                </svg>
-                                <h3 class="name" style="color: rgb(255,255,255);">Saved Invites</h3>
-                                <p th:text="@{'We are currently monitoring about ' + ${invites.size()} + ' Invites from your Server!'}"
-                                   class="description" style="color: rgb(255,255,255);">We are currently monitoring
-                                    about %s Invites from your Server!</p>
-                            </div>
-                            <div class="col-sm-6 col-lg-4 item" style="margin-top: 5px;margin-bottom: 5px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                                     viewBox="0 0 16 16"
-                                     class="bi bi-graph-up float-end d-xl-flex justify-content-xl-center align-items-xl-center icon"
-                                     style="color: #ffffff;width: 50px;height: 50px;font-size: 30px;">
-                                    <path fill-rule="evenodd"
-                                          d="M0 0h1v15h15v1H0V0Zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07Z"></path>
-                                </svg>
-                                <h3 class="name" style="color: #ffffff;">Command Stats</h3>
-                                <p th:text="@{'Here are your top 5 most used Commands: ' + ${commandstats}}"
-                                   class="description" style="color: #ffffff;">Here are your top 5 most used
-                                    Commands:<br><br></p>
-                            </div>
-                        </div><!-- End: Features -->
-                    </div>
-                    <hr style="background: rgba(0,0,0,0);height: 50px;">
-                </section>
+            <div
+                    class="img-wrapper"
+                    data-highlight=""
+                    data-color-background="#000"
+                    data-color-dot="#fff"
+            >
+                <!-- INSERT SERVER IMAGE PATH IN IMG SRC -->
+                <img
+                        th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
+                        th:alt="${guild.getName()} + 'Server Logo'"
+                        src="https://ree6.de/serverlogo/base.svg"
+                        alt="Servername Server Logo"
+                />
             </div>
         </div>
-    </div><!-- End: Sidebar -->
-</main><!-- Start: Footer Dark -->
-<footer class="footer-dark" style="background: rgb(40, 45, 50);">
-    <div class="container">
-        <div class="row">
-            <!-- Start: Services -->
-            <div class="col-sm-6 col-md-3 item">
-                <h3>Legal</h3>
-                <ul>
-                    <li><a href="https://ree6.de/legal/pp.html">Privacy Policy</a></li>
-                    <li><a href="https://ree6.de/legal/impresum.html">Impresum</a></li>
-                    <li><a href="https://ree6.de/legal/datenschutz.html">Data protection</a></li>
-                    <li><a href="mailto:legal@ree6.de">Legal Contact</a></li>
-                    <li></li>
-                </ul>
-            </div><!-- End: Services -->
-            <!-- Start: About -->
-            <div class="col-sm-6 col-md-3 item">
-                <h3>About</h3>
-                <ul>
-                    <li><a href="#team">Team</a></li>
-                </ul>
-            </div><!-- End: About -->
-            <!-- Start: Footer Text -->
-            <div class="col-md-6 item text">
-                <h3>Ree6</h3>
-                <p>Ree6 has been made to support users and give them enough tools to support and manage their Guild. We
-                    don't like how most of the Discord Bots want you to pay for special "features". So we decided to
-                    change that.</p>
-            </div><!-- End: Footer Text -->
-            <!-- Start: Social Icons -->
-            <div class="col item social"><a href="https://support.ree6.de"><i class="fab fa-discord"></i></a><a
-                    href="https://twitter.com/ree6bot"><i class="icon ion-social-twitter"></i></a><a
-                    href="https://github.com/Ree6-Applications/Ree6"><i class="icon ion-social-github"></i></a><a
-                    href="mailto:support@ree6.de"><i class="icon ion-android-mail"></i></a></div>
-            <!-- End: Social Icons -->
-        </div><!-- Start: Copyright -->
-        <p class="lead copyright">Ree6 © 2022<br>powered by Tube-Hosting</p><!-- End: Copyright -->
+        <div
+                class="img-container"
+                data-highlight=""
+                data-color-background="#000"
+                data-color-dot="#fff"
+        >
+            <img
+                    th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
+                    th:alt="${guild.getName()} + 'Server Logo'"
+                    src="https://ree6.de/serverlogo/base.svg"
+                    alt="Servername Server Logo"
+            />
+        </div>
+    </section>
+    <section class="server-stats">
+        <div class="inner-stats-wrapper">
+            <div class="server-stats-links" data-highlight="">
+                <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
+                <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
+                <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
+                <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
+            </div>
+            <div
+                    class="server-stat"
+                    data-highlight=""
+                    data-color-background="#ea0f77"
+            >
+                <div class="server-stat-img">
+                    <img src="https://ree6.de/imgs/invites.svg" alt="Saved Invites" />
+                </div>
+                <h3>Saved Invites</h3>
+                <div class="output-stats">
+                    <strong>
+                        <span th:text="${invites.size()}"><!-- INSERT SAVED INVITE COUNT HERE -->0</span> Server
+                        Invites
+                    </strong>
+                </div>
+            </div>
+            <div
+                    class="server-stat"
+                    data-highlight=""
+                    data-color-background="#ea0f77"
+            >
+                <div class="server-stat-img">
+                    <img src="https://ree6.de/imgs/trend.svg" alt="Saved Invites" />
+                </div>
+                <h3>Command Stats</h3>
+                <div class="output-stats">
+                    <strong>Most Used Commands</strong>
+                    <span th:text="${commandstats}">No Commands Listed</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer>
+    <p>
+        Ree6 has been made to support users and give them enough tools to
+        support and manage their Guild. We don't like how most of the Discord
+        Bots want you to pay for special "features". So we decided to change
+        that.
+    </p>
+    <div class="footer-nav">
+        <div class="nav-list">
+            <strong>Navigation</strong>
+            <a href="/panel/">Panel</a>
+            <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
+            <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
+            <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
+            <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
+            <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
+            <a href="/">Home</a>
+        </div>
+        <div class="nav-list">
+            <strong>Legal</strong>
+            <a href="https://ree6.de/privacy/">Privacy Policy</a>
+            <a href="https://ree6.de/impressum/">Impressum</a>
+            <a href="https://ree6.de/protection/">Data Protection</a>
+            <button
+                    data-copy="legal@ree6.de"
+                    data-color-background="#ef2222"
+                    data-color-dot="#fff"
+            >
+                legal@ree6.de
+            </button>
+        </div>
+        <div class="nav-list">
+            <strong>Contact</strong>
+            <a
+                    href="https://support.ree6.de"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >Discord</a
+            >
+            <a
+                    href="https://twitter.com/ree6bot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >Twitter</a
+            >
+            <a
+                    href="https://github.com/DxsSucuk/Ree6"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >Github</a
+            >
+            <button
+                    data-copy="support@ree6.de"
+                    data-color-background="#ef2222"
+                    data-color-dot="#fff"
+            >
+                support@ree6.de
+            </button>
+        </div>
     </div>
-</footer><!-- End: Footer Dark -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-<script src="https://ree6.de/assets/js/script.min.js"></script>
-<div th:if="${IsError}" id="window" class="window window-open">
-    <div class="content">
-        <h3 style="color: red;">Error</h3>
-        <p th:text="${error}">This is just some info text. Idk what to put here. It will open by using code later
-            anyways.</p>
-        <button class="btn btn-primary d-xl-flex mx-auto justify-content-xl-center align-items-xl-center"
-                id="close-window">Close
-        </button>
+    <div class="copyright">
+        <span class="desktop">Developed and Designed by</span>
+        <a
+                href="https://www.presti.me/"
+                target="_blank"
+                rel="noopener noreferrer"
+        >Presti</a
+        >
+        <span class="desktop">&</span>
+        <a
+                href="https://creeperbuddy.github.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+        >Creeper Buddy</a
+        >
+        ©Ree6 <span data-time="0"></span>
     </div>
-</div>
-<script>
-    const closeWindowBtn = document.getElementById('close-window');
-
-    const barWindow = document.getElementById('window');
-    closeWindowBtn.addEventListener('click', () => {
-        barWindow.classList.remove('window-open');
-    });
-</script>
+    <script src="https://ree6.de/js/time.js"></script>
+    <script src="https://ree6.de/js/navigation.js"></script>
+    <script src="https://ree6.de/js/cursor.js"></script>
+    <script src="https://ree6.de/js/vanilla-tilt.js"></script>
+</footer>
 </body>
 </html>

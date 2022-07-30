@@ -29,7 +29,7 @@ public class BackendController {
      * @return {@link String} a stringified JsonObject.
      */
     @GetMapping(value = "/api/v1/level/leaderboard", produces = "application/json")
-    public String getLeaderboard(@RequestParam String guildId, @RequestParam int count) {
+    public String getLeaderboard(@RequestParam(name = "guildId") String guildId, @RequestParam int count) {
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.addProperty("count", count);
@@ -100,19 +100,19 @@ public class BackendController {
 
     /**
      * Request mapper for a User Guild Level Request.
-     * @param guildID the GuildID of the wanted Guild.
+     * @param guildId the GuildID of the wanted Guild.
      * @param userID the UserID of the wanted User.
      * @return {@link String} a stringified JsonObject.
      */
     @GetMapping(value = "/api/v1/level/member", produces = "application/json")
-    public String getLeaderboard(@RequestParam String guildID, @RequestParam String userID) {
+    public String getLeaderboard(@RequestParam(name = "guildId") String guildId, @RequestParam String userID) {
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.addProperty("userId", userID);
 
         JsonObject voiceJsonObject = new JsonObject();
 
-        long xp = Server.getInstance().getSqlConnector().getSqlWorker().getVoiceLevelData(guildID, userID).getExperience();
+        long xp = Server.getInstance().getSqlConnector().getSqlWorker().getVoiceLevelData(guildId, userID).getExperience();
 
         int level = 1;
 
@@ -127,7 +127,7 @@ public class BackendController {
 
         JsonObject chatJsonObject = new JsonObject();
 
-        xp = Server.getInstance().getSqlConnector().getSqlWorker().getChatLevelData(guildID, userID).getExperience();
+        xp = Server.getInstance().getSqlConnector().getSqlWorker().getChatLevelData(guildId, userID).getExperience();
 
         level = 1;
 
@@ -187,30 +187,30 @@ public class BackendController {
 
     /**
      * Request mapper for a Command Guild Stats Request.
-     * @param guildID the GuildID of the wanted Guild.
+     * @param guildId the GuildID of the wanted Guild.
      * @param command the Name of the Command.
      * @return {@link String} a stringified JsonObject.
      */
     @GetMapping(value = "/api/v1/stats/guild/command", produces = "application/json")
-    public String getStatsGuildCommand(@RequestParam String guildID, @RequestParam String command) {
+    public String getStatsGuildCommand(@RequestParam(name = "guildId") String guildId, @RequestParam String command) {
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.addProperty("command", command);
-        jsonObject.addProperty("usage", Server.getInstance().getSqlConnector().getSqlWorker().getStatsCommand(guildID, command).getUses());
+        jsonObject.addProperty("usage", Server.getInstance().getSqlConnector().getSqlWorker().getStatsCommand(guildId, command).getUses());
 
         return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
     }
 
     /**
      * Request mapper for a Guild Stats Request.
-     * @param guildID the GuildID of the wanted Guild.
+     * @param guildId the GuildID of the wanted Guild.
      * @return {@link String} a stringified JsonObject.
      */
     @GetMapping(value = "/api/v1/stats/guild/all", produces = "application/json")
-    public String getStatsGuildAll(@RequestParam String guildID) {
+    public String getStatsGuildAll(@RequestParam(name = "guildId") String guildId) {
         JsonObject jsonObject = new JsonObject();
 
-        for (Stats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildID)) {
+        for (Stats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildId)) {
             jsonObject.addProperty(entry.getCommand(), entry.getUses());
         }
 

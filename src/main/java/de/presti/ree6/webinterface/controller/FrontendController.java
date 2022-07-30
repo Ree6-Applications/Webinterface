@@ -45,7 +45,10 @@ public class FrontendController {
     // Paths to Thymeleaf Templates.
     private static final String
             MAIN_PATH = "main/index",
-            ERROR_PATH = "error/index",
+            ERROR_400_PATH = "error/400/index",
+            ERROR_403_PATH = "error/403/index",
+            ERROR_404_PATH = "error/404/index",
+            ERROR_500_PATH = "error/500/index",
             MODERATION_PATH = "panel/moderation/index",
             SOCIAL_PATH = "panel/social/index",
             LOGGING_PATH = "panel/logging/index",
@@ -150,16 +153,15 @@ public class FrontendController {
      * @return {@link ModelAndView} with the redirect data.
      */
     @GetMapping(value = "/leaderboard/chat")
-    public String getLeaderboardChat(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String guildId, Model model) {
+    public String getLeaderboardChat(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
         id = getIdentifier(id);
 
         if (checkIdentifier(id)) {
-            model.addAttribute("title", "Insufficient Permissions");
-            model.addAttribute("message", new String[]{"Please check if you are logged in!"});
+            model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
             deleteSessionCookie(httpServletResponse);
-            return ERROR_PATH;
+            return ERROR_403_PATH;
         }
 
         try {
@@ -167,10 +169,9 @@ public class FrontendController {
             Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
 
             if (session == null) {
-                model.addAttribute("title", "Insufficient Permissions");
-                model.addAttribute("message", new String[]{"Please check if you are logged in!"});
+                model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
                 deleteSessionCookie(httpServletResponse);
-                return ERROR_PATH;
+                return ERROR_403_PATH;
             }
 
             model.addAttribute("isLogged", true);
@@ -183,24 +184,24 @@ public class FrontendController {
 
             // If the Guild couldn't be loaded redirect to Error page.
             if (guild == null) {
-                model.addAttribute("title", "Invalid Guild");
-                model.addAttribute("message", new String[]{"The requested Guild is Invalid or not recognized!"});
-                return ERROR_PATH;
+                model.addAttribute("errorMessage","The requested Guild is Invalid or not recognized!");
+                deleteSessionCookie(httpServletResponse);
+                return ERROR_404_PATH;
             }
 
             Member member = guild.retrieveMemberById(oAuth2User.getId()).complete();
 
             if (member == null) {
-                model.addAttribute("title", "Insufficient Permissions");
-                model.addAttribute("message", new String[]{"You are not part of this Guild!"});
-                return ERROR_PATH;
+                model.addAttribute("errorMessage","Insufficient Permissions - You are not part of this Guild!");
+                deleteSessionCookie(httpServletResponse);
+                return ERROR_403_PATH;
             }
 
             model.addAttribute("guild", guild);
         } catch (Exception exception) {
             model.addAttribute("title", "Unexpected Error, please Report!");
             model.addAttribute("message", new String[]{"We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")"});
-            return ERROR_PATH;
+            return ERROR_500_PATH;
         }
 
         int i = 1;
@@ -231,16 +232,15 @@ public class FrontendController {
      * @return {@link ModelAndView} with the redirect data.
      */
     @GetMapping(value = "/leaderboard/voice")
-    public String getLeaderboardVoice(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String guildId, Model model) {
+    public String getLeaderboardVoice(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
         id = getIdentifier(id);
 
         if (checkIdentifier(id)) {
-            model.addAttribute("title", "Insufficient Permissions");
-            model.addAttribute("message", new String[]{"Please check if you are logged in!"});
+            model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
             deleteSessionCookie(httpServletResponse);
-            return ERROR_PATH;
+            return ERROR_403_PATH;
         }
 
         try {
@@ -248,10 +248,9 @@ public class FrontendController {
             Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
 
             if (session == null) {
-                model.addAttribute("title", "Insufficient Permissions");
-                model.addAttribute("message", new String[]{"Please check if you are logged in!"});
+                model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
                 deleteSessionCookie(httpServletResponse);
-                return ERROR_PATH;
+                return ERROR_403_PATH;
             }
 
             model.addAttribute("isLogged", true);
@@ -264,24 +263,24 @@ public class FrontendController {
 
             // If the Guild couldn't be loaded redirect to Error page.
             if (guild == null) {
-                model.addAttribute("title", "Invalid Guild");
-                model.addAttribute("message", new String[]{"The requested Guild is Invalid or not recognized!"});
-                return ERROR_PATH;
+                model.addAttribute("errorMessage","The requested Guild is Invalid or not recognized!");
+                deleteSessionCookie(httpServletResponse);
+                return ERROR_404_PATH;
             }
 
             Member member = guild.retrieveMemberById(oAuth2User.getId()).complete();
 
             if (member == null) {
-                model.addAttribute("title", "Insufficient Permissions");
-                model.addAttribute("message", new String[]{"You are not part of this Guild!"});
-                return ERROR_PATH;
+                model.addAttribute("errorMessage","Insufficient Permissions - You are not part of this Guild!");
+                deleteSessionCookie(httpServletResponse);
+                return ERROR_403_PATH;
             }
 
             model.addAttribute("guild", guild);
         } catch (Exception exception) {
             model.addAttribute("title", "Unexpected Error, please Report!");
             model.addAttribute("message", new String[]{"We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")"});
-            return ERROR_PATH;
+            return ERROR_500_PATH;
         }
 
         int i = 1;
@@ -322,10 +321,10 @@ public class FrontendController {
         id = getIdentifier(id);
 
         if (checkIdentifier(id)) {
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Session!");
+            model.addAttribute("errorCode", 403);
+            model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
-            return MAIN_PATH;
+            return ERROR_403_PATH;
         }
 
         Session session = null;
@@ -356,8 +355,9 @@ public class FrontendController {
             }
 
             // If the Session isn't null give the User a Notification that his Guilds couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Session!");
+            model.addAttribute("errorCode", 403);
+            model.addAttribute("errorMessage", "Couldn't load Session!");
+            return ERROR_403_PATH;
         }
 
         // Return Panel Page.
@@ -373,32 +373,32 @@ public class FrontendController {
      *
      * @param httpServletResponse the HTTP Response.
      * @param id                  the Session Identifier.
-     * @param guildID             the ID of the selected Guild.
+     * @param guildId             the ID of the selected Guild.
      * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @GetMapping(path = "/panel/server")
-    public String openServerPanel(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String guildID, Model model) {
+    @GetMapping(path = "/server")
+    public String openServerPanel(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
         id = getIdentifier(id);
 
         if (checkIdentifier(id)) {
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Session!");
+            model.addAttribute("errorCode", 403);
+            model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
-            return "main/index";
+            return ERROR_403_PATH;
         }
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, httpServletResponse, guildID, id)) return ERROR_PATH;
+        if (setDefaultInformation(model, httpServletResponse, guildId, id)) return ERROR_404_PATH;
 
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
-        model.addAttribute("invites", Server.getInstance().getSqlConnector().getSqlWorker().getInvites(guildID));
+        model.addAttribute("invites", Server.getInstance().getSqlConnector().getSqlWorker().getInvites(guildId));
 
         StringBuilder commandStats = new StringBuilder();
 
-        for (Stats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildID)) {
+        for (Stats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildId)) {
             commandStats.append(entry.getCommand()).append(" - ").append(entry.getUses()).append(", ");
         }
 
@@ -423,25 +423,25 @@ public class FrontendController {
      *
      * @param httpServletResponse the HTTP Response.
      * @param id                  the Session Identifier.
-     * @param guildID             the ID of the selected Guild.
+     * @param guildId             the ID of the selected Guild.
      * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @GetMapping(path = "/panel/moderation")
-    public String openPanelModeration(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String guildID, Model model) {
+    @GetMapping(path = "/moderation")
+    public String openPanelModeration(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
         id = getIdentifier(id);
 
         if (checkIdentifier(id)) {
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Session!");
+            model.addAttribute("errorCode", 403);
+            model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
-            return "main/index";
+            return ERROR_403_PATH;
         }
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, httpServletResponse, guildID, id)) return ERROR_PATH;
+        if (setDefaultInformation(model, httpServletResponse, guildId, id)) return ERROR_403_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -449,14 +449,14 @@ public class FrontendController {
         if (model.getAttribute("guild") instanceof Guild guild1) guild = guild1;
 
         // If null return to Error page.
-        if (guild == null) return ERROR_PATH;
+        if (guild == null) return ERROR_404_PATH;
 
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("roles", guild.getRoles());
         model.addAttribute("channels", guild.getTextChannels());
-        model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guildID).stream().filter(setting -> setting.getName().startsWith("com")).toList());
-        model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guildID, "chatprefix"));
-        model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guildID));
+        model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guildId).stream().filter(setting -> setting.getName().startsWith("com")).toList());
+        model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guildId, "chatprefix"));
+        model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guildId));
 
         List<Role> roles = new ArrayList<>();
 
@@ -482,12 +482,12 @@ public class FrontendController {
      * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @PostMapping(path = "/panel/moderation/role")
+    @PostMapping(path = "/moderation/role")
     public String openPanelModeration(HttpServletResponse httpServletResponse, @ModelAttribute(name = "roleChangeForm") RoleChangeForm roleChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
         if (setDefaultInformation(model, httpServletResponse, roleChangeForm.getGuild(), roleChangeForm.getIdentifier()))
-            return ERROR_PATH;
+            return ERROR_403_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -495,7 +495,7 @@ public class FrontendController {
         if (model.getAttribute("guild") instanceof Guild guild1) guild = guild1;
 
         // If null return to Error page.
-        if (guild == null) return ERROR_PATH;
+        if (guild == null) return ERROR_404_PATH;
 
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("roles", guild.getRoles());
@@ -526,12 +526,12 @@ public class FrontendController {
      * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @PostMapping(path = "/panel/moderation/settings")
+    @PostMapping(path = "/moderation/settings")
     public String openPanelModeration(HttpServletResponse httpServletResponse, @ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
         if (setDefaultInformation(model, httpServletResponse, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
-            return ERROR_PATH;
+            return ERROR_403_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -539,7 +539,7 @@ public class FrontendController {
         if (model.getAttribute("guild") instanceof Guild guild1) guild = guild1;
 
         // If null return to Error page.
-        if (guild == null) return ERROR_PATH;
+        if (guild == null) return ERROR_404_PATH;
 
         // Change the Setting Data.
         if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("addBadWord") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeBadWord") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("addAutoRole") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeAutoRole")) {
@@ -589,25 +589,25 @@ public class FrontendController {
      *
      * @param httpServletResponse the HTTP Response.
      * @param id                  the Session Identifier.
-     * @param guildID             the ID of the selected Guild.
+     * @param guildId             the ID of the selected Guild.
      * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @GetMapping(path = "/panel/social")
-    public String openPanelSocial(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String guildID, Model model) {
+    @GetMapping(path = "/social")
+    public String openPanelSocial(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
         id = getIdentifier(id);
 
         if (checkIdentifier(id)) {
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Session!");
+            model.addAttribute("errorCode", 403);
+            model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
-            return "main/index";
+            return ERROR_403_PATH;
         }
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, httpServletResponse, guildID, id)) return ERROR_PATH;
+        if (setDefaultInformation(model, httpServletResponse, guildId, id)) return ERROR_403_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -615,12 +615,12 @@ public class FrontendController {
         if (model.getAttribute("guild") instanceof Guild guild1) guild = guild1;
 
         // If null return to Error page.
-        if (guild == null) return ERROR_PATH;
+        if (guild == null) return ERROR_404_PATH;
 
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("roles", guild.getRoles());
         model.addAttribute("channels", guild.getTextChannels());
-        model.addAttribute("joinMessage", new Setting(guildID,"message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guildID)));
+        model.addAttribute("joinMessage", new Setting(guildId,"message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guildId)));
 
         // Return to the Social Panel Page.
         return SOCIAL_PATH;
@@ -634,12 +634,12 @@ public class FrontendController {
      * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @PostMapping(path = "/panel/social/channel")
+    @PostMapping(path = "/social/channel")
     public String openPanelSocial(HttpServletResponse httpServletResponse, @ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
         if (setDefaultInformation(model, httpServletResponse, channelChangeForm.getGuild(), channelChangeForm.getIdentifier()))
-            return ERROR_PATH;
+            return ERROR_403_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -647,7 +647,7 @@ public class FrontendController {
         if (model.getAttribute("guild") instanceof Guild guild1) guild = guild1;
 
         // If null return to Error page.
-        if (guild == null) return ERROR_PATH;
+        if (guild == null) return ERROR_404_PATH;
 
         // Change the channel Data.
         // Check if null.
@@ -679,12 +679,12 @@ public class FrontendController {
      * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @PostMapping(path = "/panel/social/settings")
+    @PostMapping(path = "/social/settings")
     public String openPanelSocial(HttpServletResponse httpServletResponse, @ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
         if (setDefaultInformation(model, httpServletResponse, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
-            return ERROR_PATH;
+            return ERROR_403_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -692,7 +692,7 @@ public class FrontendController {
         if (model.getAttribute("guild") instanceof Guild guild1) guild = guild1;
 
         // If null return to Error page.
-        if (guild == null) return ERROR_PATH;
+        if (guild == null) return ERROR_404_PATH;
 
         // Change the setting Data.
         if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("message_join")) {
@@ -718,25 +718,25 @@ public class FrontendController {
      *
      * @param httpServletResponse the HTTP Response.
      * @param id                  the Session Identifier.
-     * @param guildID             the ID of the selected Guild.
+     * @param guildId             the ID of the selected Guild.
      * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @GetMapping(path = "/panel/logging")
-    public String openPanelLogging(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String guildID, Model model) {
+    @GetMapping(path = "/logging")
+    public String openPanelLogging(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
         id = getIdentifier(id);
 
         if (checkIdentifier(id)) {
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Session!");
+            model.addAttribute("errorCode", 403);
+            model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
-            return "main/index";
+            return ERROR_403_PATH;
         }
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, httpServletResponse, guildID, id)) return ERROR_PATH;
+        if (setDefaultInformation(model, httpServletResponse, guildId, id)) return ERROR_403_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -744,7 +744,7 @@ public class FrontendController {
         if (model.getAttribute("guild") instanceof Guild guild1) guild = guild1;
 
         // If null return to Error page.
-        if (guild == null) return ERROR_PATH;
+        if (guild == null) return ERROR_404_PATH;
 
         // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
         model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).toList());
@@ -762,12 +762,12 @@ public class FrontendController {
      * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @PostMapping(path = "/panel/logging/channel")
+    @PostMapping(path = "/logging/channel")
     public String openPanelLogging(HttpServletResponse httpServletResponse, @ModelAttribute(name = "channelChangeForm") ChannelChangeForm channelChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
         if (setDefaultInformation(model, httpServletResponse, channelChangeForm.getGuild(), channelChangeForm.getIdentifier()))
-            return ERROR_PATH;
+            return ERROR_403_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -775,7 +775,7 @@ public class FrontendController {
         if (model.getAttribute("guild") instanceof Guild guild1) guild = guild1;
 
         // If null return to Error page.
-        if (guild == null) return ERROR_PATH;
+        if (guild == null) return ERROR_404_PATH;
 
         // Change the channel Data.
         // Check if null.
@@ -801,12 +801,12 @@ public class FrontendController {
      * @param model               the ViewModel.
      * @return {@link String} for Thyme to the HTML Page.
      */
-    @PostMapping(path = "/panel/logging/settings")
+    @PostMapping(path = "/logging/settings")
     public String openPanelLogging(HttpServletResponse httpServletResponse, @ModelAttribute(name = "settingChangeForm") SettingChangeForm settingChangeForm, Model model) {
 
         // Set default Data and If there was an error return to the Error Page.
         if (setDefaultInformation(model, httpServletResponse, settingChangeForm.getGuild(), settingChangeForm.getIdentifier()))
-            return ERROR_PATH;
+            return ERROR_403_PATH;
 
         // Get the Guild from the Model.
         Guild guild = null;
@@ -814,7 +814,7 @@ public class FrontendController {
         if (model.getAttribute("guild") instanceof Guild guild1) guild = guild1;
 
         // If null return to Error page.
-        if (guild == null) return ERROR_PATH;
+        if (guild == null) return ERROR_404_PATH;
 
         // Change the setting Data.
         Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());
@@ -844,10 +844,10 @@ public class FrontendController {
         id = getIdentifier(id);
 
         if (checkIdentifier(id)) {
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Session!");
+            model.addAttribute("errorCode", 403);
+            model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
-            return MAIN_PATH;
+            return ERROR_403_PATH;
         }
 
         Session session = null;
@@ -867,9 +867,9 @@ public class FrontendController {
                     recordIdentifier);
 
             if (!sqlResponse.isSuccess()) {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "Couldn't find the requested Recording!");
-                return MAIN_PATH;
+                model.addAttribute("errorCode", 404);
+                model.addAttribute("errorMessage", "Couldn't find the requested Recording!");
+                return ERROR_404_PATH;
             }
 
             // Try retrieving the Guilds of the OAuth2 User.
@@ -898,27 +898,25 @@ public class FrontendController {
                     Server.getInstance().getSqlConnector().getSqlWorker().deleteEntity(recording);
                     return RECORDING_PATH;
                 } else {
-                    model.addAttribute("IsError", true);
-                    model.addAttribute("error", "You are not allowed to view this Recording!");
-                    return MAIN_PATH;
+                    model.addAttribute("errorCode", 403);
+                    model.addAttribute("errorMessage", "You are not allowed to view this Recording!");
+                    return ERROR_403_PATH;
                 }
             } else {
-                model.addAttribute("IsError", true);
-                model.addAttribute("error", "You are not allowed to access this Recording!");
-                return MAIN_PATH;
+                model.addAttribute("errorCode", 403);
+                model.addAttribute("errorMessage", "You are not allowed to access this Recording!");
+                return ERROR_403_PATH;
             }
         } catch (Exception e) {
             // If the Session isn't null give the User a Notification that his Guilds couldn't be loaded.
-            model.addAttribute("IsError", true);
-            model.addAttribute("error", "Couldn't load Session!");
+            model.addAttribute("errorCode", 403);
+            model.addAttribute("errorMessage", "Couldn't load Session!");
             if (session == null) {
                 // If the Session is null just return to the default Page.
                 deleteSessionCookie(httpServletResponse);
             }
+            return ERROR_403_PATH;
         }
-
-        // Return Panel Page.
-        return MAIN_PATH;
     }
 
     //endregion

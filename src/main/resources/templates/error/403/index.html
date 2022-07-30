@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://ree6.de/styles/style.css" />
     <link rel="icon" href="https://ree6.de/imgs/logo.png" />
-    <title>REE6 | Unknown Error</title>
+    <title>REE6 | Access Denied</title>
     <style>
         footer {
             padding-top: 150px;
@@ -76,7 +76,7 @@
     <section id="home">
         <div data-parallax data-xaxis="0" data-yaxis="0" class="hero-statement">
             <h1 data-parallax data-xaxis="0.7" data-yaxis="0">
-                Error<span class="dim-text">.???</span>
+                Error<span class="dim-text">.403</span>
             </h1>
             <div
                     data-parallax
@@ -84,15 +84,8 @@
                     data-yaxis="0"
                     class="hero-descrip"
             >
-                <div
-                        data-parallax
-                        data-xaxis="0.5"
-                        data-yaxis="0"
-                        class="hero-descrip"
-                >
-                    <strong>Ree6</strong> apologizes for this Issue please try again later.
-                    <p th:if="${errorMessage != null}" th:text="${errorMessage}">Message</p>
-                </div>
+                Access <strong>Denied</strong>
+                <p th:if="${errorMessage != null}" th:text="${errorMessage}">Message</p>
             </div>
             <a href="https://cp.ree6.de" data-highlight="" class="hero-cta"
             >Ree6 Respawn</a

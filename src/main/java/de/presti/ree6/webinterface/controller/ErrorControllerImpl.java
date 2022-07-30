@@ -33,24 +33,20 @@ public class ErrorControllerImpl implements org.springframework.boot.web.servlet
      */
     @GetMapping(value = "/error")
     public String error(HttpServletRequest request, WebRequest webRequest, Model model) {
-        Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);;
+        Object status = model.getAttribute("errorCode") != null ? model.getAttribute("errorCode") : request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);;
 
         if (status != null) {
             int statusCode = Integer.parseInt(status.toString());
 
             // display specific error page
             if (statusCode == HttpStatus.NOT_FOUND.value()) {
-                model.addAttribute("title", "Unable to find page");
-                model.addAttribute("message", new String[] { "The page you are looking for was not found.", "Please return back to the dashboard!" });
+                return "error/404/index";
             } else if (statusCode == HttpStatus.FORBIDDEN.value()) {
-                model.addAttribute("title", "Forbidden");
-                model.addAttribute("message", new String[] { "You are not allowed to access this page.", "Please return back to the dashboard!" });
+                return "error/403/index";
             } else if (statusCode == HttpStatus.BAD_REQUEST.value()) {
-                model.addAttribute("tittle", "Bad Request");
-                model.addAttribute("message", new String[] { "The request you made is invalid.", "Please return back to the dashboard!" });
+                return "error/400/index";
             } else if (statusCode != HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-                model.addAttribute("title", "Error");
-                model.addAttribute("message", new String[] { "An error has occurred.", "Please contact the Developer about this!" });
+                return "error/500/index";
             }
         }
 
