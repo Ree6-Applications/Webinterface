@@ -2,19 +2,17 @@ package de.presti.ree6.webinterface.sql;
 
 import com.google.gson.JsonElement;
 import de.presti.ree6.webinterface.Server;
-import de.presti.ree6.webinterface.sql.base.data.MigrationUtil;
-import de.presti.ree6.webinterface.sql.base.data.SQLEntity;
-import de.presti.ree6.webinterface.sql.base.data.SQLUtil;
-import de.presti.ree6.webinterface.sql.base.data.StoredResultSet;
+import de.presti.ree6.webinterface.sql.base.entities.SQLEntity;
+import de.presti.ree6.webinterface.sql.base.entities.StoredResultSet;
+import de.presti.ree6.webinterface.sql.base.utils.MigrationUtil;
+import de.presti.ree6.webinterface.sql.base.utils.SQLUtil;
 import de.presti.ree6.webinterface.sql.mapper.EntityMapper;
 import de.presti.ree6.webinterface.sql.seed.SeedManager;
 import org.reflections.Reflections;
 
 import java.sql.*;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.Date;
+import java.util.*;
 
 /**
  * A "Connector" Class which connect with the used Database Server.
@@ -192,6 +190,8 @@ public class SQLConnector {
                     preparedStatement.setObject(index++, SQLUtil.convertJSONToBlob(jsonElement), Types.BLOB);
                 } else if (obj instanceof byte[] byteArray) {
                     preparedStatement.setObject(index++, Base64.getEncoder().encodeToString(byteArray), Types.VARCHAR);
+                } else if (obj instanceof Date date) {
+                    preparedStatement.setObject(index++, date.getTime(), Types.BIGINT);
                 }
             }
 

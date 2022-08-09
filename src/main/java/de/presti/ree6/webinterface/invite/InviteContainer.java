@@ -6,14 +6,29 @@ package de.presti.ree6.webinterface.invite;
 public class InviteContainer {
 
     /**
-     * information about the Invite.
+     * The ID of the Guild.
      */
-    String creatorId, guildId, code;
+    String guildId;
+
+    /**
+     * The ID of the creator.
+     */
+    String creatorId;
+
+    /**
+     * The Code of the Invite.
+     */
+    String code;
 
     /**
      * The use count from our Database.
      */
     long uses;
+
+    /**
+     * If the Invite is a vanity Invite.
+     */
+    boolean isVanity;
 
     /**
      * Constructor for the InviteContainer which saved the Data.
@@ -22,12 +37,14 @@ public class InviteContainer {
      * @param guildId   the ID of the Guild.
      * @param code      the Code of the Invite.
      * @param uses      the Usage Count of the Invite.
+     * @param isVanity  if the Invite is a vanity Invite.
      */
-    public InviteContainer(String creatorId, String guildId, String code, long uses) {
+    public InviteContainer(String creatorId, String guildId, String code, long uses, boolean isVanity) {
         this.creatorId = creatorId;
         this.guildId = guildId;
         this.code = code;
         this.uses = uses;
+        this.isVanity = isVanity;
     }
 
     /**
@@ -100,6 +117,24 @@ public class InviteContainer {
      */
     public void setUses(long uses) {
         this.uses = uses;
+    }
+
+    /**
+     * Get if the Invite is a Vanity Invite.
+     *
+     * @return {@link Boolean} as Vanity Invite.
+     */
+    public boolean isVanity() {
+        return isVanity;
+    }
+
+    /**
+     * Set if the Invite is a Vanity Invite.
+     *
+     * @param isVanity if the Invite is a Vanity Invite.
+     */
+    public void setVanity(boolean isVanity) {
+        this.isVanity = isVanity;
     }
 }
 

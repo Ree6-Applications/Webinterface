@@ -12,7 +12,7 @@ import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.controller.forms.ChannelChangeForm;
 import de.presti.ree6.webinterface.controller.forms.RoleChangeForm;
 import de.presti.ree6.webinterface.controller.forms.SettingChangeForm;
-import de.presti.ree6.webinterface.sql.base.data.SQLResponse;
+import de.presti.ree6.webinterface.sql.base.entities.SQLResponse;
 import de.presti.ree6.webinterface.sql.entities.Recording;
 import de.presti.ree6.webinterface.sql.entities.Setting;
 import de.presti.ree6.webinterface.sql.entities.level.ChatUserLevel;
@@ -103,7 +103,7 @@ public class FrontendController {
         Session session = null;
 
         // Generate a secure Base64 String for the Identifier.
-        String identifier = RandomUtils.getRandomBase64String();
+        String identifier = RandomUtils.getRandomBase64String(128);
 
         try {
             // Try creating a Session.

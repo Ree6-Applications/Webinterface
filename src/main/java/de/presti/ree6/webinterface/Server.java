@@ -5,7 +5,7 @@ import com.mindscapehq.raygun4java.core.RaygunClient;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.sql.SQLConnector;
-import de.presti.ree6.webinterface.sql.base.data.SQLResponse;
+import de.presti.ree6.webinterface.sql.base.entities.SQLResponse;
 import de.presti.ree6.webinterface.sql.entities.Recording;
 import de.presti.ree6.webinterface.utils.data.Config;
 import de.presti.ree6.webinterface.utils.others.ThreadUtil;

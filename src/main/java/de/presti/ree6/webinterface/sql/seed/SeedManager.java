@@ -24,11 +24,11 @@ public class SeedManager {
         Set<Class<? extends Seed>> classes = reflections.getSubTypesOf(Seed.class);
         for (Class<? extends Seed> aClass : classes) {
             try {
-                Server.getInstance().getLogger().info("Trying to run Seed " + aClass.getSimpleName());
+                Server.getInstance().getLogger().info("Trying to run Seed {}", aClass.getSimpleName());
                 Seed seed = aClass.getDeclaredConstructor().newInstance();
 
                 if (sqlConnector.querySQL("SELECT * FROM Seeds WHERE VERSION=?", seed.getSeedVersion().toString()).hasResults()) {
-                    Server.getInstance().getLogger().info("Seed " + aClass.getSimpleName() + " already ran.");
+                    Server.getInstance().getLogger().info("Seed {} already ran.", aClass.getSimpleName());
                     continue;
                 }
 

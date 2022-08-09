@@ -2,7 +2,7 @@ package de.presti.ree6.webinterface.sql.entities.stats;
 
 import de.presti.ree6.webinterface.sql.base.annotations.Property;
 import de.presti.ree6.webinterface.sql.base.annotations.Table;
-import de.presti.ree6.webinterface.sql.base.data.SQLEntity;
+import de.presti.ree6.webinterface.sql.base.entities.SQLEntity;
 
 /**
  * SQL Entity for the Stats.

@@ -3,7 +3,7 @@ package de.presti.ree6.webinterface.sql.entities;
 import com.google.gson.JsonArray;
 import de.presti.ree6.webinterface.sql.base.annotations.Property;
 import de.presti.ree6.webinterface.sql.base.annotations.Table;
-import de.presti.ree6.webinterface.sql.base.data.SQLEntity;
+import de.presti.ree6.webinterface.sql.base.entities.SQLEntity;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
 
 /**
@@ -48,7 +48,6 @@ public class Recording extends SQLEntity {
     @Property(name = "participants", keepOriginalValue = false)
     JsonArray jsonArray;
 
-
     /**
      * Value used to tell us when this entry was made.
      */
@@ -70,7 +69,7 @@ public class Recording extends SQLEntity {
      * @param jsonArray an JsonArray containing the IDs of the Users who have participated in the Recording.
      */
     public Recording(String guildId, String voiceId, String creatorId, byte[] recording, JsonArray jsonArray) {
-        this.identifier = RandomUtils.getRandomBase64String();
+        this.identifier = RandomUtils.getRandomBase64String(16);
         this.guildId = guildId;
         this.voiceId = voiceId;
         this.creatorId = creatorId;

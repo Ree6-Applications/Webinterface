@@ -2,7 +2,7 @@ package de.presti.ree6.webinterface.sql.entities;
 
 import de.presti.ree6.webinterface.sql.base.annotations.Property;
 import de.presti.ree6.webinterface.sql.base.annotations.Table;
-import de.presti.ree6.webinterface.sql.base.data.SQLEntity;
+import de.presti.ree6.webinterface.sql.base.entities.SQLEntity;
 
 /**
  * Invite class to store information about an Invite.
@@ -89,5 +89,13 @@ public class Invite extends SQLEntity {
      */
     public String getCode() {
         return code;
+    }
+
+    /**
+     * Set the Code of the Invite.
+     * @param code the Code of the Invite.
+     */
+    public void setCode(String code) {
+        this.code = code;
     }
 }
