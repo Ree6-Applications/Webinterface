@@ -19,6 +19,7 @@ import de.presti.ree6.webinterface.sql.entities.level.ChatUserLevel;
 import de.presti.ree6.webinterface.sql.entities.level.VoiceUserLevel;
 import de.presti.ree6.webinterface.sql.entities.stats.Stats;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
+import de.presti.ree6.webinterface.utils.others.SessionUtil;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -63,10 +64,10 @@ public class FrontendController {
     public String main(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
-        id = getIdentifier(id);
+        id = SessionUtil.getIdentifier(id);
 
         try {
-            if (!checkIdentifier(id)) {
+            if (!SessionUtil.checkIdentifier(id)) {
                 // Try retrieving the Session from the Identifier.
                 Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
                 if (session != null) {
@@ -156,9 +157,9 @@ public class FrontendController {
     public String getLeaderboardChat(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
-        id = getIdentifier(id);
+        id = SessionUtil.getIdentifier(id);
 
-        if (checkIdentifier(id)) {
+        if (SessionUtil.checkIdentifier(id)) {
             model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
             deleteSessionCookie(httpServletResponse);
             return ERROR_403_PATH;
@@ -235,9 +236,9 @@ public class FrontendController {
     public String getLeaderboardVoice(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
-        id = getIdentifier(id);
+        id = SessionUtil.getIdentifier(id);
 
-        if (checkIdentifier(id)) {
+        if (SessionUtil.checkIdentifier(id)) {
             model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
             deleteSessionCookie(httpServletResponse);
             return ERROR_403_PATH;
@@ -318,9 +319,9 @@ public class FrontendController {
     public String openPanel(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
-        id = getIdentifier(id);
+        id = SessionUtil.getIdentifier(id);
 
-        if (checkIdentifier(id)) {
+        if (SessionUtil.checkIdentifier(id)) {
             model.addAttribute("errorCode", 403);
             model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
@@ -381,9 +382,9 @@ public class FrontendController {
     public String openServerPanel(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
-        id = getIdentifier(id);
+        id = SessionUtil.getIdentifier(id);
 
-        if (checkIdentifier(id)) {
+        if (SessionUtil.checkIdentifier(id)) {
             model.addAttribute("errorCode", 403);
             model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
@@ -431,9 +432,9 @@ public class FrontendController {
     public String openPanelModeration(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
-        id = getIdentifier(id);
+        id = SessionUtil.getIdentifier(id);
 
-        if (checkIdentifier(id)) {
+        if (SessionUtil.checkIdentifier(id)) {
             model.addAttribute("errorCode", 403);
             model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
@@ -597,9 +598,9 @@ public class FrontendController {
     public String openPanelSocial(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
-        id = getIdentifier(id);
+        id = SessionUtil.getIdentifier(id);
 
-        if (checkIdentifier(id)) {
+        if (SessionUtil.checkIdentifier(id)) {
             model.addAttribute("errorCode", 403);
             model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
@@ -726,9 +727,9 @@ public class FrontendController {
     public String openPanelLogging(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
-        id = getIdentifier(id);
+        id = SessionUtil.getIdentifier(id);
 
-        if (checkIdentifier(id)) {
+        if (SessionUtil.checkIdentifier(id)) {
             model.addAttribute("errorCode", 403);
             model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
@@ -841,9 +842,9 @@ public class FrontendController {
     public String openRecordingView(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "recordId") String recordIdentifier, Model model) {
 
         // Check and decode the Identifier saved in the Cookies.
-        id = getIdentifier(id);
+        id = SessionUtil.getIdentifier(id);
 
-        if (checkIdentifier(id)) {
+        if (SessionUtil.checkIdentifier(id)) {
             model.addAttribute("errorCode", 403);
             model.addAttribute("errorMessage", "Couldn't load Session!");
             deleteSessionCookie(httpServletResponse);
@@ -986,32 +987,6 @@ public class FrontendController {
         cookie.setPath("/");
 
         httpServletResponse.addCookie(cookie);
-    }
-
-    /**
-     * Get the Identifier out of the Cookie-Value.
-     *
-     * @param identifier the encoded Identifier.
-     * @return the decoded Identifier.
-     */
-    public String getIdentifier(String identifier) {
-        try {
-            identifier = new String(Base64.getDecoder().decode(identifier));
-            return identifier;
-        } catch (Exception ignored) {
-        }
-
-        return null;
-    }
-
-    /**
-     * Check if a String is a valid identifier.
-     *
-     * @param identifier the "identifier".
-     * @return true, if it is an invalid identifier | false, if not.
-     */
-    public boolean checkIdentifier(String identifier) {
-        return identifier == null || identifier.equals("-1");
     }
 
     //endregion

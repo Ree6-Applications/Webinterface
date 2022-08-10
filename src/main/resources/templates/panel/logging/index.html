@@ -62,8 +62,9 @@
 <div class="cursor-modal"></div>
 <header id="float-home">
    <nav class="desktop-nav">
-      <a th:href="@{'/server?guildId=' + ${guild.getId()}}" class="slide-active">Server</a>
-      <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
+      <a href="/panel/">Panel</a>
+      <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
+      <a th:href="@{'/logging?guildId=' + ${guild.getId()}}" class="slide-active">Logging</a>
       <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
       <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
       <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
