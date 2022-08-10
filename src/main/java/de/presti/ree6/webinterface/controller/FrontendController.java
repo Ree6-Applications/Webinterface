@@ -16,6 +16,7 @@ import de.presti.ree6.webinterface.sql.base.entities.SQLResponse;
 import de.presti.ree6.webinterface.sql.entities.Recording;
 import de.presti.ree6.webinterface.sql.entities.Setting;
 import de.presti.ree6.webinterface.sql.entities.level.ChatUserLevel;
+import de.presti.ree6.webinterface.sql.entities.level.UserLevel;
 import de.presti.ree6.webinterface.sql.entities.level.VoiceUserLevel;
 import de.presti.ree6.webinterface.sql.entities.stats.Stats;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
@@ -147,6 +148,68 @@ public class FrontendController {
     //region Leaderboard.
 
     /**
+     * A Get Mapper for the Leaderboard Page.
+     * @param httpServletResponse the HTTP Response.
+     * @param id the Identifier of the Session.
+     * @param guildId the Guild ID of the Guild.
+     * @param model the Model for Thymeleaf.
+     * @return {@link String} for Thyme to the HTML Page.
+     */
+    @GetMapping(value = "/leaderboard")
+    public String getLeaderboard(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam(name = "guildId") String guildId, Model model) {
+        // Check and decode the Identifier saved in the Cookies.
+        id = SessionUtil.getIdentifier(id);
+
+        if (SessionUtil.checkIdentifier(id)) {
+            model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
+            deleteSessionCookie(httpServletResponse);
+            return ERROR_403_PATH;
+        }
+
+        try {
+            // Try retrieving the Session from the Identifier.
+            Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+
+            if (session == null) {
+                model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
+                deleteSessionCookie(httpServletResponse);
+                return ERROR_403_PATH;
+            }
+
+            model.addAttribute("isLogged", true);
+
+            // Try retrieving the User from the Session.
+            OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
+
+            // Retrieve the Guild by its giving ID.
+            Guild guild = BotWorker.getShardManager().getGuildById(guildId);
+
+            // If the Guild couldn't be loaded redirect to Error page.
+            if (guild == null) {
+                model.addAttribute("errorMessage","The requested Guild is Invalid or not recognized!");
+                deleteSessionCookie(httpServletResponse);
+                return ERROR_404_PATH;
+            }
+
+            Member member = guild.retrieveMemberById(oAuth2User.getId()).complete();
+
+            if (member == null) {
+                model.addAttribute("errorMessage","Insufficient Permissions - You are not part of this Guild!");
+                deleteSessionCookie(httpServletResponse);
+                return ERROR_403_PATH;
+            }
+
+            model.addAttribute("guild", guild);
+        } catch (Exception exception) {
+            model.addAttribute("title", "Unexpected Error, please Report!");
+            model.addAttribute("errorMessage", "We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")");
+            return ERROR_500_PATH;
+        }
+
+        return "leaderboard/index";
+    }
+
+    /**
      * The Request Mapper for the Guild Leaderboard.
      *
      * @param guildId the ID of the Guild.
@@ -200,13 +263,12 @@ public class FrontendController {
 
             model.addAttribute("guild", guild);
         } catch (Exception exception) {
-            model.addAttribute("title", "Unexpected Error, please Report!");
-            model.addAttribute("message", new String[]{"We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")"});
+            model.addAttribute("errorMessage", "We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")");
             return ERROR_500_PATH;
         }
 
-        int i = 1;
-        for (ChatUserLevel userLevel : Server.getInstance().getSqlConnector().getSqlWorker().getTopChat(guildId, 5)) {
+        List<ChatUserLevel> userLevels = Server.getInstance().getSqlConnector().getSqlWorker().getTopChat(guildId, 5);
+        for (ChatUserLevel userLevel : userLevels) {
             try {
                 if (BotWorker.getShardManager().getUserById(userLevel.getUserId()) != null) {
                     userLevel.setUser(BotWorker.getShardManager().getUserById(userLevel.getUserId()));
@@ -217,12 +279,11 @@ public class FrontendController {
                 userLevel.setExperience(0);
                 Server.getInstance().getSqlConnector().getSqlWorker().addChatLevelData(guildId, null, userLevel);
             }
-
-            model.addAttribute("user" + i, userLevel);
-            i++;
         }
 
-        return "leaderboard/index";
+        model.addAttribute("userLevels", userLevels);
+
+        return "leaderboard/index2";
     }
 
     /**
@@ -280,7 +341,7 @@ public class FrontendController {
             model.addAttribute("guild", guild);
         } catch (Exception exception) {
             model.addAttribute("title", "Unexpected Error, please Report!");
-            model.addAttribute("message", new String[]{"We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")"});
+            model.addAttribute("errorMessage", "We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")");
             return ERROR_500_PATH;
         }
 
@@ -301,7 +362,7 @@ public class FrontendController {
             i++;
         }
 
-        return "leaderboard/index";
+        return "leaderboard/index2";
     }
 
     //endregion

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://ree6.de/styles/style.css" />
+    <link rel="icon" href="https://ree6.de/imgs/logo.png" />
+    <title>REE6 | Leaderboard</title>
+    <style>
+        footer {
+            padding-top: 150px;
+        }
+        #home .img-wrapper {
+            height: 200px;
+            width: 200px;
+        }
+        #home .img-container {
+            width: 25vw;
+            height: 25vw;
+            margin: auto;
+            overflow: hidden;
+            margin-left: 5vw;
+            border-radius: 100%;
+        }
+        .hero-statement {
+            margin-right: 1%;
+        }
+        #home .img-wrapper:hover img {
+            transform: scale(1.1);
+        }
+        #home .img-container:hover img {
+            transform: scale(1.1);
+        }
+
+        .hamburger-container {
+            height: 90%;
+        }
+        .hero-statement h1 {
+            font-size: clamp(25px, 10.5vw, 135px);
+        }
+        @media only screen and (max-width: 1650px) {
+            section#home {
+                grid-template-columns: 1fr 0.85fr;
+            }
+            .hero-statement {
+                margin-right: 1vw;
+            }
+        }
+        @media only screen and (max-width: 1350px) {
+            section#home {
+                grid-template-columns: 1fr 0.65fr;
+            }
+        }
+        @media only screen and (max-width: 1150px) {
+            section#home {
+                grid-template-columns: 1fr;
+            }
+            .hero-statement {
+                margin: auto;
+            }
+        }
+        @media only screen and (max-width: 700px) {
+            section.leaderboard {
+                column-gap: 0;
+            }
+            .number-placement span {
+                padding: 20px 10px;
+            }
+        }
+        @media only screen and (max-width: 600px) {
+            .number-placement {
+                display: none;
+            }
+            .person-stat {
+                flex-direction: column;
+                row-gap: 20px;
+            }
+            .leaderboard-stats {
+                row-gap: 15px;
+                text-align: center;
+            }
+            .progress-bar-wrapper {
+                width: 100%;
+                margin-top: 10px;
+            }
+            section.leaderboard {
+                padding-top: 100px;
+            }
+        }
+        @media only screen and (max-width: 525px) {
+            .hero-statement .hero-descrip {
+                font-size: 10px;
+            }
+        }
+        @media only screen and (max-height: 650px) {
+            .hamburger-container a {
+                font-size: 11px;
+            }
+        }
+        @media only screen and (max-height: 425px) {
+            .hamburger-container a {
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="transition-fade"></div>
+<div class="cursor"></div>
+<div class="inner-cursor"></div>
+<div class="cursor-modal"></div>
+<header id="float-home">
+    <nav class="desktop-nav">
+        <a href="/panel/">Panel</a>
+        <a href="/server/">Server</a>
+        <a href="/logging/">Logging</a>
+        <a href="/moderation/">Moderation</a>
+        <a href="/social/">Social</a>
+        <a href="/leaderboard/" class="slide-active">Leaderboard</a>
+    </nav>
+    <button class="hamburger-button">
+        <span class="line-one"></span>
+        <span class="line-two"></span>
+    </button>
+    <nav class="hamburger-wrapper">
+        <div class="hamburger-container">
+            <a href="/panel/"><span>Panel</span></a>
+            <a href="/server/"><span>Server</span></a>
+            <a href="/logging/"><span>Logging</span></a>
+            <a href="/moderation/"><span>Moderation</span></a>
+            <a href="/social/"><span>Social</span></a>
+            <a href="/leaderboard/"><span>Leaderboard</span></a>
+            <a href="/"><span>Home</span></a>
+        </div>
+    </nav>
+</header>
+<a href="/" class="nav-arrow">
+    <div class="arrow-container">
+        <div class="arrow-wrapper">
+            <span class="circle"></span>
+            <div class="arrow">
+                <span class="line-one"></span>
+                <span class="line-two"></span>
+                <span class="line-three"></span>
+            </div>
+        </div>
+    </div>
+    <span class="inner-text">Back to Home</span>
+</a>
+<main>
+    <section id="home">
+        <div data-parallax data-xaxis="0" data-yaxis="0" class="hero-statement">
+            <h1 data-parallax data-xaxis="0.7" data-yaxis="0">
+                Lead<span class="dim-text">.er</span>
+            </h1>
+            <div
+                    data-parallax
+                    data-xaxis="0.5"
+                    data-yaxis="0"
+                    class="hero-descrip"
+            >
+                <strong><!-- INSERT SERVERNAME HERE-->Servername</strong>
+                Leaderboard
+            </div>
+            <div
+                    data-highlight=""
+                    data-color-background="#000"
+                    data-color-dot="#fff"
+                    class="img-wrapper"
+            >
+                <!-- INSERT SERVER IMAGE PATH IN IMG SRC -->
+                <img
+                        src="https://ree6.de/serverlogo/base.svg"
+                        alt="<!-- INSERT SERVERNAME HERE--> Server Logo"
+                />
+            </div>
+        </div>
+        <div
+                data-highlight=""
+                data-color-background="#000"
+                data-color-dot="#fff"
+                class="img-container"
+        >
+            <img
+                    src="https://ree6.de/serverlogo/base.svg"
+                    alt="<!-- INSERT SERVERNAME HERE--> Server Logo"
+            />
+        </div>
+    </section>
+    <section class="leaderboard">
+        <div class="number-placement">
+            <span th:each="userlevel: ${userLevels}" th:text="'0' + ${userlevel.getRank()}">01</span>
+        </div>
+        <div class="people-container">
+            <!-- INPUT PERCENT PROGRESS AS A STRICT INTEGER BETWEEN 1 - 100 -->
+            <div th:each="userlevel: ${userLevels}" th:data-percent="${userlevel.getProgress()}" class="person-stat">
+                <div class="leaderboard-avatar">
+                    <img
+                            th:src="${userlevel.getUser().getEffectiveAvatarUrl()}"
+                            th:alt="${userlevel.getUser().getName()} + 's Avatar'"
+                            src="https://ree6.de/serverlogo/base.svg"
+                            alt="<!-- INSERT PERSON IMAGE HERE--> PERSON ICON"
+                    />
+                </div>
+                <div class="leaderboard-stats">
+                    <h2 th:inline="text" > [[${userlevel.getUser().getName()}]]<span class="dim-text" th:text="'#' + ${userlevel.getUser().getDiscriminator()}">#0000</span></h2>
+                    <span class="sub-stats">
+                Level <strong th:text="${userlevel.getLevel()}">0<!-- INSERT LEVEL HERE--></strong>
+              </span>
+                    <span class="sub-stats">
+                xp <strong th:text="${userlevel.getExperience()}">0<!-- INSERT XP-AMOUNT HERE--></strong>
+              </span>
+                    <div class="progress-bar-wrapper">
+                        <span class="percentage" th:text="${userlevel.getProgress()} + '%'">0%</span>
+                        <span class="bar"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer>
+    <p>
+        Ree6 has been made to support users and give them enough tools to
+        support and manage their Guild. We don't like how most of the Discord
+        Bots want you to pay for special "features". So we decided to change
+        that.
+    </p>
+    <div class="footer-nav">
+        <div class="nav-list">
+            <strong>Navigation</strong>
+            <a href="/panel/">Panel</a>
+            <a href="/server/">Server</a>
+            <a href="/logging/">Logging</a>
+            <a href="/moderation/">Moderation</a>
+            <a href="/social/">Social</a>
+            <a href="/leaderboard/">Leaderboard</a>
+            <a href="/">Home</a>
+        </div>
+        <div class="nav-list">
+            <strong>Legal</strong>
+            <a href="https://ree6.de/privacy/">Privacy Policy</a>
+            <a href="https://ree6.de/impressum/">Impressum</a>
+            <a href="https://ree6.de/protection/">Data Protection</a>
+            <button
+                    data-copy="legal@ree6.de"
+                    data-color-background="#ef2222"
+                    data-color-dot="#fff"
+            >
+                legal@ree6.de
+            </button>
+        </div>
+        <div class="nav-list">
+            <strong>Contact</strong>
+            <a
+                    href="https://discord.com/invite/m99MGKVxuC"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >Discord</a
+            >
+            <a
+                    href="https://twitter.com/ree6bot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >Twitter</a
+            >
+            <a
+                    href="https://github.com/DxsSucuk/Ree6"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >Github</a
+            >
+            <button
+                    data-copy="support@ree6.de"
+                    data-color-background="#ef2222"
+                    data-color-dot="#fff"
+            >
+                support@ree6.de
+            </button>
+        </div>
+    </div>
+    <div class="copyright">
+        Developed and Designed by
+        <a
+                href="https://www.presti.me/"
+                target="_blank"
+                rel="noopener noreferrer"
+        >Presti</a
+        >
+        &
+        <a
+                href="https://creeperbuddy.github.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+        >Creeper Buddy</a
+        >
+        ©Ree6 <span data-time="0"></span>
+    </div>
+    <script src="https://ree6.de/js/time.js"></script>
+    <script src="https://ree6.de/js/navigation.js"></script>
+    <script src="https://ree6.de/js/cursor.js"></script>
+    <script src="https://ree6.de/js/percent.js"></script>
+</footer>
+</body>
+</html>

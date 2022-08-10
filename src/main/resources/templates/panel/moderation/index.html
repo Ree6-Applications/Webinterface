@@ -135,14 +135,15 @@
    <section class="logging">
       <div class="inner-logging-wrapper">
          <div class="server-profile">
-            <img
-                    th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
-                    th:alt="${guild.getName()} + 'Server Logo'"
-                    src="https://ree6.de/serverlogo/base.svg"
-                    alt="Servername Server Logo"
-            />
-         </div>
-         <h4 th:text="${guild.getName()}">Server</h4>
+            <div class="profile-img-wrapper">
+               <img
+                       th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
+                       th:alt="${guild.getName()} + 'Server Logo'"
+                       src="https://ree6.de/serverlogo/base.svg"
+                       alt="Servername Server Logo"
+               />
+            </div>
+            <h4 th:text="${guild.getName()}">Server</h4>
          </div>
          <div class="logging-features">
             <div class="channel-message-wrapper" data-state="">
@@ -275,6 +276,7 @@
                   <input type="submit" th:value="${command.getName()}" th:name="${command.getName()}" th:aria-selected="${command.getBooleanValue()}" />
                </div>
             </form>
+         </div>
       </div>
    </section>
 </main>
