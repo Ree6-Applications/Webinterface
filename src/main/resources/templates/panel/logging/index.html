@@ -152,8 +152,8 @@
                <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
                <input type="hidden" name="identifierSession" th:value="${identifier}" />
                <strong>Logging Features</strong>
-               <div th:each="log: ${logs}" class="logging-feature" th:classappend="${log.getBooleanValue() ? 'logging-feature-active' : ''}">
-                  <input type="submit" th:value="${log.getName()}" th:name="${log.getName()}" th:aria-selected="${log.getBooleanValue()}" />
+               <div th:each="log: ${logs}" th:id="${log.getName()}" class="logging-feature" th:classappend="${log.getBooleanValue() ? 'logging-feature-active' : ''}">
+                  <input type="submit" th:value="${log.getName()}" th:name="${log.getName()}" th:aria-selected="${log.getBooleanValue()}" th:onclick="@{'updateSettings(\'' + ${log.getName()} + '\')'}" />
                </div>
             </form>
          </div>
@@ -242,6 +242,57 @@
    <script src="https://ree6.de/js/cursor.js"></script>
    <script src="https://ree6.de/js/vanilla-tilt.js"></script>
    <script src="https://ree6.de/js/logging.js"></script>
+   <script th:inline="javascript">
+      function updateSettings(name) {
+         var element = document.getElementById(name);
+
+         var isActive = element.classList != null && element.classList.contains('logging-feature-active')
+
+         const XHR = new XMLHttpRequest();
+
+         var guildId = /*[[${guild.getId()}]]*/"";
+         var sessionIdentifier = /*[[${identifier}]]*/"";
+
+         const urlEncodedDataPairs = [];
+
+         // Turn the data object into an array of URL-encoded key/value pairs.
+         urlEncodedDataPairs.push(`${encodeURIComponent('name')}=${encodeURIComponent(name)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('value')}=${encodeURIComponent(!isActive)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('guildSession')}=${encodeURIComponent(guildId)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('identifierSession')}=${encodeURIComponent(sessionIdentifier)}`);
+
+         // Combine the pairs into a single string and replace all %-encoded spaces to
+         // the '+' character; matches the behavior of browser form submissions.
+         const urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
+
+         // Define what happens on successful data submission
+         XHR.addEventListener('load', (event) => {
+            if (isActive) {
+               element.classList.remove('logging-feature-active');
+            } else {
+               if (element.classList != null) {
+                  element.classList.add('logging-feature-active');
+               } else {
+                  element.className = 'logging-feature-active';
+               }
+            }
+         });
+
+           // Define what happens in case of error
+         XHR.addEventListener('error', (event) => {
+            alert('Oops! Something went wrong.');
+         });
+
+         // Set up our request
+         XHR.open('POST', '/logging/settings');
+
+         // Add the required HTTP header for form data POST requests
+         XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+         // Finally, send our data.
+         XHR.send(urlEncodedData);
+      }
+   </script>
 </footer>
 </body>
 </html>
