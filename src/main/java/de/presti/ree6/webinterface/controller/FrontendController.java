@@ -537,50 +537,6 @@ public class FrontendController {
     }
 
     /**
-     * Request Mapper for the Moderation Role Change Panel.
-     *
-     * @param httpServletResponse the HTTP Response.
-     * @param roleChangeForm      as the Form which contains the needed data.
-     * @param model               the ViewModel.
-     * @return {@link String} for Thyme to the HTML Page.
-     */
-    @PostMapping(path = "/moderation/role")
-    public String openPanelModeration(HttpServletResponse httpServletResponse, @ModelAttribute(name = "roleChangeForm") RoleChangeForm roleChangeForm, Model model) {
-
-        // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, httpServletResponse, roleChangeForm.getGuild(), roleChangeForm.getIdentifier()))
-            return ERROR_403_PATH;
-
-        // Get the Guild from the Model.
-        Guild guild = null;
-
-        if (model.getAttribute("guild") instanceof Guild guild1) guild = guild1;
-
-        // If null return to Error page.
-        if (guild == null) return ERROR_404_PATH;
-
-        // Retrieve every Role and Channel of the Guild and set them as Attribute.
-        model.addAttribute("roles", guild.getRoles());
-        model.addAttribute("channels", guild.getTextChannels());
-        model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("com")).toList());
-        model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guild.getId(), "chatprefix"));
-        model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
-
-        List<Role> roles = new ArrayList<>();
-
-        for (de.presti.ree6.webinterface.sql.entities.roles.Role role : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
-            try {
-                roles.add(guild.getRoleById(role.getRoleId()));
-            } catch (Exception ignore) {
-                Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(guild.getId(), role.getRoleId());
-            }
-        }
-        model.addAttribute("autoroles", roles);
-
-        return MODERATION_PATH;
-    }
-
-    /**
      * Request Mapper for the Moderation Settings Change Panel.
      *
      * @param httpServletResponse the HTTP Response.

@@ -226,10 +226,11 @@
                   <button
                           class="msg-btn-add"
                           data-state=""
-                          type="submit"
+                          type="button"
                           data-highlight=""
                           data-color-background="#5865F2"
                           data-color-dot="#fff"
+                          onclick="updateBadWord('word', 'addBadWord')"
                   >
                      add
                   </button>
@@ -247,32 +248,33 @@
                   </button>
                </form>
                <div class="entries-wrapper">
-                  <form action="" method="post" class="entries-list">
-                     <!--<div
+                  <form id="blacklist-entries" action="" method="post" class="entries-list">
+                     <div th:each="word: ${words}"
                        class="entry"
                        data-highlight=""
                        data-color-dot="#fff"
                        data-color-border="#fff"
                        data-color-background="#ffffff00"
+                       th:onclick="@{'updateBadWord(\'' + ${word} + '\',\'removeBadWord\')'}"
                      >
-                       <div class="inner-text">test</div>
+                       <div th:id="${word}" class="inner-text" th:text="${word}">test</div>
                        <button type="button" class="delete">
-                         <img src="https://ree6.de/imgs/trash.svg" alt="DELETE MESSAGE" />
+                         <img src="https://ree6.de/imgs/trash.svg" alt="DELETE MESSAGE"/>
                        </button>
-                     </div>-->
+                     </div>
                   </form>
                </div>
             </div>
             <form class="activation-options" action="" method="post">
                <strong>Autoroles</strong>
-               <div th:each="role: ${roles}" th:id="${role.getId()}" class="logging-feature">
-                  <input type="submit" th:value="${role.getId()}" th:name="${role.getName()}" value="@everyone" />
+               <div th:each="role: ${roles}" th:id="${role.getId()}" class="logging-feature" th:classappend="${autoroles.contains(role) ? 'logging-feature-active' : ''}">
+                  <input type="submit" th:value="${role.getName()}" value="@everyone" th:onclick="@{'updateRoles(\'' + ${role.getId()} + '\')'}" />
                </div>
             </form>
             <form class="activation-options" action="" method="post">
                <strong>Moderation Features</strong>
                <div th:each="command: ${commands}" th:id="${command.getName()}" class="logging-feature" th:classappend="${command.getBooleanValue() ? 'logging-feature-active' : ''}">
-                  <input type="submit" th:value="${command.getName()}" th:name="${command.getName()}" th:aria-selected="${command.getBooleanValue()}" th:onclick="@{'updateSettings(\'' + ${command.getName()} + '\')'}"/>
+                  <input type="submit" th:value="${command.getName()}" th:name="${command.getName()}" th:onclick="@{'updateSettings(\'' + ${command.getName()} + '\')'}"/>
                </div>
             </form>
          </div>
@@ -394,6 +396,136 @@
                   element.classList.add('logging-feature-active');
                } else {
                   element.className = 'logging-feature-active';
+               }
+            }
+         });
+
+         // Define what happens in case of error
+         XHR.addEventListener('error', (event) => {
+            alert('Oops! Something went wrong.');
+         });
+
+         // Set up our request
+         XHR.open('POST', '/moderation/settings');
+
+         // Add the required HTTP header for form data POST requests
+         XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+         // Finally, send our data.
+         XHR.send(urlEncodedData);
+      }
+   </script>
+   <script th:inline="javascript">
+      function updateRoles(name) {
+         var element = document.getElementById(name);
+
+         var isActive = element.classList != null && element.classList.contains('logging-feature-active')
+
+         const XHR = new XMLHttpRequest();
+
+         var guildId = /*[[${guild.getId()}]]*/"";
+         var sessionIdentifier = /*[[${identifier}]]*/"";
+
+         const urlEncodedDataPairs = [];
+
+         // Turn the data object into an array of URL-encoded key/value pairs.
+         urlEncodedDataPairs.push(`${encodeURIComponent('name')}=${encodeURIComponent(isActive ? 'removeAutoRole' : 'addAutoRole')}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('value')}=${encodeURIComponent(name)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('guildSession')}=${encodeURIComponent(guildId)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('identifierSession')}=${encodeURIComponent(sessionIdentifier)}`);
+
+         // Combine the pairs into a single string and replace all %-encoded spaces to
+         // the '+' character; matches the behavior of browser form submissions.
+         const urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
+
+         // Define what happens on successful data submission
+         XHR.addEventListener('load', (event) => {
+            if (isActive) {
+               element.classList.remove('logging-feature-active');
+            } else {
+               if (element.classList != null) {
+                  element.classList.add('logging-feature-active');
+               } else {
+                  element.className = 'logging-feature-active';
+               }
+            }
+         });
+
+         // Define what happens in case of error
+         XHR.addEventListener('error', (event) => {
+            alert('Oops! Something went wrong.');
+         });
+
+         // Set up our request
+         XHR.open('POST', '/moderation/settings');
+
+         // Add the required HTTP header for form data POST requests
+         XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+         // Finally, send our data.
+         XHR.send(urlEncodedData);
+      }
+   </script>
+   <script th:inline="javascript">
+      function updateBadWord(name, action) {
+         var element = document.getElementById(name);
+
+         name = element.value;
+
+         if (typeof name === 'undefined') {
+            name = element.innerText;
+         }
+
+         const XHR = new XMLHttpRequest();
+
+         var guildId = /*[[${guild.getId()}]]*/"";
+         var sessionIdentifier = /*[[${identifier}]]*/"";
+
+         const urlEncodedDataPairs = [];
+
+         // Turn the data object into an array of URL-encoded key/value pairs.
+         urlEncodedDataPairs.push(`${encodeURIComponent('name')}=${encodeURIComponent(action)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('value')}=${encodeURIComponent(name)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('guildSession')}=${encodeURIComponent(guildId)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('identifierSession')}=${encodeURIComponent(sessionIdentifier)}`);
+
+         // Combine the pairs into a single string and replace all %-encoded spaces to
+         // the '+' character; matches the behavior of browser form submissions.
+         const urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
+
+         // Define what happens on successful data submission
+         XHR.addEventListener('load', (event) => {
+            if (action == 'addBadWord') {
+               var listParent = document.getElementById('blacklist-entries');
+               var newDiv = document.createElement('div');
+               newDiv.className = 'entry';
+               newDiv.setAttribute('data-highlight', '');
+               newDiv.setAttribute('data-color-dot', '#fff');
+               newDiv.setAttribute('data-color-border', '#fff');
+               newDiv.setAttribute('data-color-background', '#ffffff00');
+               newDiv.setAttribute('onclick', 'updateBadWord(\'' + name + '\', \'removeBadWord\')');
+
+               var innerText = document.createElement('div');
+               innerText.innerText = name;
+               innerText.className = 'inner-text';
+
+               newDiv.appendChild(innerText);
+
+               var button = document.createElement('button');
+               button.setAttribute('type', 'button');
+               button.className = 'delete';
+
+               var image = document.createElement('img');
+               image.setAttribute('src', 'https://ree6.de/imgs/trash.svg');
+               image.setAttribute('alt', 'DELETE MESSAGE');
+
+               button.append(image);
+               newDiv.append(button);
+               listParent.appendChild(newDiv)
+            } else if (action == 'removeBadWord') {
+               var currentParent = element.parentElement;
+               if (currentParent != null) {
+                  currentParent.remove();
                }
             }
          });

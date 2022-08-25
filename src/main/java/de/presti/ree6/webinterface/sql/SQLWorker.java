@@ -1455,6 +1455,8 @@ public record SQLWorker(SQLConnector sqlConnector) {
      */
     public void addChatProtectorWord(String guildId, String word) {
 
+        if (word.length() <= 2 || word.isBlank()) return;
+
         // Check if there is already an entry for it.
         if (isChatProtectorSetup(guildId, word)) return;
 
