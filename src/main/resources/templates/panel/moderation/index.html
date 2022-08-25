@@ -95,7 +95,7 @@
       <div class="hamburger-container">
          <a href="/panel/"><span>Panel</span></a>
          <a th:href="@{'/server?guildId=' + ${guild.getId()}}"><span>Server</span></a>
-         <a th:href="@{/'logging?guildId=' + ${guild.getId()}}"><span>Logging</span></a>
+         <a th:href="@{'/logging?guildId=' + ${guild.getId()}}"><span>Logging</span></a>
          <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}"><span>Moderation</span></a>
          <a th:href="@{'/social?guildId=' + ${guild.getId()}}"><span>Social</span></a>
          <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}"><span>Leaderboard</span></a>
@@ -140,8 +140,7 @@
                        th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
                        th:alt="${guild.getName()} + 'Server Logo'"
                        src="https://ree6.de/serverlogo/base.svg"
-                       alt="Servername Server Logo"
-               />
+                       alt="Server Logo" />
             </div>
             <h4 th:text="${guild.getName()}">Server</h4>
          </div>
