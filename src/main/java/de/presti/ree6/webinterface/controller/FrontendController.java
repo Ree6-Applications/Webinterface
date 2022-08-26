@@ -558,6 +558,8 @@ public class FrontendController {
         // If null return to Error page.
         if (guild == null) return ERROR_404_PATH;
 
+        if (settingChangeForm.getSetting().getName() == null || settingChangeForm.getSetting().getValue() == null) return ERROR_400_PATH;
+
         // Change the Setting Data.
         if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("addBadWord") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeBadWord") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("addAutoRole") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeAutoRole")) {
             Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());
@@ -723,6 +725,8 @@ public class FrontendController {
         // If null return to Error page.
         if (guild == null) return ERROR_404_PATH;
 
+        if (settingChangeForm.getSetting().getName() == null || settingChangeForm.getSetting().getValue() == null) return ERROR_400_PATH;
+
         // Change the setting Data.
         if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("message_join")) {
             Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());
@@ -850,6 +854,8 @@ public class FrontendController {
 
         // If null return to Error page.
         if (guild == null) return ERROR_404_PATH;
+
+        if (settingChangeForm.getSetting().getName() == null || settingChangeForm.getSetting().getValue() == null) return ERROR_400_PATH;
 
         // Change the setting Data.
         Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());

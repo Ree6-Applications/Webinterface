@@ -294,7 +294,7 @@
                            aria-valuemax="200"
                            aria-modal=""
                            autocomplete="off"
-                           th:value="${joinMessage}"
+                           th:value="${joinMessage.getStringValue()}"
                            />
                         <label for="message_join">Message</label>
                      </div>
@@ -481,7 +481,7 @@
                });
             
                // Set up our request
-               XHR.open('POST', '/social/settings');
+               XHR.open('POST', '/social/channel');
             
                // Add the required HTTP header for form data POST requests
                XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
