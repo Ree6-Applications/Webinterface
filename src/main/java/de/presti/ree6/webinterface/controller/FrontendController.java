@@ -453,7 +453,7 @@ public class FrontendController {
         }
 
         // Set default Data and If there was an error return to the Error Page.
-        if (setDefaultInformation(model, httpServletResponse, guildId, id)) return ERROR_404_PATH;
+        if (setDefaultInformation(model, httpServletResponse, guildId, id)) return ERROR_403_PATH;
 
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("invites", Server.getInstance().getSqlConnector().getSqlWorker().getInvites(guildId));
