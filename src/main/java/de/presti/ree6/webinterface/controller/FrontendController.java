@@ -912,6 +912,7 @@ public class FrontendController {
                 }
 
                 if (found) {
+                    model.addAttribute("guild", BotWorker.getShardManager().getGuildById(recording.getGuildId()));
                     model.addAttribute("recording", Base64.getEncoder().encodeToString(recording.getRecording()));
                     Server.getInstance().getSqlConnector().getSqlWorker().deleteEntity(recording);
                     return RECORDING_PATH;

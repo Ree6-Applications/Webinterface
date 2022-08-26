@@ -1,93 +1,299 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-    <meta charset="utf-8">
-    <title>Ree6 - Records</title>
-    <link rel="stylesheet" href="https://ree6.de/css/Main.css">
-    <link rel="stylesheet" href="https://ree6.de/css/Error.css">
-    <link rel="icon" type="image/png" sizes="64x64" href="https://ree6.de/assets/img/ree6-icon.png">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://ree6.de/styles/style.css" />
+    <link rel="icon" href="https://ree6.de/imgs/logo.png" />
+    <title>REE6 | Recording</title>
+    <style>
+        footer {
+            padding-top: 150px;
+        }
+        #home .img-wrapper {
+            height: 200px;
+            width: 200px;
+        }
+        #home .img-container {
+            width: 25vw;
+            height: 25vw;
+            margin: auto;
+            overflow: hidden;
+            margin-left: 5vw;
+            border-radius: 100%;
+        }
+        .hero-statement {
+            margin-right: 1%;
+        }
+        #home .img-wrapper:hover img {
+            transform: scale(1.1);
+        }
+        #home .img-container:hover img {
+            transform: scale(1.1);
+        }
+
+        .hamburger-container {
+            height: 90%;
+        }
+        .hero-statement h1 {
+            font-size: clamp(25px, 10.5vw, 135px);
+        }
+        @media only screen and (max-width: 1650px) {
+            section#home {
+                grid-template-columns: 1fr 0.85fr;
+            }
+            .hero-statement {
+                margin-right: 1vw;
+            }
+        }
+        @media only screen and (max-width: 1350px) {
+            section#home {
+                grid-template-columns: 1fr 0.65fr;
+            }
+        }
+        @media only screen and (max-width: 1150px) {
+            section#home {
+                grid-template-columns: 1fr;
+            }
+            .hero-statement {
+                margin: auto;
+            }
+        }
+        @media only screen and (max-width: 700px) {
+            section.leaderboard {
+                column-gap: 0;
+            }
+            .number-placement span {
+                padding: 20px 10px;
+            }
+        }
+        @media only screen and (max-width: 600px) {
+            .number-placement {
+                display: none;
+            }
+            .person-stat {
+                flex-direction: column;
+                row-gap: 20px;
+            }
+            .leaderboard-stats {
+                row-gap: 15px;
+                text-align: center;
+            }
+            .progress-bar-wrapper {
+                width: 100%;
+                margin-top: 10px;
+            }
+            section.leaderboard {
+                padding-top: 100px;
+            }
+        }
+        @media only screen and (max-width: 525px) {
+            .hero-statement .hero-descrip {
+                font-size: 10px;
+            }
+        }
+        @media only screen and (max-height: 650px) {
+            .hamburger-container a {
+                font-size: 11px;
+            }
+        }
+        @media only screen and (max-height: 425px) {
+            .hamburger-container a {
+                font-size: 9px;
+            }
+        }
+    </style>
 </head>
-<body style="background-color: #212529;">
-<!--Top bar-->
-<div class="container"  id="topbar">
-    <a href="https://cp.ree6.de"><img src="https://ree6.de/assets/img/ree6-icon.png" id="boticon" alt="ree6-bot-icon"></a>
-    <div style="flex: 1"></div>
-    <span id="loginbutton">
-         <a th:text="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth">Login</a>
-    </span>
-</div>
-<div class="container" id="name-desc" style="flex-direction: column; justify-content: center; height: fit-content;">
-    <h1>Ree6</h1>
-    <h2>The alternative to Mee6!</h2>
-</div>
-<!--Error Message-->
-<div class="content">
-    <h2 class="section-header">Your Voice-Recording!</h2>
-    <div class="container" style="text-align: center; justify-content:center; flex-direction: column;">
-        <p class="errormessage">Please mind that your recording has been deleted from our Server!<br>Which means this is the only time you can download it!</p>
-        <br>
-        <audio id="recording" controls autoplay loop style="align-self: center" src="https://utils.ree6.de/placeholder/placeholder.mp3">WAV Audio not supported by browser!</audio>
+<body>
+<div class="transition-fade"></div>
+<div class="cursor"></div>
+<div class="inner-cursor"></div>
+<div class="cursor-modal"></div>
+<header id="float-home">
+    <nav class="desktop-nav">
+        <a href="/panel/">Panel</a>
+        <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
+        <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
+        <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
+        <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
+        <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
+    </nav>
+    <button class="hamburger-button">
+        <span class="line-one"></span>
+        <span class="line-two"></span>
+    </button>
+    <nav class="hamburger-wrapper">
+        <div class="hamburger-container">
+            <a href="/panel/"><span>Panel</span></a>
+            <a th:href="@{'/server?guildId=' + ${guild.getId()}}"><span>Server</span></a>
+            <a th:href="@{'/logging?guildId=' + ${guild.getId()}}"><span>Logging</span></a>
+            <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}"><span>Moderation</span></a>
+            <a th:href="@{'/social?guildId=' + ${guild.getId()}}"><span>Social</span></a>
+            <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}"><span>Leaderboard</span></a>
+            <a href="/"><span>Home</span></a>
+        </div>
+    </nav>
+</header>
+<a href="/" class="nav-arrow">
+    <div class="arrow-container">
+        <div class="arrow-wrapper">
+            <span class="circle"></span>
+            <div class="arrow">
+                <span class="line-one"></span>
+                <span class="line-two"></span>
+                <span class="line-three"></span>
+            </div>
+        </div>
     </div>
-</div>
-<!--Footer-->
+    <span class="inner-text">Back to Home</span>
+</a>
+<main>
+    <section id="home">
+        <div data-parallax data-xaxis="0" data-yaxis="0" class="hero-statement">
+            <h1 data-parallax data-xaxis="0.7" data-yaxis="0">
+                Recording
+            </h1>
+            <div
+                    data-parallax
+                    data-xaxis="0.5"
+                    data-yaxis="0"
+                    class="hero-descrip"
+            >
+                Your Voice recording is below!
+            </div>
+            <div
+                    data-highlight=""
+                    data-color-background="#000"
+                    data-color-dot="#fff"
+                    class="img-wrapper"
+            >
+                <!-- INSERT SERVER IMAGE PATH IN IMG SRC -->
+                <img
+                        th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
+                        th:alt="${guild.getName()} + 'Server Logo'"
+                        src="https://ree6.de/serverlogo/base.svg"
+                        alt="Server Logo" />
+            </div>
+        </div>
+        <div
+                data-highlight=""
+                data-color-background="#000"
+                data-color-dot="#fff"
+                class="img-container"
+        >
+            <img
+                    th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
+                    th:alt="${guild.getName()} + 'Server Logo'"
+                    src="https://ree6.de/serverlogo/base.svg"
+                    alt="Server Logo" />
+        </div>
+    </section>
+    <section class="leaderboard">
+        <div class="people-container">
+            <div class="person-stat">
+                <div class="leaderboard-stats">
+                    <h2>Please mind that your recording has been deleted from our Server!<br>Which means this is the only time you can download it!</h2>
+                    <br>
+                    <audio id="recording" controls autoplay loop style="align-self: center" src="https://utils.ree6.de/placeholder/placeholder.mp3">WAV Audio not supported by browser!</audio>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 <footer>
-    <div style="flex:1;">
-        <h3>Legal</h3>
-        <ul>
-            <li><a class="legal" href="https://ree6.de/legal/pp.html">Privacy Policy</a></li>
-            <li><a class="legal" href="https://ree6.de/legal/impresum.html">Impresum</a></li>
-            <li><a class="legal" href="https://ree6.de/legal/datenschutz.html">Data protection</a></li>
-            <li><a class="legal" href="mailto:legal@ree6.de">Legal Contact</a></li>
-        </ul>
+    <p>
+        Ree6 has been made to support users and give them enough tools to
+        support and manage their Guild. We don't like how most of the Discord
+        Bots want you to pay for special "features". So we decided to change
+        that.
+    </p>
+    <div class="footer-nav">
+        <div class="nav-list">
+            <strong>Navigation</strong>
+            <a href="/panel/">Panel</a>
+            <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
+            <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
+            <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
+            <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
+            <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
+            <a href="/">Home</a>
+        </div>
+        <div class="nav-list">
+            <strong>Legal</strong>
+            <a href="https://ree6.de/privacy/">Privacy Policy</a>
+            <a href="https://ree6.de/impressum/">Impressum</a>
+            <a href="https://ree6.de/protection/">Data Protection</a>
+            <button
+                    data-copy="legal@ree6.de"
+                    data-color-background="#ef2222"
+                    data-color-dot="#fff"
+            >
+                legal@ree6.de
+            </button>
+        </div>
+        <div class="nav-list">
+            <strong>Contact</strong>
+            <a
+                    href="https://discord.com/invite/m99MGKVxuC"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >Discord</a
+            >
+            <a
+                    href="https://twitter.com/ree6bot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >Twitter</a
+            >
+            <a
+                    href="https://github.com/DxsSucuk/Ree6"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >Github</a
+            >
+            <button
+                    data-copy="support@ree6.de"
+                    data-color-background="#ef2222"
+                    data-color-dot="#fff"
+            >
+                support@ree6.de
+            </button>
+        </div>
     </div>
-    <div style="flex:1;">
-        <h3>Ree6</h3>
-        <p id="description">Ree6 has been made to support users and give them enough tools to support and manage their Guild. We don't like how most other discord Bots want you to pay for special "features". So we decided to change that.</p>
+    <div class="copyright">
+        Developed and Designed by
+        <a
+                href="https://www.presti.me/"
+                target="_blank"
+                rel="noopener noreferrer"
+        >Presti</a
+        >
+        &
+        <a
+                href="https://creeperbuddy.github.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+        >Creeper Buddy</a
+        >
+        ©Ree6 <span data-time="0"></span>
     </div>
+    <script src="https://ree6.de/js/time.js"></script>
+    <script src="https://ree6.de/js/navigation.js"></script>
+    <script src="https://ree6.de/js/cursor.js"></script>
+    <script src="https://ree6.de/js/percent.js"></script>
+    <script>
+        const recordingAsBase64 = "[[${recording}]]";
+        const byteCharacters = atob(recordingAsBase64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+
+        let blob = new Blob([new Uint8Array(byteNumbers)], {type: "audio/wav"});
+        const audioUrl = URL.createObjectURL(blob);
+        document.getElementById("recording").src = audioUrl;
+    </script>
 </footer>
-<!--Socials at bottom-->
-<div id="socials">
-    <a href="https://support.ree6.de/">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" style="padding-top:2px;">
-            <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-            <path fill="white" d="M524.531,69.836a1.5,1.5,0,0,0-.764-.7A485.065,485.065,0,0,0,404.081,32.03a1.816,1.816,0,0,0-1.923.91,337.461,337.461,0,0,0-14.9,30.6,447.848,447.848,0,0,0-134.426,0,309.541,309.541,0,0,0-15.135-30.6,1.89,1.89,0,0,0-1.924-.91A483.689,483.689,0,0,0,116.085,69.137a1.712,1.712,0,0,0-.788.676C39.068,183.651,18.186,294.69,28.43,404.354a2.016,2.016,0,0,0,.765,1.375A487.666,487.666,0,0,0,176.02,479.918a1.9,1.9,0,0,0,2.063-.676A348.2,348.2,0,0,0,208.12,430.4a1.86,1.86,0,0,0-1.019-2.588,321.173,321.173,0,0,1-45.868-21.853,1.885,1.885,0,0,1-.185-3.126c3.082-2.309,6.166-4.711,9.109-7.137a1.819,1.819,0,0,1,1.9-.256c96.229,43.917,200.41,43.917,295.5,0a1.812,1.812,0,0,1,1.924.233c2.944,2.426,6.027,4.851,9.132,7.16a1.884,1.884,0,0,1-.162,3.126,301.407,301.407,0,0,1-45.89,21.83,1.875,1.875,0,0,0-1,2.611,391.055,391.055,0,0,0,30.014,48.815,1.864,1.864,0,0,0,2.063.7A486.048,486.048,0,0,0,610.7,405.729a1.882,1.882,0,0,0,.765-1.352C623.729,277.594,590.933,167.465,524.531,69.836ZM222.491,337.58c-28.972,0-52.844-26.587-52.844-59.239S193.056,219.1,222.491,219.1c29.665,0,53.306,26.82,52.843,59.239C275.334,310.993,251.924,337.58,222.491,337.58Zm195.38,0c-28.971,0-52.843-26.587-52.843-59.239S388.437,219.1,417.871,219.1c29.667,0,53.307,26.82,52.844,59.239C470.715,310.993,447.538,337.58,417.871,337.58Z"/>
-        </svg>
-    </a>
-    <a href="https://twitter.com/ree6bot">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-            <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-            <path fill="white" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/>
-        </svg>
-    </a>
-    <a href="https://github.com/Ree6-Applications">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512">
-            <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-            <path fill="white" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/>
-        </svg>
-    </a>
-    <a href="mailto:support@ree6.de">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-            <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-            <path fill="white" d="M464 64C490.5 64 512 85.49 512 112C512 127.1 504.9 141.3 492.8 150.4L275.2 313.6C263.8 322.1 248.2 322.1 236.8 313.6L19.2 150.4C7.113 141.3 0 127.1 0 112C0 85.49 21.49 64 48 64H464zM217.6 339.2C240.4 356.3 271.6 356.3 294.4 339.2L512 176V384C512 419.3 483.3 448 448 448H64C28.65 448 0 419.3 0 384V176L217.6 339.2z"/>
-        </svg>
-    </a>
-</div>
-<!--copyright and etc-->
-<div class="container" id="copyrightcontainer">
-    <p id="copyrightinfo">Ree6 &#169;  2022 <br> powered by Tube-Hosting <br> Site rewritten by <a id="h0l0" href="https://github.com/H0L0theBard">H0L0</a> </p>
-</div>
 </body>
 </html>
-
-<script>
-    const recordingAsBase64 = "[[${recording}]]";
-    const byteCharacters = atob(recordingAsBase64);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-
-    let blob = new Blob([new Uint8Array(byteNumbers)], {type: "audio/wav"});
-    const audioUrl = URL.createObjectURL(blob);
-    document.getElementById("recording").src = audioUrl;
-</script>
