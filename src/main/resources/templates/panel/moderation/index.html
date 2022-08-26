@@ -163,14 +163,15 @@
                      <input
                              type="text"
                              name="prefix"
-                             id="prefix"
+                             id="chatprefix"
                              aria-valuemin="1"
                              aria-valuemax="200"
                              aria-modal=""
                              autocomplete="off"
+                             th:value="${prefixSetting.getStringValue()}"
                      />
 
-                     <label for="prefix">Prefix (Default: ree!)</label>
+                     <label for="chatprefix">Prefix (Default: ree!)</label>
                   </div>
                   <button
                           class="msg-btn-add"
@@ -178,8 +179,9 @@
                           data-color-background="#5865F2"
                           data-color-dot="#fff"
                           data-state=""
-                          type="submit"
-                  >
+                          type="button"
+                          onclick="updateSettingsWithValue('chatprefix')"
+                          >
                      set
                   </button>
                   <div class="message-error" data-state=""></div>
@@ -268,13 +270,13 @@
             <form class="activation-options" action="" method="post">
                <strong>Autoroles</strong>
                <div th:each="role: ${roles}" th:id="${role.getId()}" class="logging-feature" th:classappend="${autoroles.contains(role) ? 'logging-feature-active' : ''}">
-                  <input type="submit" th:value="${role.getName()}" value="@everyone" th:onclick="@{'updateRoles(\'' + ${role.getId()} + '\')'}" />
+                  <input type="button" th:value="${role.getName()}" value="@everyone" th:onclick="@{'updateRoles(\'' + ${role.getId()} + '\')'}" />
                </div>
             </form>
             <form class="activation-options" action="" method="post">
                <strong>Moderation Features</strong>
                <div th:each="command: ${commands}" th:id="${command.getName()}" class="logging-feature" th:classappend="${command.getBooleanValue() ? 'logging-feature-active' : ''}">
-                  <input type="submit" th:value="${command.getName()}" th:name="${command.getName()}" th:onclick="@{'updateSettings(\'' + ${command.getName()} + '\')'}"/>
+                  <input type="button" th:value="${command.getName()}" th:name="${command.getName()}" th:onclick="@{'updateSettings(\'' + ${command.getName()} + '\')'}" />
                </div>
             </form>
          </div>
@@ -398,6 +400,50 @@
                   element.className = 'logging-feature-active';
                }
             }
+         });
+
+         // Define what happens in case of error
+         XHR.addEventListener('error', (event) => {
+            alert('Oops! Something went wrong.');
+         });
+
+         // Set up our request
+         XHR.open('POST', '/moderation/settings');
+
+         // Add the required HTTP header for form data POST requests
+         XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+         // Finally, send our data.
+         XHR.send(urlEncodedData);
+      }
+   </script>
+   <script th:inline="javascript">
+      function updateSettingsWithValue(name) {
+         const XHR = new XMLHttpRequest();
+
+         var guildId = /*[[${guild.getId()}]]*/"";
+         var sessionIdentifier = /*[[${identifier}]]*/"";
+
+         const urlEncodedDataPairs = [];
+
+         var value = element.value;
+
+         if (typeof value === 'undefined') {
+            value = element.innerText;
+         }
+
+         // Turn the data object into an array of URL-encoded key/value pairs.
+         urlEncodedDataPairs.push(`${encodeURIComponent('name')}=${encodeURIComponent(name)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('value')}=${encodeURIComponent(value)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('guildSession')}=${encodeURIComponent(guildId)}`);
+         urlEncodedDataPairs.push(`${encodeURIComponent('identifierSession')}=${encodeURIComponent(sessionIdentifier)}`);
+
+         // Combine the pairs into a single string and replace all %-encoded spaces to
+         // the '+' character; matches the behavior of browser form submissions.
+         const urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
+
+         // Define what happens on successful data submission
+         XHR.addEventListener('load', (event) => {
          });
 
          // Define what happens in case of error

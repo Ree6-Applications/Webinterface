@@ -10,15 +10,14 @@ import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.controller.forms.ChannelChangeForm;
-import de.presti.ree6.webinterface.controller.forms.RoleChangeForm;
 import de.presti.ree6.webinterface.controller.forms.SettingChangeForm;
 import de.presti.ree6.webinterface.sql.base.entities.SQLResponse;
 import de.presti.ree6.webinterface.sql.entities.Recording;
 import de.presti.ree6.webinterface.sql.entities.Setting;
 import de.presti.ree6.webinterface.sql.entities.level.ChatUserLevel;
-import de.presti.ree6.webinterface.sql.entities.level.UserLevel;
 import de.presti.ree6.webinterface.sql.entities.level.VoiceUserLevel;
 import de.presti.ree6.webinterface.sql.entities.stats.Stats;
+import de.presti.ree6.webinterface.sql.entities.webhook.Webhook;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
 import de.presti.ree6.webinterface.utils.others.SessionUtil;
 import net.dv8tion.jda.api.Permission;
@@ -669,15 +668,27 @@ public class FrontendController {
 
         // Change the channel Data.
         // Check if null.
-        if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
+        if (channelChangeForm.getChannel().equalsIgnoreCase("-1")) {
             if (channelChangeForm.getType().equalsIgnoreCase("newsChannel")) {
-                // Create new Webhook, If it has been created successfully add it to our Database.
-                Guild finalGuild = guild;
-                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-News").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setNewsWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+                Webhook webhookEntity = Server.getInstance().getSqlConnector().getSqlWorker().getNewsWebhook(guild.getId());
+                // Delete the existing Webhook.
+                guild.retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook -> webhook.getId().equalsIgnoreCase(webhookEntity.getChannelId()) && webhook.getToken().equalsIgnoreCase(webhookEntity.getToken())).forEach(webhook -> webhook.delete().queue()));
             } else if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
-                // Create new Webhook, If it has been created successfully add it to our Database.
-                Guild finalGuild = guild;
-                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setWelcomeWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+                Webhook webhookEntity = Server.getInstance().getSqlConnector().getSqlWorker().getWelcomeWebhook(guild.getId());
+                // Delete the existing Webhook.
+                guild.retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook -> webhook.getId().equalsIgnoreCase(webhookEntity.getChannelId()) && webhook.getToken().equalsIgnoreCase(webhookEntity.getToken())).forEach(webhook -> webhook.delete().queue()));
+            }
+        } else {
+            if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
+                if (channelChangeForm.getType().equalsIgnoreCase("newsChannel")) {
+                    // Create new Webhook, If it has been created successfully add it to our Database.
+                    Guild finalGuild = guild;
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-News").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setNewsWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+                } else if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
+                    // Create new Webhook, If it has been created successfully add it to our Database.
+                    Guild finalGuild = guild;
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setWelcomeWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+                }
             }
         }
 
@@ -797,10 +808,16 @@ public class FrontendController {
 
         // Change the channel Data.
         // Check if null.
-        if (channelChangeForm.getType().equalsIgnoreCase("logChannel") && guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
-            // Create new Webhook, If it has been created successfully add it to our Database.
-            Guild finalGuild = guild;
-            guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setLogWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+        if (channelChangeForm.getChannel().equalsIgnoreCase("-1")) {
+            Webhook webhookEntity = Server.getInstance().getSqlConnector().getSqlWorker().getLogWebhook(guild.getId());
+            // Delete the existing Webhook.
+            guild.retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook -> webhook.getId().equalsIgnoreCase(webhookEntity.getChannelId()) && webhook.getToken().equalsIgnoreCase(webhookEntity.getToken())).forEach(webhook -> webhook.delete().queue()));
+        } else {
+            if (channelChangeForm.getType().equalsIgnoreCase("logChannel") && guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
+                // Create new Webhook, If it has been created successfully add it to our Database.
+                Guild finalGuild = guild;
+                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setLogWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+            }
         }
 
         // Retrieve every Log Option and Channel of the Guild and set them as Attribute.

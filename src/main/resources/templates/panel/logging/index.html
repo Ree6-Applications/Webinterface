@@ -1,298 +1,379 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-<head>
-   <meta charset="UTF-8" />
-   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <link rel="stylesheet" href="https://ree6.de/styles/style.css" />
-   <link rel="icon" href="https://ree6.de/imgs/logo.png" />
-   <title>REE6 | Logging</title>
-   <style>
-      footer {
+   <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="stylesheet" href="https://ree6.de/styles/style.css" />
+      <link rel="icon" href="https://ree6.de/imgs/logo.png" />
+      <title>REE6 | Logging</title>
+      <style>
+         footer {
          padding-top: 150px;
-      }
-      #home .img-wrapper {
+         }
+         #home .img-wrapper {
          height: 200px;
          width: 200px;
-      }
-      #home .img-container {
+         }
+         #home .img-container {
          width: 25vw;
          height: 25vw;
          margin: auto;
          overflow: hidden;
          margin-left: 5vw;
          border-radius: 100%;
-      }
-      #home .img-wrapper:hover img {
+         }
+         #home .img-wrapper:hover img {
          transform: scale(1.1);
-      }
-      #home .img-container:hover img {
+         }
+         #home .img-container:hover img {
          transform: scale(1.1);
-      }
-      .hamburger-container {
+         }
+         .hamburger-container {
          height: 90%;
-      }
-      section#home {
+         }
+         section#home {
          grid-template-columns: 1fr;
-      }
-      #home .hero-statement {
-         margin-left: 8%;
-      }
-      @media only screen and (max-width: 700px) {
+         }
          #home .hero-statement {
-            margin: auto;
+         margin-left: 8%;
          }
-      }
-      @media only screen and (max-height: 650px) {
+         @media only screen and (max-width: 700px) {
+         #home .hero-statement {
+         margin: auto;
+         }
+         }
+         @media only screen and (max-height: 650px) {
          .hamburger-container a {
-            font-size: 11px;
+         font-size: 11px;
          }
-      }
-      @media only screen and (max-height: 425px) {
+         }
+         @media only screen and (max-height: 425px) {
          .hamburger-container a {
-            font-size: 9px;
+         font-size: 9px;
          }
-      }
-   </style>
-</head>
-<body>
-<div class="transition-fade"></div>
-<div class="cursor"></div>
-<div class="inner-cursor"></div>
-<div class="cursor-modal"></div>
-<header id="float-home">
-   <nav class="desktop-nav">
-      <a href="/panel/">Panel</a>
-      <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
-      <a th:href="@{'/logging?guildId=' + ${guild.getId()}}" class="slide-active">Logging</a>
-      <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
-      <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
-      <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
-   </nav>
-   <button class="hamburger-button">
-      <span class="line-one"></span>
-      <span class="line-two"></span>
-   </button>
-   <nav class="hamburger-wrapper">
-      <div class="hamburger-container">
-         <a href="/panel/"><span>Panel</span></a>
-         <a th:href="@{'/server?guildId=' + ${guild.getId()}}"><span>Server</span></a>
-         <a th:href="@{/'logging?guildId=' + ${guild.getId()}}"><span>Logging</span></a>
-         <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}"><span>Moderation</span></a>
-         <a th:href="@{'/social?guildId=' + ${guild.getId()}}"><span>Social</span></a>
-         <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}"><span>Leaderboard</span></a>
-         <a href="/"><span>Home</span></a>
-      </div>
-   </nav>
-</header>
-<a href="/" class="nav-arrow">
-   <div class="arrow-container">
-      <div class="arrow-wrapper">
-         <span class="circle"></span>
-         <div class="arrow">
-            <span class="line-one"></span>
-            <span class="line-two"></span>
-            <span class="line-three"></span>
-         </div>
-      </div>
-   </div>
-   <span class="inner-text">Back to Home</span>
-</a>
-<main>
-   <section id="home">
-      <div data-parallax data-xaxis="0" data-yaxis="0" class="hero-statement">
-         <h1 data-parallax data-xaxis="0.7" data-yaxis="0">
-            Logg<span class="dim-text">.ing</span>
-         </h1>
-         <div
-                 data-parallax
-                 data-xaxis="0.5"
-                 data-yaxis="0"
-                 class="hero-descrip"
-         >
-            Server <strong>Logging</strong>
-         </div>
-      </div>
-   </section>
-   <section class="logging">
-      <div class="inner-logging-wrapper">
-         <div class="server-profile">
-            <div class="profile-img-wrapper">
-               <img
-                       th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
-                       th:alt="${guild.getName()} + 'Server Logo'"
-                       src="https://ree6.de/serverlogo/base.svg"
-                       alt="Servername Server Logo"
-               />
+         }
+      </style>
+   </head>
+   <body>
+      <div class="transition-fade"></div>
+      <div class="cursor"></div>
+      <div class="inner-cursor"></div>
+      <div class="cursor-modal"></div>
+      <header id="float-home">
+         <nav class="desktop-nav">
+            <a href="/panel/">Panel</a>
+            <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
+            <a th:href="@{'/logging?guildId=' + ${guild.getId()}}" class="slide-active">Logging</a>
+            <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
+            <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
+            <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
+         </nav>
+         <button class="hamburger-button">
+         <span class="line-one"></span>
+         <span class="line-two"></span>
+         </button>
+         <nav class="hamburger-wrapper">
+            <div class="hamburger-container">
+               <a href="/panel/"><span>Panel</span></a>
+               <a th:href="@{'/server?guildId=' + ${guild.getId()}}"><span>Server</span></a>
+               <a th:href="@{/'logging?guildId=' + ${guild.getId()}}"><span>Logging</span></a>
+               <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}"><span>Moderation</span></a>
+               <a th:href="@{'/social?guildId=' + ${guild.getId()}}"><span>Social</span></a>
+               <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}"><span>Leaderboard</span></a>
+               <a href="/"><span>Home</span></a>
             </div>
-            <h4 th:text="${guild.getName()}">Server</h4>
-         </div>
-         <div class="logging-features">
-            <div class="channel-dropdown-wrapper">
-               <button class="dropdown-button">
-                  <span class="inner-text">Select Channel</span>
-                  <div class="dropdown-arrow-wrapper">
-                     <span class="line-one"></span>
-                     <span class="line-two"></span>
-                  </div>
-               </button>
-               <form action="" method="post">
-                  <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
-                  <input type="hidden" name="identifierSession" th:value="${identifier}" />
-                  <input
-                          class="channel-option-active"
-                          type="submit"
-                          name="no-channel"
-                          value="none"
-                  />
-                  <input th:each="channel: ${channels}" type="submit" th:name="${channel.getId()}" th:value="${channel.getName()}" />
-               </form>
-            </div>
-            <form class="activation-options" th:action="@{/panel/logging/settings}" th:object="${settingChangeForm}" method="post">
-               <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
-               <input type="hidden" name="identifierSession" th:value="${identifier}" />
-               <strong>Logging Features</strong>
-               <div th:each="log: ${logs}" th:id="${log.getName()}" class="logging-feature" th:classappend="${log.getBooleanValue() ? 'logging-feature-active' : ''}">
-                  <input type="submit" th:value="${log.getName()}" th:name="${log.getName()}" th:aria-selected="${log.getBooleanValue()}" th:onclick="@{'updateSettings(\'' + ${log.getName()} + '\')'}" />
+         </nav>
+      </header>
+      <a href="/" class="nav-arrow">
+         <div class="arrow-container">
+            <div class="arrow-wrapper">
+               <span class="circle"></span>
+               <div class="arrow">
+                  <span class="line-one"></span>
+                  <span class="line-two"></span>
+                  <span class="line-three"></span>
                </div>
-            </form>
+            </div>
          </div>
-      </div>
-   </section>
-</main>
-<footer>
-   <p>
-      Ree6 has been made to support users and give them enough tools to
-      support and manage their Guild. We don't like how most of the Discord
-      Bots want you to pay for special "features". So we decided to change
-      that.
-   </p>
-   <div class="footer-nav">
-      <div class="nav-list">
-         <strong>Navigation</strong>
-         <a href="/panel/">Panel</a>
-         <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
-         <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
-         <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
-         <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
-         <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
-         <a href="/">Home</a>
-      </div>
-      <div class="nav-list">
-         <strong>Legal</strong>
-         <a href="https://ree6.de/privacy/">Privacy Policy</a>
-         <a href="https://ree6.de/impressum/">Impressum</a>
-         <a href="https://ree6.de/protection/">Data Protection</a>
-         <button
-                 data-copy="legal@ree6.de"
-                 data-color-background="#ef2222"
-                 data-color-dot="#fff"
-         >
-            legal@ree6.de
-         </button>
-      </div>
-      <div class="nav-list">
-         <strong>Contact</strong>
-         <a
-                 href="https://discord.com/invite/m99MGKVxuC"
-                 target="_blank"
-                 rel="noopener noreferrer"
-         >Discord</a
-         >
-         <a
-                 href="https://twitter.com/ree6bot"
-                 target="_blank"
-                 rel="noopener noreferrer"
-         >Twitter</a
-         >
-         <a
-                 href="https://github.com/DxsSucuk/Ree6"
-                 target="_blank"
-                 rel="noopener noreferrer"
-         >Github</a
-         >
-         <button
-                 data-copy="support@ree6.de"
-                 data-color-background="#ef2222"
-                 data-color-dot="#fff"
-         >
-            support@ree6.de
-         </button>
-      </div>
-   </div>
-   <div class="copyright">
-      <span class="desktop">Developed and Designed by</span>
-      <a
-              href="https://www.presti.me/"
-              target="_blank"
-              rel="noopener noreferrer"
-      >Presti</a
-      >
-      <span class="desktop">&</span>
-      <a
-              href="https://creeperbuddy.github.io/"
-              target="_blank"
-              rel="noopener noreferrer"
-      >Creeper Buddy</a
-      >
-      ©Ree6 <span data-time="0"></span>
-   </div>
-   <script src="https://ree6.de/js/time.js"></script>
-   <script src="https://ree6.de/js/navigation.js"></script>
-   <script src="https://ree6.de/js/cursor.js"></script>
-   <script src="https://ree6.de/js/vanilla-tilt.js"></script>
-   <script src="https://ree6.de/js/logging.js"></script>
-   <script th:inline="javascript">
-      function updateSettings(name) {
-         var element = document.getElementById(name);
-
-         var isActive = element.classList != null && element.classList.contains('logging-feature-active')
-
-         const XHR = new XMLHttpRequest();
-
-         var guildId = /*[[${guild.getId()}]]*/"";
-         var sessionIdentifier = /*[[${identifier}]]*/"";
-
-         const urlEncodedDataPairs = [];
-
-         // Turn the data object into an array of URL-encoded key/value pairs.
-         urlEncodedDataPairs.push(`${encodeURIComponent('name')}=${encodeURIComponent(name)}`);
-         urlEncodedDataPairs.push(`${encodeURIComponent('value')}=${encodeURIComponent(!isActive)}`);
-         urlEncodedDataPairs.push(`${encodeURIComponent('guildSession')}=${encodeURIComponent(guildId)}`);
-         urlEncodedDataPairs.push(`${encodeURIComponent('identifierSession')}=${encodeURIComponent(sessionIdentifier)}`);
-
-         // Combine the pairs into a single string and replace all %-encoded spaces to
-         // the '+' character; matches the behavior of browser form submissions.
-         const urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
-
-         // Define what happens on successful data submission
-         XHR.addEventListener('load', (event) => {
-            if (isActive) {
-               element.classList.remove('logging-feature-active');
-            } else {
-               if (element.classList != null) {
-                  element.classList.add('logging-feature-active');
-               } else {
-                  element.className = 'logging-feature-active';
-               }
+         <span class="inner-text">Back to Home</span>
+      </a>
+      <main>
+         <section id="home">
+            <div data-parallax data-xaxis="0" data-yaxis="0" class="hero-statement">
+               <h1 data-parallax data-xaxis="0.7" data-yaxis="0">
+                  Logg<span class="dim-text">.ing</span>
+               </h1>
+               <div
+                  data-parallax
+                  data-xaxis="0.5"
+                  data-yaxis="0"
+                  class="hero-descrip"
+                  >
+                  Server <strong>Logging</strong>
+               </div>
+            </div>
+         </section>
+         <section class="logging">
+            <div class="inner-logging-wrapper">
+               <div class="server-profile">
+                  <div class="profile-img-wrapper">
+                     <img
+                        th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
+                        th:alt="${guild.getName()} + 'Server Logo'"
+                        src="https://ree6.de/serverlogo/base.svg"
+                        alt="Servername Server Logo"
+                        />
+                  </div>
+                  <h4 th:text="${guild.getName()}">Server</h4>
+               </div>
+               <div class="logging-features">
+                  <div class="channel-dropdown-wrapper">
+                     <button class="dropdown-button">
+                        <span class="inner-text">Select Channel</span>
+                        <div class="dropdown-arrow-wrapper">
+                           <span class="line-one"></span>
+                           <span class="line-two"></span>
+                        </div>
+                     </button>
+                     <form action="" method="post">
+                        <input
+                           class="channel-option-active"
+                           type="button"
+                           name="no-channel"
+                           value="no-channel"
+                           onclick="updateChannelSetting('logChannel', '-1')"
+                           />
+                        <input th:each="channel: ${channels}" type="button" th:name="${channel.getName()}" th:value="${channel.getName()}" th:onclick="@{'updateChannelSetting(\'logChannel\',\'' + ${channel.getId()} + '\')'}" />
+                     </form>
+                  </div>
+                  <form class="activation-options" th:action="@{/panel/logging/settings}" th:object="${settingChangeForm}" method="post">
+                     <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
+                     <input type="hidden" name="identifierSession" th:value="${identifier}" />
+                     <strong>Logging Features</strong>
+                     <div th:each="log: ${logs}" th:id="${log.getName()}" class="logging-feature" th:classappend="${log.getBooleanValue() ? 'logging-feature-active' : ''}">
+                        <input type="button" th:value="${log.getName()}" th:name="${log.getName()}" th:aria-selected="${log.getBooleanValue()}" th:onclick="@{'updateSettings(\'' + ${log.getName()} + '\')'}" />
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </section>
+      </main>
+      <footer>
+         <p>
+            Ree6 has been made to support users and give them enough tools to
+            support and manage their Guild. We don't like how most of the Discord
+            Bots want you to pay for special "features". So we decided to change
+            that.
+         </p>
+         <div class="footer-nav">
+            <div class="nav-list">
+               <strong>Navigation</strong>
+               <a href="/panel/">Panel</a>
+               <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
+               <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
+               <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
+               <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
+               <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
+               <a href="/">Home</a>
+            </div>
+            <div class="nav-list">
+               <strong>Legal</strong>
+               <a href="https://ree6.de/privacy/">Privacy Policy</a>
+               <a href="https://ree6.de/impressum/">Impressum</a>
+               <a href="https://ree6.de/protection/">Data Protection</a>
+               <button
+                  data-copy="legal@ree6.de"
+                  data-color-background="#ef2222"
+                  data-color-dot="#fff"
+                  >
+               legal@ree6.de
+               </button>
+            </div>
+            <div class="nav-list">
+               <strong>Contact</strong>
+               <a
+                  href="https://discord.com/invite/m99MGKVxuC"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Discord</a
+                  >
+               <a
+                  href="https://twitter.com/ree6bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Twitter</a
+                  >
+               <a
+                  href="https://github.com/DxsSucuk/Ree6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Github</a
+                  >
+               <button
+                  data-copy="support@ree6.de"
+                  data-color-background="#ef2222"
+                  data-color-dot="#fff"
+                  >
+               support@ree6.de
+               </button>
+            </div>
+         </div>
+         <div class="copyright">
+            <span class="desktop">Developed and Designed by</span>
+            <a
+               href="https://www.presti.me/"
+               target="_blank"
+               rel="noopener noreferrer"
+               >Presti</a
+               >
+            <span class="desktop">&</span>
+            <a
+               href="https://creeperbuddy.github.io/"
+               target="_blank"
+               rel="noopener noreferrer"
+               >Creeper Buddy</a
+               >
+            ©Ree6 <span data-time="0"></span>
+         </div>
+         <script src="https://ree6.de/js/time.js"></script>
+         <script src="https://ree6.de/js/navigation.js"></script>
+         <script src="https://ree6.de/js/cursor.js"></script>
+         <script src="https://ree6.de/js/vanilla-tilt.js"></script>
+         <script src="https://ree6.de/js/logging.js"></script>
+         <script th:inline="javascript">
+            function updateSettings(name) {
+               var element = document.getElementById(name);
+            
+               var isActive = element.classList != null && element.classList.contains('logging-feature-active')
+            
+               const XHR = new XMLHttpRequest();
+            
+               var guildId = /*[[${guild.getId()}]]*/"";
+               var sessionIdentifier = /*[[${identifier}]]*/"";
+            
+               const urlEncodedDataPairs = [];
+            
+               // Turn the data object into an array of URL-encoded key/value pairs.
+               urlEncodedDataPairs.push(`${encodeURIComponent('name')}=${encodeURIComponent(name)}`);
+               urlEncodedDataPairs.push(`${encodeURIComponent('value')}=${encodeURIComponent(!isActive)}`);
+               urlEncodedDataPairs.push(`${encodeURIComponent('guildSession')}=${encodeURIComponent(guildId)}`);
+               urlEncodedDataPairs.push(`${encodeURIComponent('identifierSession')}=${encodeURIComponent(sessionIdentifier)}`);
+            
+               // Combine the pairs into a single string and replace all %-encoded spaces to
+               // the '+' character; matches the behavior of browser form submissions.
+               const urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
+            
+               // Define what happens on successful data submission
+               XHR.addEventListener('load', (event) => {
+                  if (isActive) {
+                     element.classList.remove('logging-feature-active');
+                  } else {
+                     if (element.classList != null) {
+                        element.classList.add('logging-feature-active');
+                     } else {
+                        element.className = 'logging-feature-active';
+                     }
+                  }
+               });
+            
+                 // Define what happens in case of error
+               XHR.addEventListener('error', (event) => {
+                  alert('Oops! Something went wrong.');
+               });
+            
+               // Set up our request
+               XHR.open('POST', '/logging/settings');
+            
+               // Add the required HTTP header for form data POST requests
+               XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+               // Finally, send our data.
+               XHR.send(urlEncodedData);
             }
-         });
-
-           // Define what happens in case of error
-         XHR.addEventListener('error', (event) => {
-            alert('Oops! Something went wrong.');
-         });
-
-         // Set up our request
-         XHR.open('POST', '/logging/settings');
-
-         // Add the required HTTP header for form data POST requests
-         XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-         // Finally, send our data.
-         XHR.send(urlEncodedData);
-      }
-   </script>
-</footer>
-</body>
+         </script>
+         <script th:inline="javascript">
+            function updateSettingsWithValue(name) {
+               const XHR = new XMLHttpRequest();
+            
+               var guildId = /*[[${guild.getId()}]]*/"";
+               var sessionIdentifier = /*[[${identifier}]]*/"";
+            
+               const urlEncodedDataPairs = [];
+            
+               var value = element.value;
+            
+               if (typeof value === 'undefined') {
+                  value = element.innerText;
+               }
+            
+               // Turn the data object into an array of URL-encoded key/value pairs.
+               urlEncodedDataPairs.push(`${encodeURIComponent('name')}=${encodeURIComponent(name)}`);
+               urlEncodedDataPairs.push(`${encodeURIComponent('value')}=${encodeURIComponent(value)}`);
+               urlEncodedDataPairs.push(`${encodeURIComponent('guildSession')}=${encodeURIComponent(guildId)}`);
+               urlEncodedDataPairs.push(`${encodeURIComponent('identifierSession')}=${encodeURIComponent(sessionIdentifier)}`);
+            
+               // Combine the pairs into a single string and replace all %-encoded spaces to
+               // the '+' character; matches the behavior of browser form submissions.
+               const urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
+            
+               // Define what happens on successful data submission
+               XHR.addEventListener('load', (event) => {
+               });
+            
+               // Define what happens in case of error
+               XHR.addEventListener('error', (event) => {
+                  alert('Oops! Something went wrong.');
+               });
+            
+               // Set up our request
+               XHR.open('POST', '/logging/settings');
+            
+               // Add the required HTTP header for form data POST requests
+               XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+               // Finally, send our data.
+               XHR.send(urlEncodedData);
+            }
+         </script>
+         <script th:inline="javascript">
+            function updateChannelSetting(name, value) {
+               const XHR = new XMLHttpRequest();
+            
+               var guildId = /*[[${guild.getId()}]]*/"";
+               var sessionIdentifier = /*[[${identifier}]]*/"";
+            
+               const urlEncodedDataPairs = [];
+            
+               // Turn the data object into an array of URL-encoded key/value pairs.
+               urlEncodedDataPairs.push(`${encodeURIComponent('type')}=${encodeURIComponent(name)}`);
+               urlEncodedDataPairs.push(`${encodeURIComponent('channel')}=${encodeURIComponent(value)}`);
+               urlEncodedDataPairs.push(`${encodeURIComponent('guildSession')}=${encodeURIComponent(guildId)}`);
+               urlEncodedDataPairs.push(`${encodeURIComponent('identifierSession')}=${encodeURIComponent(sessionIdentifier)}`);
+            
+               // Combine the pairs into a single string and replace all %-encoded spaces to
+               // the '+' character; matches the behavior of browser form submissions.
+               const urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
+            
+               // Define what happens on successful data submission
+               XHR.addEventListener('load', (event) => {
+               });
+            
+               // Define what happens in case of error
+               XHR.addEventListener('error', (event) => {
+                  alert('Oops! Something went wrong.');
+               });
+            
+               // Set up our request
+               XHR.open('POST', '/logging/settings');
+            
+               // Add the required HTTP header for form data POST requests
+               XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+               // Finally, send our data.
+               XHR.send(urlEncodedData);
+            }
+         </script>
+      </footer>
+   </body>
 </html>
