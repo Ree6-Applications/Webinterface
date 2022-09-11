@@ -419,6 +419,7 @@
    </script>
    <script th:inline="javascript">
       function updateSettingsWithValue(name) {
+         var element = document.getElementById(name);
          const XHR = new XMLHttpRequest();
 
          var guildId = /*[[${guild.getId()}]]*/"";
