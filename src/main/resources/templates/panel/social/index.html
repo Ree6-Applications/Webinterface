@@ -289,14 +289,14 @@
                         <input
                            type="text"
                            name="welcome-message"
-                           id="message_join"
+                           id="welcome-message"
                            aria-valuemin="5"
                            aria-valuemax="200"
                            aria-modal=""
                            autocomplete="off"
                            th:value="${joinMessage.getStringValue()}"
                            />
-                        <label for="message_join">Message</label>
+                        <label for="welcome-message">Message</label>
                      </div>
                      <button
                         class="msg-btn-add"
@@ -305,7 +305,7 @@
                         data-highlight=""
                         data-color-background="#5865F2"
                         data-color-dot="#fff"
-                        onclick="updateSettingsWithValue('message_join')"
+                        onclick="updateSettingsWithValue('message_join', 'welcome-message')"
                         >
                      set
                      </button>
@@ -409,8 +409,9 @@
          <script src="https://ree6.de/js/vanilla-tilt.js"></script>
          <script src="https://ree6.de/js/logging.js"></script>
          <script th:inline="javascript">
-            function updateSettingsWithValue(name) {
+            function updateSettingsWithValue(name, elementId) {
                const XHR = new XMLHttpRequest();
+               var element = document.getElementById(elementId);
             
                var guildId = /*[[${guild.getId()}]]*/"";
                var sessionIdentifier = /*[[${identifier}]]*/"";

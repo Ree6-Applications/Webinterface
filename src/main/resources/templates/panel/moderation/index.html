@@ -145,7 +145,7 @@
             <h4 th:text="${guild.getName()}">Server</h4>
          </div>
          <div class="logging-features">
-            <div class="channel-message-wrapper" data-state="">
+            <div class="channel-message-wrapper" th:data-state="${prefixSetting != null ? 'active' : ''}">
                <strong>Command Prefix</strong>
                <form
                        action=""
