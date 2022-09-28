@@ -151,16 +151,16 @@
                <div class="server-profile">
                   <div class="profile-img-wrapper">
                      <img
-                        th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
-                        th:alt="${guild.getName()} + 'Server Logo'"
-                        src="https://ree6.de/serverlogo/base.svg"
-                        alt="Servername Server Logo"
-                        />
+                             th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
+                             th:alt="${guild.getName()} + 'Server Logo'"
+                             src="https://ree6.de/serverlogo/base.svg"
+                             alt="Servername Server Logo"
+                     />
                   </div>
                   <h4 th:text="${guild.getName()}">Server</h4>
                </div>
                <div class="logging-features">
-                  <div
+                  <div hidden
                      class="channel-dropdown-wrapper"
                      data-highlight=""
                      data-color-border="#ea0f77"
@@ -190,10 +190,6 @@
                      <strong>Twitch Notifier</strong>
                      <button class="dropdown-button">
                         <span class="inner-text">Use ree!twitch</span>
-                        <div class="dropdown-arrow-wrapper">
-                           <span class="line-one"></span>
-                           <span class="line-two"></span>
-                        </div>
                      </button>
                      <form action="" method="post">
                      </form>
@@ -208,10 +204,6 @@
                      <strong>YouTube Notifier</strong>
                      <button class="dropdown-button">
                         <span class="inner-text">Use ree!yt</span>
-                        <div class="dropdown-arrow-wrapper">
-                           <span class="line-one"></span>
-                           <span class="line-two"></span>
-                        </div>
                      </button>
                      <form action="" method="post">
                      </form>
@@ -226,10 +218,6 @@
                      <strong>Twitter Notifier</strong>
                      <button class="dropdown-button">
                         <span class="inner-text">Use ree!twitternotifier</span>
-                        <div class="dropdown-arrow-wrapper">
-                           <span class="line-one"></span>
-                           <span class="line-two"></span>
-                        </div>
                      </button>
                      <form action="" method="post">
                      </form>
@@ -243,11 +231,7 @@
                      >
                      <strong>Level Rewards</strong>
                      <button class="dropdown-button">
-                        <span class="inner-text">SoonTM</span>
-                        <div class="dropdown-arrow-wrapper">
-                           <span class="line-one"></span>
-                           <span class="line-two"></span>
-                        </div>
+                        <span class="inner-text">Not available yet.</span>
                      </button>
                      <form action="" method="post">
                      </form>
@@ -276,7 +260,7 @@
                      action=""
                      method="post"
                      class="channel-message-wrapper"
-                     data-state=""
+                     th:data-state="${joinMessage.getStringValue() != null ? 'active' : ''}"
                      >
                      <strong>Welcome Message</strong>
                      <div
