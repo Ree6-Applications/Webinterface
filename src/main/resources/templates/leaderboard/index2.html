@@ -160,7 +160,7 @@
                     data-yaxis="0"
                     class="hero-descrip"
             >
-                <strong><!-- INSERT SERVERNAME HERE-->Servername</strong>
+                <strong th:text="t${guild.getName()}"><!-- INSERT SERVERNAME HERE-->Servername</strong>
                 Leaderboard
             </div>
             <div
@@ -171,8 +171,10 @@
             >
                 <!-- INSERT SERVER IMAGE PATH IN IMG SRC -->
                 <img
+                        th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
+                        th:alt="${guild.getName()} + 'Server Logo'"
                         src="https://ree6.de/serverlogo/base.svg"
-                        alt="<!-- INSERT SERVERNAME HERE--> Server Logo"
+                        alt="Servername Server Logo"
                 />
             </div>
         </div>
@@ -183,8 +185,10 @@
                 class="img-container"
         >
             <img
+                    th:src="${guild.getIconUrl() != null ? guild.getIconUrl() : 'https://ree6.de/serverlogo/base.svg'}"
+                    th:alt="${guild.getName()} + 'Server Logo'"
                     src="https://ree6.de/serverlogo/base.svg"
-                    alt="<!-- INSERT SERVERNAME HERE--> Server Logo"
+                    alt="Servername Server Logo"
             />
         </div>
     </section>
