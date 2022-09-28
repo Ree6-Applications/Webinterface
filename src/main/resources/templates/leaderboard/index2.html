@@ -113,11 +113,11 @@
 <header id="float-home">
     <nav class="desktop-nav">
         <a href="/panel/">Panel</a>
-        <a href="/server/">Server</a>
-        <a href="/logging/">Logging</a>
-        <a href="/moderation/">Moderation</a>
-        <a href="/social/">Social</a>
-        <a href="/leaderboard/" class="slide-active">Leaderboard</a>
+        <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
+        <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
+        <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
+        <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
+        <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}" class="slide-active">Leaderboard</a>
     </nav>
     <button class="hamburger-button">
         <span class="line-one"></span>
@@ -126,11 +126,11 @@
     <nav class="hamburger-wrapper">
         <div class="hamburger-container">
             <a href="/panel/"><span>Panel</span></a>
-            <a href="/server/"><span>Server</span></a>
-            <a href="/logging/"><span>Logging</span></a>
-            <a href="/moderation/"><span>Moderation</span></a>
-            <a href="/social/"><span>Social</span></a>
-            <a href="/leaderboard/"><span>Leaderboard</span></a>
+            <a th:href="@{'/server?guildId=' + ${guild.getId()}}"><span>Server</span></a>
+            <a th:href="@{/'logging?guildId=' + ${guild.getId()}}"><span>Logging</span></a>
+            <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}"><span>Moderation</span></a>
+            <a th:href="@{'/social?guildId=' + ${guild.getId()}}"><span>Social</span></a>
+            <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}"><span>Leaderboard</span></a>
             <a href="/"><span>Home</span></a>
         </div>
     </nav>
@@ -235,11 +235,11 @@
         <div class="nav-list">
             <strong>Navigation</strong>
             <a href="/panel/">Panel</a>
-            <a href="/server/">Server</a>
-            <a href="/logging/">Logging</a>
-            <a href="/moderation/">Moderation</a>
-            <a href="/social/">Social</a>
-            <a href="/leaderboard/">Leaderboard</a>
+            <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
+            <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
+            <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>
+            <a th:href="@{'/social?guildId=' + ${guild.getId()}}">Social</a>
+            <a th:href="@{'/leaderboard?guildId=' + ${guild.getId()}}">Leaderboard</a>
             <a href="/">Home</a>
         </div>
         <div class="nav-list">
