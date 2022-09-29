@@ -339,13 +339,12 @@ public class FrontendController {
 
             model.addAttribute("guild", guild);
         } catch (Exception exception) {
-            model.addAttribute("title", "Unexpected Error, please Report!");
             model.addAttribute("errorMessage", "We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")");
             return ERROR_500_PATH;
         }
 
-        int i = 1;
-        for (VoiceUserLevel userLevel : Server.getInstance().getSqlConnector().getSqlWorker().getTopVoice(guildId, 5)) {
+        List<VoiceUserLevel> userLevels = Server.getInstance().getSqlConnector().getSqlWorker().getTopVoice(guildId, 5);
+        for (VoiceUserLevel userLevel : userLevels) {
             try {
                 if (BotWorker.getShardManager().getUserById(userLevel.getUserId()) != null) {
                     userLevel.setUser(BotWorker.getShardManager().getUserById(userLevel.getUserId()));
@@ -356,10 +355,9 @@ public class FrontendController {
                 userLevel.setExperience(0);
                 Server.getInstance().getSqlConnector().getSqlWorker().addVoiceLevelData(guildId, null, userLevel);
             }
-
-            model.addAttribute("user" + i, userLevel);
-            i++;
         }
+
+        model.addAttribute("userLevels", userLevels);
 
         return "leaderboard/index2";
     }
