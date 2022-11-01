@@ -44,7 +44,7 @@ public class Config {
             yamlFile.addDefault("hikari.sql.port", 3306);
             yamlFile.addDefault("hikari.misc.storage", "sqlite");
             yamlFile.addDefault("hikari.misc.poolSize", 10);
-            yamlFile.addDefault("discord.bot.tokens.rel", "ReleaseTokenhere");
+            yamlFile.addDefault("discord.bot.tokens.release", "ReleaseTokenhere");
             yamlFile.addDefault("discord.bot.tokens.dev", "DevTokenhere");
             yamlFile.addDefault("discord.client.id", 0);
             yamlFile.addDefault("discord.client.secret", "yourDiscordClientSecrethere");
