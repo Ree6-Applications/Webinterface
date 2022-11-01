@@ -6,7 +6,8 @@ import com.google.gson.JsonObject;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.sql.entities.level.UserLevel;
-import de.presti.ree6.webinterface.sql.entities.stats.Stats;
+import de.presti.ree6.webinterface.sql.entities.stats.CommandStats;
+import de.presti.ree6.webinterface.sql.entities.stats.GuildCommandStats;
 import net.dv8tion.jda.api.entities.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -174,7 +175,7 @@ public class BackendController {
     public String getStatsGlobal() {
         JsonObject jsonObject = new JsonObject();
 
-        for (Stats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStatsGlobal()) {
+        for (CommandStats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStatsGlobal()) {
             jsonObject.addProperty(entry.getCommand(), entry.getUses());
         }
 
@@ -210,7 +211,7 @@ public class BackendController {
     public String getStatsGuildAll(@RequestParam(name = "guildId") String guildId) {
         JsonObject jsonObject = new JsonObject();
 
-        for (Stats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildId)) {
+        for (GuildCommandStats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildId)) {
             jsonObject.addProperty(entry.getCommand(), entry.getUses());
         }
 

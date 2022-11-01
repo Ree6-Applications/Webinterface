@@ -1,32 +1,40 @@
 package de.presti.ree6.webinterface.sql.entities;
 
-import de.presti.ree6.webinterface.sql.base.annotations.Property;
-import de.presti.ree6.webinterface.sql.base.annotations.Table;
-import de.presti.ree6.webinterface.sql.base.entities.SQLEntity;
+
+import jakarta.persistence.*;
 
 /**
  * File to store Settings information.
  */
+@Entity
 @Table(name = "Settings")
-public class Setting extends SQLEntity {
+public class Setting {
+
+    /**
+     * The PrimaryKey of the Entity.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
 
     /**
      * The ID of the Guild.
      */
-    @Property(name = "gid")
+    @Column(name = "gid")
     private String guildId;
 
     /**
      * Name / Identifier of the Setting.
      */
-    @Property(name = "name")
+    @Column(name = "name")
     private String name;
 
     /**
      * The value of the Setting.
      */
-    @Property(name = "value", updateQuery = true)
-    private Object value;
+    @Column(name = "value")
+    private String value;
 
     /**
      * Constructor.
@@ -44,7 +52,7 @@ public class Setting extends SQLEntity {
     public Setting(String guildId, String name, Object value) {
         this.guildId = guildId;
         this.name = name;
-        this.value = value;
+        this.value = String.valueOf(value);
     }
 
     /**
@@ -53,10 +61,12 @@ public class Setting extends SQLEntity {
      * @return the Value as {@link Boolean}
      */
     public boolean getBooleanValue() {
-        if (value instanceof Boolean booleanValue) {
+        Object currentValue = getValue();
+        if (currentValue instanceof Boolean booleanValue) {
             return booleanValue;
-        } else if (value instanceof String stringValue) {
+        } else if (currentValue instanceof String stringValue) {
             if (stringValue.equals("1")) return true;
+            if (stringValue.equals("0")) return false;
             return Boolean.parseBoolean(stringValue);
         }
         return true;
@@ -68,11 +78,12 @@ public class Setting extends SQLEntity {
      * @return Value as {@link String}
      */
     public String getStringValue() {
-        if (value instanceof String stringValue) {
+        Object currentValue = getValue();
+        if (currentValue instanceof String stringValue) {
             return stringValue;
         } else if (getName().equalsIgnoreCase("chatprefix")) {
             return "ree!";
-        } else if (value instanceof Boolean booleanValue) {
+        } else if (currentValue instanceof Boolean booleanValue) {
             return booleanValue + "";
         }
         return "";
@@ -120,6 +131,6 @@ public class Setting extends SQLEntity {
      * @param value new Value as {@link Object}
      */
     public void setValue(Object value) {
-        this.value = value;
+        this.value = String.valueOf(value);
     }
 }

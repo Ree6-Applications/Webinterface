@@ -1,31 +1,38 @@
 package de.presti.ree6.webinterface.sql.entities.stats;
 
-import de.presti.ree6.webinterface.sql.base.annotations.Property;
-import de.presti.ree6.webinterface.sql.base.annotations.Table;
-import de.presti.ree6.webinterface.sql.base.entities.SQLEntity;
+import jakarta.persistence.*;
 
 /**
  * SQL Entity for the Stats.
  */
+@Entity
 @Table(name = "CommandStats")
-public class Stats extends SQLEntity {
+public class CommandStats {
+
+    /**
+     * The PrimaryKey of the Entity.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
 
     /**
      * Name of the Command.
      */
-    @Property(name = "command")
+    @Column(name = "command")
     private String command;
 
     /**
      * Number of times the Command was used.
      */
-    @Property(name = "uses", updateQuery = true)
+    @Column(name = "uses")
     private int uses;
 
     /**
      * Constructor.
      */
-    public Stats() {
+    public CommandStats() {
     }
 
     /**
@@ -33,7 +40,7 @@ public class Stats extends SQLEntity {
      * @param command Name of the Command.
      * @param uses Number of times the Command was used.
      */
-    public Stats(String command, int uses) {
+    public CommandStats(String command, int uses) {
         this.command = command;
         this.uses = uses;
     }

@@ -1,15 +1,20 @@
 package de.presti.ree6.webinterface.sql.entities.roles;
 
-import de.presti.ree6.webinterface.sql.base.annotations.Property;
-import de.presti.ree6.webinterface.sql.base.annotations.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
+/**
+ * SQL Entity for the Chat-Auto-Roles.
+ */
+@Entity
 @Table(name = "ChatLevelAutoRoles")
 public class ChatAutoRole extends Role {
 
     /**
      * The needed level for this AutoRole.
      */
-    @Property(name = "lvl")
+    @Column(name = "lvl")
     int level;
 
     /**

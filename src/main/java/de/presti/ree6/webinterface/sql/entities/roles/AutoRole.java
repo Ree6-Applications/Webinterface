@@ -1,10 +1,12 @@
 package de.presti.ree6.webinterface.sql.entities.roles;
 
-import de.presti.ree6.webinterface.sql.base.annotations.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * SQL Entity for the Auto-Roles.
  */
+@Entity
 @Table(name = "AutoRoles")
 public class AutoRole extends Role {
 

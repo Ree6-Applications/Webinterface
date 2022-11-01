@@ -1,43 +1,57 @@
 package de.presti.ree6.webinterface.sql.entities.level;
 
-import de.presti.ree6.webinterface.sql.base.annotations.Property;
-import de.presti.ree6.webinterface.sql.base.entities.SQLEntity;
 import de.presti.ree6.webinterface.utils.data.LevelUtil;
+import jakarta.persistence.*;
 import net.dv8tion.jda.api.entities.User;
 
-public class UserLevel extends SQLEntity {
+/**
+ * Base class for the UserLevel.
+ */
+@MappedSuperclass
+public class UserLevel {
+
+    /**
+     * The PrimaryKey of the Entity.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
 
     /**
      * The ID of the Guild.
      */
-    @Property(name = "gid")
+    @Column(name = "gid")
     String guildId;
 
     /**
      * The ID of the User.
      */
-    @Property(name = "uid")
+    @Column(name = "uid")
     String userId;
 
     /**
      * The User.
      */
+    @Transient
     User user;
 
     /**
      * The experience of the User.
      */
-    @Property(name = "xp", updateQuery = true)
+    @Column(name = "xp")
     long experience;
 
     /**
      * The level of the User.
      */
+    @Transient
     long level = -1;
 
     /**
      * The Rank of the User.
      */
+    @Transient
     int rank = -1;
 
     /**
@@ -170,7 +184,7 @@ public class UserLevel extends SQLEntity {
 
     /**
      * Get the GuildId.
-     * @return
+     * @return the GuildId.
      */
     public String getGuildId() {
         return guildId;

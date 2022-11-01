@@ -11,12 +11,11 @@ import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.controller.forms.ChannelChangeForm;
 import de.presti.ree6.webinterface.controller.forms.SettingChangeForm;
-import de.presti.ree6.webinterface.sql.base.entities.SQLResponse;
 import de.presti.ree6.webinterface.sql.entities.Recording;
 import de.presti.ree6.webinterface.sql.entities.Setting;
 import de.presti.ree6.webinterface.sql.entities.level.ChatUserLevel;
 import de.presti.ree6.webinterface.sql.entities.level.VoiceUserLevel;
-import de.presti.ree6.webinterface.sql.entities.stats.Stats;
+import de.presti.ree6.webinterface.sql.entities.stats.GuildCommandStats;
 import de.presti.ree6.webinterface.sql.entities.webhook.Webhook;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
 import de.presti.ree6.webinterface.utils.others.SessionUtil;
@@ -35,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller for the Frontend to manage what the user sees.
@@ -276,7 +276,7 @@ public class FrontendController {
                 }
             } catch (Exception ignore) {
                 userLevel.setExperience(0);
-                Server.getInstance().getSqlConnector().getSqlWorker().addChatLevelData(guildId, null, userLevel);
+                Server.getInstance().getSqlConnector().getSqlWorker().addChatLevelData(guildId, userLevel);
             }
         }
 
@@ -353,7 +353,7 @@ public class FrontendController {
                 }
             } catch (Exception ignore) {
                 userLevel.setExperience(0);
-                Server.getInstance().getSqlConnector().getSqlWorker().addVoiceLevelData(guildId, null, userLevel);
+                Server.getInstance().getSqlConnector().getSqlWorker().addVoiceLevelData(guildId, userLevel);
             }
         }
 
@@ -457,7 +457,7 @@ public class FrontendController {
 
         StringBuilder commandStats = new StringBuilder();
 
-        for (Stats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildId)) {
+        for (GuildCommandStats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildId)) {
             commandStats.append(entry.getCommand()).append(" - ").append(entry.getUses()).append(", ");
         }
 
@@ -669,22 +669,14 @@ public class FrontendController {
         // Change the channel Data.
         // Check if null.
         if (channelChangeForm.getChannel().equalsIgnoreCase("-1")) {
-            if (channelChangeForm.getType().equalsIgnoreCase("newsChannel")) {
-                Webhook webhookEntity = Server.getInstance().getSqlConnector().getSqlWorker().getNewsWebhook(guild.getId());
-                // Delete the existing Webhook.
-                guild.retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook -> webhook.getId().equalsIgnoreCase(webhookEntity.getChannelId()) && webhook.getToken().equalsIgnoreCase(webhookEntity.getToken())).forEach(webhook -> webhook.delete().queue()));
-            } else if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
+            if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
                 Webhook webhookEntity = Server.getInstance().getSqlConnector().getSqlWorker().getWelcomeWebhook(guild.getId());
                 // Delete the existing Webhook.
                 guild.retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook -> webhook.getId().equalsIgnoreCase(webhookEntity.getChannelId()) && webhook.getToken().equalsIgnoreCase(webhookEntity.getToken())).forEach(webhook -> webhook.delete().queue()));
             }
         } else {
             if (guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
-                if (channelChangeForm.getType().equalsIgnoreCase("newsChannel")) {
-                    // Create new Webhook, If it has been created successfully add it to our Database.
-                    Guild finalGuild = guild;
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-News").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setNewsWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
-                } else if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
+                if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
                     // Create new Webhook, If it has been created successfully add it to our Database.
                     Guild finalGuild = guild;
                     guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setWelcomeWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
@@ -902,10 +894,10 @@ public class FrontendController {
 
             model.addAttribute("isLogged", true);
 
-            SQLResponse sqlResponse = Server.getInstance().getSqlConnector().getSqlWorker().getEntity(Recording.class, "SELECT * FROM Recording WHERE ID=?",
-                    recordIdentifier);
+            Recording recording = Server.getInstance().getSqlConnector().getSqlWorker().getEntity(new Recording(), "SELECT * FROM Recording WHERE ID=:id",
+                    Map.of("id", recordIdentifier));
 
-            if (!sqlResponse.isSuccess()) {
+            if (recording == null) {
                 model.addAttribute("errorCode", 404);
                 model.addAttribute("errorMessage", "Couldn't find the requested Recording!");
                 return ERROR_404_PATH;
@@ -915,8 +907,6 @@ public class FrontendController {
             guilds = Server.getInstance().getOAuth2Client().getGuilds(session).complete();
 
             user = Server.getInstance().getOAuth2Client().getUser(session).complete();
-
-            Recording recording = (Recording) sqlResponse.getEntity();
 
             if (guilds.stream().map(OAuth2Guild::getId).anyMatch(g -> g.equalsIgnoreCase(recording.getGuildId()))) {
                 boolean found = false;

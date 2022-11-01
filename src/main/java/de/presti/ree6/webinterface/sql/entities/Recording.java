@@ -1,57 +1,62 @@
 package de.presti.ree6.webinterface.sql.entities;
 
 import com.google.gson.JsonArray;
-import de.presti.ree6.webinterface.sql.base.annotations.Property;
-import de.presti.ree6.webinterface.sql.base.annotations.Table;
-import de.presti.ree6.webinterface.sql.base.entities.SQLEntity;
+import com.google.gson.JsonElement;
+import de.presti.ree6.webinterface.sql.converter.ByteAttributeConverter;
+import de.presti.ree6.webinterface.sql.converter.JsonAttributeConverter;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
+import jakarta.persistence.*;
 
 /**
  * This class is used to represent a Ree6-Voice-Recording, in our Database.
  */
+@Entity
 @Table(name = "Recording")
-public class Recording extends SQLEntity {
+public class Recording {
 
     /**
      * The Identifier for the recording.
      */
-    @Property(name = "id", primary = true)
+    @Id
+    @Column(name = "id")
     String identifier;
 
     /**
      * The ID of the Guild.
      */
-    @Property(name = "gid")
+    @Column(name = "gid")
     String guildId;
 
     /**
      * The ID of the Voice-Channel.
      */
-    @Property(name = "vid")
+    @Column(name = "vid")
     String voiceId;
 
     /**
      * The ID of the Creator.
      */
-    @Property(name = "creator")
+    @Column(name = "creator")
     String creatorId;
 
     /**
      * The WAV-File bytes.
      */
-    @Property(name = "recording", updateQuery = true, keepOriginalValue = false)
+    @Convert(converter = ByteAttributeConverter.class)
+    @Column(name = "recording")
     byte[] recording;
 
     /**
      * An JsonArray containing the IDs of the Users who have participated in the Recording.
      */
-    @Property(name = "participants", keepOriginalValue = false)
-    JsonArray jsonArray;
+    @Convert(converter = JsonAttributeConverter.class)
+    @Column(name = "participants")
+    JsonElement jsonArray;
 
     /**
      * Value used to tell us when this entry was made.
      */
-    @Property(name = "created")
+    @Column(name = "created")
     long creation;
 
     /**
@@ -68,7 +73,7 @@ public class Recording extends SQLEntity {
      * @param recording the WAV-File bytes.
      * @param jsonArray an JsonArray containing the IDs of the Users who have participated in the Recording.
      */
-    public Recording(String guildId, String voiceId, String creatorId, byte[] recording, JsonArray jsonArray) {
+    public Recording(String guildId, String voiceId, String creatorId, byte[] recording, JsonElement jsonArray) {
         this.identifier = RandomUtils.getRandomBase64String(16);
         this.guildId = guildId;
         this.voiceId = voiceId;
@@ -123,7 +128,7 @@ public class Recording extends SQLEntity {
      * @return the IDs of the Users who have participated in the Recording.
      */
     public JsonArray getJsonArray() {
-        return jsonArray;
+        return jsonArray.getAsJsonArray();
     }
 
     /**

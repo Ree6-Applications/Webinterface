@@ -1,11 +1,9 @@
 package de.presti.ree6.webinterface;
 
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
-import com.mindscapehq.raygun4java.core.RaygunClient;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.sql.SQLConnector;
-import de.presti.ree6.webinterface.sql.base.entities.SQLResponse;
 import de.presti.ree6.webinterface.sql.entities.Recording;
 import de.presti.ree6.webinterface.utils.data.Config;
 import de.presti.ree6.webinterface.utils.others.ThreadUtil;
@@ -13,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
  * The "Main" Class used to store Instance of the needed Classes.
@@ -57,12 +56,9 @@ public class Server {
         // Initialize the Config.
         config.init();
 
-        // Add Raygun for external Exceptions Information.
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> new RaygunClient(config.getConfiguration().getString("raygun.apitoken")).send(e));
-
         // Create a new JDA Session.
         try {
-            BotWorker.createBot(BotVersion.RELEASE, "1.9.4");
+            BotWorker.createBot(BotVersion.RELEASE, "2.0.8");
             logger.info("Service (JDA) has been started. Creation was successful.");
         } catch (Exception exception) {
             //Inform if not successful.
@@ -80,9 +76,9 @@ public class Server {
         Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
 
         ThreadUtil.createNewThread(x -> {
-            SQLResponse sqlResponse = sqlConnector.getSqlWorker().getEntity(Recording.class, "SELECT * FROM Recording");
-            if (sqlResponse.isSuccess()) {
-                for (Recording recording : sqlResponse.getEntities().stream().map(Recording.class::cast).toList()) {
+            List<Recording> recordings = sqlConnector.getSqlWorker().getEntityList(new Recording(), "SELECT * FROM Recording", null);
+            if (recordings != null && !recordings.isEmpty()) {
+                for (Recording recording : recordings) {
                     if (recording.getCreation() < System.currentTimeMillis() - Duration.ofDays(1).toMillis()) {
                         sqlConnector.getSqlWorker().deleteEntity(recording);
                     }

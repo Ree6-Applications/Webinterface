@@ -1,12 +1,15 @@
 package de.presti.ree6.webinterface.utils.data;
 
+import lombok.extern.slf4j.Slf4j;
 import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * Config.
  */
+@Slf4j
 public class Config {
 
     /**
@@ -32,12 +35,15 @@ public class Config {
                     #                              #
                     ################################
                     """);
-            yamlFile.addDefault("mysql.user", "root");
-            yamlFile.addDefault("mysql.db", "root");
-            yamlFile.addDefault("mysql.pw", "yourpw");
-            yamlFile.addDefault("mysql.host", "localhost");
-            yamlFile.addDefault("mysql.port", 3306);
-            yamlFile.addDefault("raygun.apitoken", "yourrayguntokenherepog");
+            yamlFile.addDefault("config.version", "2.0.0");
+            yamlFile.addDefault("config.creation", System.currentTimeMillis());
+            yamlFile.addDefault("hikari.sql.user", "root");
+            yamlFile.addDefault("hikari.sql.db", "root");
+            yamlFile.addDefault("hikari.sql.pw", "yourpw");
+            yamlFile.addDefault("hikari.sql.host", "localhost");
+            yamlFile.addDefault("hikari.sql.port", 3306);
+            yamlFile.addDefault("hikari.misc.storage", "sqlite");
+            yamlFile.addDefault("hikari.misc.poolSize", 10);
             yamlFile.addDefault("discord.bot.tokens.rel", "ReleaseTokenhere");
             yamlFile.addDefault("discord.bot.tokens.dev", "DevTokenhere");
             yamlFile.addDefault("discord.client.id", 0);
@@ -51,6 +57,39 @@ public class Config {
             try {
                 yamlFile.load();
             } catch (Exception ignored) {
+            }
+        }
+    }
+
+    /**
+     * Migrate from 3.0.2 config to 3.0.3 config.
+     */
+    public void migrateOldConfig() {
+        if (yamlFile.getString("config.version") == null) {
+            Map<String, Object> resources = yamlFile.getValues(true);
+            if (getFile().delete()) {
+                init();
+
+                for (Map.Entry<String, Object> entry : resources.entrySet()) {
+                    String key = entry.getKey();
+
+                    if (key.startsWith("mysql"))
+                        key = key.replace("mysql", "hikari.sql");
+
+                    if (key.startsWith("discord") && key.endsWith("rel"))
+                        key = key.replace("rel", "release");
+
+                    if (key.startsWith("raygun"))
+                        continue;
+
+                    yamlFile.set(key, entry.getValue());
+                }
+
+                try {
+                    yamlFile.save(getFile());
+                } catch (Exception exception) {
+                    log.error("Could not save config file!", exception);
+                }
             }
         }
     }

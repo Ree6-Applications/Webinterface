@@ -1,29 +1,37 @@
 package de.presti.ree6.webinterface.sql.entities.webhook;
 
-import de.presti.ree6.webinterface.sql.base.annotations.Property;
-import de.presti.ree6.webinterface.sql.base.entities.SQLEntity;
+import jakarta.persistence.*;
 
 /**
  * SQL Entity for the Webhooks.
  */
-public class Webhook extends SQLEntity {
+@MappedSuperclass
+public class Webhook {
+
+    /**
+     * The PrimaryKey of the Entity.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
 
     /**
      * The GuildID of the Webhook.
      */
-    @Property(name = "gid")
+    @Column(name = "gid")
     private String guildId;
 
     /**
      * The ChannelID of the Webhook.
      */
-    @Property(name = "cid")
+    @Column(name = "cid")
     private String channelId;
 
     /**
      * The Token of the Webhook.
      */
-    @Property(name = "token")
+    @Column(name = "token")
     private String token;
 
     /**
