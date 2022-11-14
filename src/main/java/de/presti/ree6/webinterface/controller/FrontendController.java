@@ -148,10 +148,11 @@ public class FrontendController {
 
     /**
      * A Get Mapper for the Leaderboard Page.
+     *
      * @param httpServletResponse the HTTP Response.
-     * @param id the Identifier of the Session.
-     * @param guildId the Guild ID of the Guild.
-     * @param model the Model for Thymeleaf.
+     * @param id                  the Identifier of the Session.
+     * @param guildId             the Guild ID of the Guild.
+     * @param model               the Model for Thymeleaf.
      * @return {@link String} for Thyme to the HTML Page.
      */
     @GetMapping(value = "/leaderboard")
@@ -160,7 +161,7 @@ public class FrontendController {
         id = SessionUtil.getIdentifier(id);
 
         if (SessionUtil.checkIdentifier(id)) {
-            model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
+            model.addAttribute("errorMessage", "Insufficient Permissions - Please check if you are logged in!");
             deleteSessionCookie(httpServletResponse);
             return ERROR_403_PATH;
         }
@@ -170,7 +171,7 @@ public class FrontendController {
             Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
 
             if (session == null) {
-                model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
+                model.addAttribute("errorMessage", "Insufficient Permissions - Please check if you are logged in!");
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_403_PATH;
             }
@@ -185,7 +186,7 @@ public class FrontendController {
 
             // If the Guild couldn't be loaded redirect to Error page.
             if (guild == null) {
-                model.addAttribute("errorMessage","The requested Guild is Invalid or not recognized!");
+                model.addAttribute("errorMessage", "The requested Guild is Invalid or not recognized!");
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_404_PATH;
             }
@@ -193,7 +194,7 @@ public class FrontendController {
             Member member = guild.retrieveMemberById(oAuth2User.getId()).complete();
 
             if (member == null) {
-                model.addAttribute("errorMessage","Insufficient Permissions - You are not part of this Guild!");
+                model.addAttribute("errorMessage", "Insufficient Permissions - You are not part of this Guild!");
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_403_PATH;
             }
@@ -222,7 +223,7 @@ public class FrontendController {
         id = SessionUtil.getIdentifier(id);
 
         if (SessionUtil.checkIdentifier(id)) {
-            model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
+            model.addAttribute("errorMessage", "Insufficient Permissions - Please check if you are logged in!");
             deleteSessionCookie(httpServletResponse);
             return ERROR_403_PATH;
         }
@@ -232,7 +233,7 @@ public class FrontendController {
             Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
 
             if (session == null) {
-                model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
+                model.addAttribute("errorMessage", "Insufficient Permissions - Please check if you are logged in!");
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_403_PATH;
             }
@@ -247,7 +248,7 @@ public class FrontendController {
 
             // If the Guild couldn't be loaded redirect to Error page.
             if (guild == null) {
-                model.addAttribute("errorMessage","The requested Guild is Invalid or not recognized!");
+                model.addAttribute("errorMessage", "The requested Guild is Invalid or not recognized!");
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_404_PATH;
             }
@@ -255,7 +256,7 @@ public class FrontendController {
             Member member = guild.retrieveMemberById(oAuth2User.getId()).complete();
 
             if (member == null) {
-                model.addAttribute("errorMessage","Insufficient Permissions - You are not part of this Guild!");
+                model.addAttribute("errorMessage", "Insufficient Permissions - You are not part of this Guild!");
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_403_PATH;
             }
@@ -299,7 +300,7 @@ public class FrontendController {
         id = SessionUtil.getIdentifier(id);
 
         if (SessionUtil.checkIdentifier(id)) {
-            model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
+            model.addAttribute("errorMessage", "Insufficient Permissions - Please check if you are logged in!");
             deleteSessionCookie(httpServletResponse);
             return ERROR_403_PATH;
         }
@@ -309,7 +310,7 @@ public class FrontendController {
             Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
 
             if (session == null) {
-                model.addAttribute("errorMessage","Insufficient Permissions - Please check if you are logged in!");
+                model.addAttribute("errorMessage", "Insufficient Permissions - Please check if you are logged in!");
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_403_PATH;
             }
@@ -324,7 +325,7 @@ public class FrontendController {
 
             // If the Guild couldn't be loaded redirect to Error page.
             if (guild == null) {
-                model.addAttribute("errorMessage","The requested Guild is Invalid or not recognized!");
+                model.addAttribute("errorMessage", "The requested Guild is Invalid or not recognized!");
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_404_PATH;
             }
@@ -332,7 +333,7 @@ public class FrontendController {
             Member member = guild.retrieveMemberById(oAuth2User.getId()).complete();
 
             if (member == null) {
-                model.addAttribute("errorMessage","Insufficient Permissions - You are not part of this Guild!");
+                model.addAttribute("errorMessage", "Insufficient Permissions - You are not part of this Guild!");
                 deleteSessionCookie(httpServletResponse);
                 return ERROR_403_PATH;
             }
@@ -556,7 +557,8 @@ public class FrontendController {
         // If null return to Error page.
         if (guild == null) return ERROR_404_PATH;
 
-        if (settingChangeForm.getSetting().getName() == null || settingChangeForm.getSetting().getValue() == null) return ERROR_400_PATH;
+        if (settingChangeForm.getSetting().getName() == null || settingChangeForm.getSetting().getValue() == null)
+            return ERROR_400_PATH;
 
         // Change the Setting Data.
         if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("addBadWord") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeBadWord") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("addAutoRole") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeAutoRole")) {
@@ -637,7 +639,11 @@ public class FrontendController {
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("roles", guild.getRoles());
         model.addAttribute("channels", guild.getTextChannels());
-        model.addAttribute("joinMessage", new Setting(guildId,"message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guildId)));
+
+        if (Server.getInstance().getSqlConnector().getSqlWorker().isWelcomeSetup(guildId))
+            model.addAttribute("welcomeChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId).getChannelId())).findFirst().orElse(null));
+
+        model.addAttribute("joinMessage", new Setting(guildId, "message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guildId)));
 
         // Return to the Social Panel Page.
         return SOCIAL_PATH;
@@ -687,7 +693,13 @@ public class FrontendController {
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("roles", guild.getRoles());
         model.addAttribute("channels", guild.getTextChannels());
-        model.addAttribute("joinMessage", new Setting(guild.getId(),"message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
+
+        if (Server.getInstance().getSqlConnector().getSqlWorker().isWelcomeSetup(guild.getId())) {
+            Guild finalGuild1 = guild;
+            model.addAttribute("welcomeChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getWelcomeWebhook(finalGuild1.getId()).getChannelId())).findFirst().orElse(null));
+        }
+
+        model.addAttribute("joinMessage", new Setting(guild.getId(), "message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
 
         return SOCIAL_PATH;
     }
@@ -715,7 +727,8 @@ public class FrontendController {
         // If null return to Error page.
         if (guild == null) return ERROR_404_PATH;
 
-        if (settingChangeForm.getSetting().getName() == null || settingChangeForm.getSetting().getValue() == null) return ERROR_400_PATH;
+        if (settingChangeForm.getSetting().getName() == null || settingChangeForm.getSetting().getValue() == null)
+            return ERROR_400_PATH;
 
         // Change the setting Data.
         if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("message_join")) {
@@ -727,7 +740,13 @@ public class FrontendController {
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("roles", guild.getRoles());
         model.addAttribute("channels", guild.getTextChannels());
-        model.addAttribute("joinMessage", new Setting(guild.getId(),"message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
+
+        if (Server.getInstance().getSqlConnector().getSqlWorker().isWelcomeSetup(guild.getId())) {
+            Guild finalGuild = guild;
+            model.addAttribute("welcomeChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getWelcomeWebhook(finalGuild.getId()).getChannelId())).findFirst().orElse(null));
+        }
+
+        model.addAttribute("joinMessage", new Setting(guild.getId(), "message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
 
         return SOCIAL_PATH;
     }
@@ -773,6 +792,9 @@ public class FrontendController {
         model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).toList());
         model.addAttribute("channels", guild.getTextChannels());
 
+        if (Server.getInstance().getSqlConnector().getSqlWorker().isLogSetup(guildId))
+            model.addAttribute("logChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getLogWebhook(guildId).getChannelId())).findFirst().orElse(null));
+
         // Return to the Logging Panel Page.
         return LOGGING_PATH;
     }
@@ -817,7 +839,10 @@ public class FrontendController {
         // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
         model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).toList());
         model.addAttribute("channels", guild.getTextChannels());
-
+        if (Server.getInstance().getSqlConnector().getSqlWorker().isLogSetup(guild.getId())) {
+            Guild finalGuild1 = guild;
+            model.addAttribute("logChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getLogWebhook(finalGuild1.getId()).getChannelId())).findFirst().orElse(null));
+        }
         // Return to the Logging Panel Page.
         return LOGGING_PATH;
     }
@@ -845,14 +870,18 @@ public class FrontendController {
         // If null return to Error page.
         if (guild == null) return ERROR_404_PATH;
 
-        if (settingChangeForm.getSetting().getName() == null || settingChangeForm.getSetting().getValue() == null) return ERROR_400_PATH;
+        if (settingChangeForm.getSetting().getName() == null || settingChangeForm.getSetting().getValue() == null)
+            return ERROR_400_PATH;
 
         // Change the setting Data.
         Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());
         // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
         model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).toList());
         model.addAttribute("channels", guild.getTextChannels());
-
+        if (Server.getInstance().getSqlConnector().getSqlWorker().isLogSetup(guild.getId())) {
+            Guild finalGuild = guild;
+            model.addAttribute("logChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getLogWebhook(finalGuild.getId()).getChannelId())).findFirst().orElse(null));
+        }
         // Return to the Logging Panel Page.
         return LOGGING_PATH;
     }

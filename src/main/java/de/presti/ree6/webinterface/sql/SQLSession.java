@@ -4,7 +4,6 @@ import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import jakarta.persistence.Table;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
