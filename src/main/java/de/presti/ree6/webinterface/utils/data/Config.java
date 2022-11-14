@@ -56,6 +56,7 @@ public class Config {
         } else {
             try {
                 yamlFile.load();
+                migrateOldConfig();
             } catch (Exception ignored) {
             }
         }
