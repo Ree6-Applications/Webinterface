@@ -12,7 +12,7 @@
 
     <groupId>de.presti.ree6</groupId>
     <artifactId>Webinterface</artifactId>
-    <version>3.0.3-RELEASE</version>
+    <version>3.0.4-RELEASE</version>
     <name>Webinterface</name>
     <description>Webinterface</description>
 
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>3.0.9</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.xerial</groupId>

@@ -69,8 +69,8 @@ public class Server {
         oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfiguration().getLong("discord.client.id")).setClientSecret(config.getConfiguration().getString("discord.client.secret")).build();
 
         // Creating a new SQL-Connector Instance.
-        sqlConnector = new SQLConnector(config.getConfiguration().getString("mysql.user"), config.getConfiguration().getString("mysql.db"),
-                config.getConfiguration().getString("mysql.pw"), config.getConfiguration().getString("mysql.host"), config.getConfiguration().getInt("mysql.port"));
+        sqlConnector = new SQLConnector(config.getConfiguration().getString("hikari.sql.user"), config.getConfiguration().getString("hikari.sql.db"),
+                config.getConfiguration().getString("hikari.sql.pw"), config.getConfiguration().getString("hikari.sql.host"), config.getConfiguration().getInt("hikari.sql.port"));
 
         // Add onShutdown as call methode when Shutdown.
         Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
