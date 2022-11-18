@@ -43,6 +43,7 @@ public class Config {
             yamlFile.addDefault("hikari.sql.host", "localhost");
             yamlFile.addDefault("hikari.sql.port", 3306);
             yamlFile.addDefault("hikari.misc.storage", "sqlite");
+            yamlFile.addDefault("hikari.misc.storageFile", "storage/Ree6.db");
             yamlFile.addDefault("hikari.misc.poolSize", 10);
             yamlFile.addDefault("discord.bot.tokens.release", "ReleaseTokenhere");
             yamlFile.addDefault("discord.bot.tokens.dev", "DevTokenhere");
