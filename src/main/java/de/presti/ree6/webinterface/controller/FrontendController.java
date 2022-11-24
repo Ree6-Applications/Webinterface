@@ -19,6 +19,8 @@ import de.presti.ree6.webinterface.sql.entities.stats.GuildCommandStats;
 import de.presti.ree6.webinterface.sql.entities.webhook.Webhook;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
 import de.presti.ree6.webinterface.utils.others.SessionUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -28,8 +30,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -44,16 +44,7 @@ import java.util.Map;
 public class FrontendController {
 
     // Paths to Thymeleaf Templates.
-    private static final String
-            MAIN_PATH = "main/index",
-            ERROR_400_PATH = "error/400/index",
-            ERROR_403_PATH = "error/403/index",
-            ERROR_404_PATH = "error/404/index",
-            ERROR_500_PATH = "error/500/index",
-            MODERATION_PATH = "panel/moderation/index",
-            SOCIAL_PATH = "panel/social/index",
-            LOGGING_PATH = "panel/logging/index",
-            RECORDING_PATH = "panel/recording/index";
+    private static final String MAIN_PATH = "main/index", ERROR_400_PATH = "error/400/index", ERROR_403_PATH = "error/403/index", ERROR_404_PATH = "error/404/index", ERROR_500_PATH = "error/500/index", MODERATION_PATH = "panel/moderation/index", SOCIAL_PATH = "panel/social/index", LOGGING_PATH = "panel/logging/index", RECORDING_PATH = "panel/recording/index";
 
     /**
      * A Get Mapper for the Main Page.
@@ -923,8 +914,7 @@ public class FrontendController {
 
             model.addAttribute("isLogged", true);
 
-            Recording recording = Server.getInstance().getSqlConnector().getSqlWorker().getEntity(new Recording(), "SELECT * FROM Recording WHERE ID=:id",
-                    Map.of("id", recordIdentifier));
+            Recording recording = Server.getInstance().getSqlConnector().getSqlWorker().getEntity(new Recording(), "SELECT * FROM Recording WHERE ID=:id", Map.of("id", recordIdentifier));
 
             if (recording == null) {
                 model.addAttribute("errorCode", 404);
