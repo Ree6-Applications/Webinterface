@@ -3,6 +3,8 @@ package de.presti.ree6.webinterface.controller;
 import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.utils.others.SessionUtil;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -10,9 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.context.request.WebRequest;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class ErrorControllerImpl implements org.springframework.boot.web.servlet.error.ErrorController {
@@ -25,6 +24,7 @@ public class ErrorControllerImpl implements org.springframework.boot.web.servlet
 
     /**
      * Controller for the Error Controller
+     *
      * @param errorAttributes Attributes that give more Info about the Error.
      */
     public ErrorControllerImpl(ErrorAttributes errorAttributes) {
@@ -33,6 +33,7 @@ public class ErrorControllerImpl implements org.springframework.boot.web.servlet
 
     /**
      * Request mapper for errors.
+     *
      * @return {@link String} for Thyme to the HTML Page.
      */
     @GetMapping(value = "/error")
@@ -51,7 +52,8 @@ public class ErrorControllerImpl implements org.springframework.boot.web.servlet
         } catch (Exception ignore) {
         }
 
-        Object status = model.getAttribute("errorCode") != null ? model.getAttribute("errorCode") : request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);;
+        Object status = model.getAttribute("errorCode") != null ? model.getAttribute("errorCode") : request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        ;
 
         if (status != null) {
             int statusCode = Integer.parseInt(status.toString());
