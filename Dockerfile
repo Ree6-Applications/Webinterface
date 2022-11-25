@@ -1,6 +1,12 @@
+# syntax=docker/dockerfile:1
+
+FROM maven:3.8.6-amazoncorretto-17 AS build
+COPY src /usr/src/app/src
+COPY pom.xml /usr/src/app
+RUN mvn -f /usr/src/app/pom.xml clean package
+
 FROM amazoncorretto:17-alpine3.16-full
-MAINTAINER ree6.de
+ARG JAR_FILE=/usr/src/app/target/*.jar
+COPY --from=build ${JAR_FILE} /usr/app/Ree6-Webinterface.jar
 EXPOSE 8080/tcp
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","/usr/app/Ree6-Webinterface.jar"]
