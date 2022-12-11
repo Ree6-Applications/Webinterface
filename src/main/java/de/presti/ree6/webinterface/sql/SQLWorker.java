@@ -1100,12 +1100,10 @@ public record SQLWorker(SQLConnector sqlConnector) {
      * @return {@link List<String>} as List with {@link InviteContainer}.
      */
     public List<InviteContainer> getInvites(String guildId) {
-        ArrayList<InviteContainer> invites = new ArrayList<>();
-
-        List<Invite> inviteList = getEntityList(new Invite(), "SELECT * FROM Invites WHERE GID=:gid", Map.of("gid", guildId));
-
-        inviteList.stream().map(invite -> new InviteContainer(invite.getUserId(), invite.getGuild(), invite.getCode(), invite.getUses(), false)).forEach(invites::add);
-        return invites;
+        return getEntityList(new Invite(), "SELECT * FROM Invites WHERE GID=:gid", Map.of("gid", guildId))
+                .stream()
+                .map(invite -> new InviteContainer(invite.getUserId(), invite.getGuild(), invite.getCode(), invite.getUses(), false))
+                .toList();
     }
 
     /**
