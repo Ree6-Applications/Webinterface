@@ -39,7 +39,6 @@ public class SQLSession {
      *
      * @param username the username.
      * @param password the password.
-     *
      * @return The SessionFactory.
      */
     public static SessionFactory buildSessionFactory(String username, String password) {
@@ -55,10 +54,8 @@ public class SQLSession {
             properties.put("hibernate.connection.password", password);
             properties.put("hibernate.hikari.maximumPoolSize", String.valueOf(maxPoolSize));
             properties.put("hibernate.dialect", Server.getInstance().getSqlConnector().getDatabaseTyp().getHibernateDialect());
-            if (BotWorker.getVersion().isDebug()) {
-                properties.put("hibernate.show_sql", true);
-                properties.put("hibernate.format_sql", true);
-            }
+            properties.put("hibernate.show_sql", true);
+            properties.put("hibernate.format_sql", true);
             properties.put("hibernate.hbm2ddl.auto", "update");
             properties.put("jakarta.persistence.schema-generation.database.action", "update");
 
@@ -79,6 +76,7 @@ public class SQLSession {
 
     /**
      * Set the JDBC URL used to connect to the Database.
+     *
      * @param jdbcURL The JDBC URL.
      */
     public static void setJdbcURL(String jdbcURL) {
@@ -87,6 +85,7 @@ public class SQLSession {
 
     /**
      * Set the max amount of connections allowed by Hikari.
+     *
      * @param maxPoolSize The max amount of connections.
      */
     public static void setMaxPoolSize(int maxPoolSize) {
@@ -95,6 +94,7 @@ public class SQLSession {
 
     /**
      * Get the JDBC URL used to connect to the Database.
+     *
      * @return The JDBC URL.
      */
     public static String getJdbcURL() {
@@ -103,6 +103,7 @@ public class SQLSession {
 
     /**
      * Get the max amount of connections allowed by Hikari.
+     *
      * @return The max amount of connections.
      */
     public static int getMaxPoolSize() {
@@ -111,6 +112,7 @@ public class SQLSession {
 
     /**
      * Get the current SessionFactory.
+     *
      * @return The SessionFactory.
      */
     public static SessionFactory getSessionFactory() {

@@ -1100,10 +1100,13 @@ public record SQLWorker(SQLConnector sqlConnector) {
      * @return {@link List<String>} as List with {@link InviteContainer}.
      */
     public List<InviteContainer> getInvites(String guildId) {
-        return getEntityList(new Invite(), "SELECT * FROM Invites WHERE GID=:gid", Map.of("gid", guildId))
-                .stream()
-                .map(invite -> new InviteContainer(invite.getUserId(), invite.getGuild(), invite.getCode(), invite.getUses(), false))
-                .toList();
+        ArrayList<InviteContainer> containerList = new ArrayList<>();
+
+        List<Invite> inviteList = getEntityList(new Invite(), "SELECT * FROM Invites WHERE gid=:gid", Map.of("gid", guildId));
+        inviteList.stream()
+                .forEach(invite -> containerList.add(new InviteContainer(invite.getUserId(), invite.getGuild(), invite.getCode(), invite.getUses(), false)));
+
+        return containerList;
     }
 
     /**
@@ -1531,7 +1534,7 @@ public record SQLWorker(SQLConnector sqlConnector) {
      * @return all the Command-Stats related to the given Guild.
      */
     public List<GuildCommandStats> getStats(String guildId) {
-        return getEntityList(new GuildCommandStats(), "SELECT * FROM GuildStats WHERE GID=:gid ORDER BY CAST(uses as INT) DESC LIMIT 5", Map.of("gid", guildId));
+        return getEntityList(new GuildCommandStats(), "SELECT * FROM GuildStats WHERE gid=:gid ORDER BY CAST(uses as INT) DESC LIMIT 5", Map.of("gid", guildId));
     }
 
     /**
@@ -1831,7 +1834,10 @@ public record SQLWorker(SQLConnector sqlConnector) {
 
             session.getTransaction().commit();
 
-            return query.getResultList();
+            List<R> list = query.getResultList();
+            System.out.println(list);
+            System.out.println(r.getClass());
+            return list;
         }
     }
 

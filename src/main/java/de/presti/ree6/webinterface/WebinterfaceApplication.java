@@ -22,7 +22,7 @@ public class WebinterfaceApplication {
         application.run(args);
 
         // Initialize the Server class
-        new Server();
+        new Server(args);
     }
 
 }

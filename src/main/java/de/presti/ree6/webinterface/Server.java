@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,17 +36,21 @@ public class Server {
 
     /**
      * Call when the Class should be Initialized.
+     *
+     * @param args {@link String[]} used as List of the Arguments given at the start of the Application.
      */
-    public Server() {
+    public Server(String[] args) {
         instance = this;
 
-        load();
+        load(args);
     }
 
     /**
      * Call to load and Initialize Data.
+     *
+     * @param args {@link String[]} used as List of the Arguments given at the start of the Application.
      */
-    public void load() {
+    public void load(String[] args) {
 
         // Create the Logger with a LoggerFactory.
         logger = LoggerFactory.getLogger(Server.class);
@@ -58,7 +63,18 @@ public class Server {
 
         // Create a new JDA Session.
         try {
-            BotWorker.createBot(BotVersion.RELEASE, "2.0.8");
+            List<String> argList = Arrays.stream(args).map(String::toLowerCase).toList();
+
+            if (argList.contains("--dev")) {
+                BotWorker.createBot(BotVersion.DEVELOPMENT_BUILD, "2.1.3");
+            } else if (argList.contains("--prod")) {
+                BotWorker.createBot(BotVersion.RELEASE,"2.1.3");
+            } else if (argList.contains("--beta")) {
+                BotWorker.createBot(BotVersion.BETA_BUILD,"2.1.3");
+            } else {
+                BotWorker.createBot(BotVersion.RELEASE,"2.1.3");
+            }
+
             logger.info("Service (JDA) has been started. Creation was successful.");
         } catch (Exception exception) {
             //Inform if not successful.
