@@ -1,6 +1,8 @@
 package de.presti.ree6.webinterface.sql;
 
 import de.presti.ree6.webinterface.Server;
+import de.presti.ree6.webinterface.bot.BotWorker;
+import jakarta.persistence.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -54,8 +56,12 @@ public class SQLSession {
             properties.put("hibernate.connection.password", password);
             properties.put("hibernate.hikari.maximumPoolSize", String.valueOf(maxPoolSize));
             properties.put("hibernate.dialect", Server.getInstance().getSqlConnector().getDatabaseTyp().getHibernateDialect());
-            properties.put("hibernate.show_sql", true);
-            properties.put("hibernate.format_sql", true);
+
+            if (BotWorker.getVersion().isDebug()) {
+                properties.put("hibernate.show_sql", true);
+                properties.put("hibernate.format_sql", true);
+            }
+
             properties.put("hibernate.hbm2ddl.auto", "update");
             properties.put("jakarta.persistence.schema-generation.database.action", "update");
 
@@ -70,7 +76,10 @@ public class SQLSession {
 
             classSet.forEach(configuration::addAnnotatedClass);
 
-            System.out.println(classSet);
+            if (classSet.isEmpty()) {
+                log.error("No SQL-Entity classes found!");
+                log.error("Note that this means that the SQL Mapping will fail and you will not be able to retrieve the correct data!");
+            }
 
             ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 
