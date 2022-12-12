@@ -1834,10 +1834,7 @@ public record SQLWorker(SQLConnector sqlConnector) {
 
             session.getTransaction().commit();
 
-            List<R> list = query.getResultList();
-            System.out.println(list);
-            System.out.println(r.getClass());
-            return list;
+            return query.getResultList();
         }
     }
 

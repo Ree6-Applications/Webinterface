@@ -147,7 +147,7 @@
                         <input th:each="channel: ${channels}" type="button" th:name="${channel.getName()}" th:value="${channel.getName()}" th:onclick="@{'updateChannelSetting(\'logChannel\',\'' + ${channel.getId()} + '\')'}" />
                      </form>
                   </div>
-                  <form class="activation-options" th:action="@{/panel/logging/settings}" th:object="${settingChangeForm}" method="post">
+                  <form class="activation-options" th:action="@{/logging/settings}" th:object="${settingChangeForm}" method="post">
                      <input type="hidden" name="guildSession" th:value="${guild.getId()}" />
                      <input type="hidden" name="identifierSession" th:value="${identifier}" />
                      <strong>Logging Features</strong>
