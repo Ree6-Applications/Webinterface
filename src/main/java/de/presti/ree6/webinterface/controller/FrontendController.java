@@ -6,17 +6,20 @@ import com.jagrosh.jdautilities.oauth2.Scope;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2User;
 import com.jagrosh.jdautilities.oauth2.session.Session;
+import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.controller.forms.ChannelChangeForm;
 import de.presti.ree6.webinterface.controller.forms.SettingChangeForm;
-import de.presti.ree6.webinterface.sql.entities.Recording;
-import de.presti.ree6.webinterface.sql.entities.Setting;
-import de.presti.ree6.webinterface.sql.entities.level.ChatUserLevel;
-import de.presti.ree6.webinterface.sql.entities.level.VoiceUserLevel;
-import de.presti.ree6.webinterface.sql.entities.stats.GuildCommandStats;
-import de.presti.ree6.webinterface.sql.entities.webhook.Webhook;
+import de.presti.ree6.sql.entities.Recording;
+import de.presti.ree6.sql.entities.Setting;
+import de.presti.ree6.sql.entities.level.ChatUserLevel;
+import de.presti.ree6.sql.entities.level.VoiceUserLevel;
+import de.presti.ree6.sql.entities.stats.GuildCommandStats;
+import de.presti.ree6.sql.entities.webhook.Webhook;
+import de.presti.ree6.webinterface.invite.InviteContainerManager;
+import de.presti.ree6.webinterface.utils.data.UserLevelContainer;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
 import de.presti.ree6.webinterface.utils.others.SessionUtil;
 import jakarta.servlet.http.Cookie;
@@ -260,21 +263,26 @@ public class FrontendController {
             return ERROR_500_PATH;
         }
 
-        List<ChatUserLevel> userLevels = Server.getInstance().getSqlConnector().getSqlWorker().getTopChat(guildId, 5);
+        List<ChatUserLevel> userLevels = SQLSession.getSqlConnector().getSqlWorker().getTopChat(guildId, 5);
+        List<UserLevelContainer> containerUserLevels = new ArrayList<>();
         for (ChatUserLevel userLevel : userLevels) {
             try {
+                UserLevelContainer userLevelContainer = new UserLevelContainer();
+                userLevelContainer.setUserLevel(userLevel);
+
                 if (BotWorker.getShardManager().getUserById(userLevel.getUserId()) != null) {
-                    userLevel.setUser(BotWorker.getShardManager().getUserById(userLevel.getUserId()));
+                    userLevelContainer.setUser(BotWorker.getShardManager().getUserById(userLevel.getUserId()));
                 } else {
-                    userLevel.setUser(BotWorker.getShardManager().retrieveUserById(userLevel.getUserId()).complete());
+                    userLevelContainer.setUser(BotWorker.getShardManager().retrieveUserById(userLevel.getUserId()).complete());
                 }
+                containerUserLevels.add(userLevelContainer);
             } catch (Exception ignore) {
                 userLevel.setExperience(0);
-                Server.getInstance().getSqlConnector().getSqlWorker().addChatLevelData(guildId, userLevel);
+                SQLSession.getSqlConnector().getSqlWorker().addChatLevelData(guildId, userLevel);
             }
         }
 
-        model.addAttribute("userLevels", userLevels);
+        model.addAttribute("userLevels", containerUserLevels);
 
         return "leaderboard/index2";
     }
@@ -337,21 +345,26 @@ public class FrontendController {
             return ERROR_500_PATH;
         }
 
-        List<VoiceUserLevel> userLevels = Server.getInstance().getSqlConnector().getSqlWorker().getTopVoice(guildId, 5);
+        List<VoiceUserLevel> userLevels = SQLSession.getSqlConnector().getSqlWorker().getTopVoice(guildId, 5);
+        List<UserLevelContainer> containerUserLevels = new ArrayList<>();
         for (VoiceUserLevel userLevel : userLevels) {
             try {
+                UserLevelContainer userLevelContainer = new UserLevelContainer();
+                userLevelContainer.setUserLevel(userLevel);
+
                 if (BotWorker.getShardManager().getUserById(userLevel.getUserId()) != null) {
-                    userLevel.setUser(BotWorker.getShardManager().getUserById(userLevel.getUserId()));
+                    userLevelContainer.setUser(BotWorker.getShardManager().getUserById(userLevel.getUserId()));
                 } else {
-                    userLevel.setUser(BotWorker.getShardManager().retrieveUserById(userLevel.getUserId()).complete());
+                    userLevelContainer.setUser(BotWorker.getShardManager().retrieveUserById(userLevel.getUserId()).complete());
                 }
+                containerUserLevels.add(userLevelContainer);
             } catch (Exception ignore) {
                 userLevel.setExperience(0);
-                Server.getInstance().getSqlConnector().getSqlWorker().addVoiceLevelData(guildId, userLevel);
+                SQLSession.getSqlConnector().getSqlWorker().addVoiceLevelData(guildId, userLevel);
             }
         }
 
-        model.addAttribute("userLevels", userLevels);
+        model.addAttribute("userLevels", containerUserLevels);
 
         return "leaderboard/index2";
     }
@@ -447,11 +460,11 @@ public class FrontendController {
         if (setDefaultInformation(model, httpServletResponse, guildId, id)) return ERROR_403_PATH;
 
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
-        model.addAttribute("invites", Server.getInstance().getSqlConnector().getSqlWorker().getInvites(guildId));
+        model.addAttribute("invites", InviteContainerManager.getInvites(guildId));
 
         StringBuilder commandStats = new StringBuilder();
 
-        for (GuildCommandStats entry : Server.getInstance().getSqlConnector().getSqlWorker().getStats(guildId)) {
+        for (GuildCommandStats entry : SQLSession.getSqlConnector().getSqlWorker().getStats(guildId)) {
             commandStats.append(entry.getCommand()).append(" - ").append(entry.getUses()).append(", ");
         }
 
@@ -507,17 +520,17 @@ public class FrontendController {
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("roles", guild.getRoles());
         model.addAttribute("channels", guild.getTextChannels());
-        model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guildId).stream().filter(setting -> setting.getName().startsWith("com")).toList());
-        model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guildId, "chatprefix"));
-        model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guildId));
+        model.addAttribute("commands", SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guildId).stream().filter(setting -> setting.getName().startsWith("com")).toList());
+        model.addAttribute("prefixSetting", SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, "chatprefix"));
+        model.addAttribute("words", SQLSession.getSqlConnector().getSqlWorker().getChatProtectorWords(guildId));
 
         List<Role> roles = new ArrayList<>();
 
-        for (de.presti.ree6.webinterface.sql.entities.roles.Role role : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
+        for (de.presti.ree6.sql.entities.roles.Role role : SQLSession.getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
             try {
                 roles.add(guild.getRoleById(role.getRoleId()));
             } catch (Exception ignore) {
-                Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(guild.getId(), role.getRoleId());
+                SQLSession.getSqlConnector().getSqlWorker().removeAutoRole(guild.getId(), role.getRoleId());
             }
         }
 
@@ -555,35 +568,35 @@ public class FrontendController {
 
         // Change the Setting Data.
         if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("addBadWord") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeBadWord") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("addAutoRole") && !settingChangeForm.getSetting().getName().equalsIgnoreCase("removeAutoRole")) {
-            Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());
+            SQLSession.getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());
         } else {
             switch (settingChangeForm.getSetting().getName()) {
                 case "addBadWord" ->
-                        Server.getInstance().getSqlConnector().getSqlWorker().addChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                        SQLSession.getSqlConnector().getSqlWorker().addChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
                 case "removeBadWord" ->
-                        Server.getInstance().getSqlConnector().getSqlWorker().removeChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                        SQLSession.getSqlConnector().getSqlWorker().removeChatProtectorWord(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
                 case "addAutoRole" ->
-                        Server.getInstance().getSqlConnector().getSqlWorker().addAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                        SQLSession.getSqlConnector().getSqlWorker().addAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
                 case "removeAutoRole" ->
-                        Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+                        SQLSession.getSqlConnector().getSqlWorker().removeAutoRole(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
             }
         }
 
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("roles", guild.getRoles());
         model.addAttribute("channels", guild.getTextChannels());
-        model.addAttribute("commands", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("com")).toList());
-        model.addAttribute("prefixSetting", Server.getInstance().getSqlConnector().getSqlWorker().getSetting(guild.getId(), "chatprefix"));
-        model.addAttribute("words", Server.getInstance().getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
+        model.addAttribute("commands", SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("com")).toList());
+        model.addAttribute("prefixSetting", SQLSession.getSqlConnector().getSqlWorker().getSetting(guild.getId(), "chatprefix"));
+        model.addAttribute("words", SQLSession.getSqlConnector().getSqlWorker().getChatProtectorWords(guild.getId()));
 
         List<Role> roles = new ArrayList<>();
 
 
-        for (de.presti.ree6.webinterface.sql.entities.roles.Role role : Server.getInstance().getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
+        for (de.presti.ree6.sql.entities.roles.Role role : SQLSession.getSqlConnector().getSqlWorker().getAutoRoles(guild.getId())) {
             try {
                 roles.add(guild.getRoleById(role.getRoleId()));
             } catch (Exception ignore) {
-                Server.getInstance().getSqlConnector().getSqlWorker().removeAutoRole(guild.getId(), role.getRoleId());
+                SQLSession.getSqlConnector().getSqlWorker().removeAutoRole(guild.getId(), role.getRoleId());
             }
         }
 
@@ -633,10 +646,10 @@ public class FrontendController {
         model.addAttribute("roles", guild.getRoles());
         model.addAttribute("channels", guild.getTextChannels());
 
-        if (Server.getInstance().getSqlConnector().getSqlWorker().isWelcomeSetup(guildId))
-            model.addAttribute("welcomeChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId).getChannelId())).findFirst().orElse(null));
+        if (SQLSession.getSqlConnector().getSqlWorker().isWelcomeSetup(guildId))
+            model.addAttribute("welcomeChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId).getChannelId())).findFirst().orElse(null));
 
-        model.addAttribute("joinMessage", new Setting(guildId, "message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guildId)));
+        model.addAttribute("joinMessage", new Setting(guildId, "message_join", SQLSession.getSqlConnector().getSqlWorker().getMessage(guildId)));
 
         // Return to the Social Panel Page.
         return SOCIAL_PATH;
@@ -669,7 +682,7 @@ public class FrontendController {
         // Check if null.
         if (channelChangeForm.getChannel().equalsIgnoreCase("-1")) {
             if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
-                Webhook webhookEntity = Server.getInstance().getSqlConnector().getSqlWorker().getWelcomeWebhook(guild.getId());
+                Webhook webhookEntity = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guild.getId());
                 // Delete the existing Webhook.
                 guild.retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook -> webhook.getId().equalsIgnoreCase(webhookEntity.getChannelId()) && webhook.getToken().equalsIgnoreCase(webhookEntity.getToken())).forEach(webhook -> webhook.delete().queue()));
             }
@@ -678,7 +691,7 @@ public class FrontendController {
                 if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
                     // Create new Webhook, If it has been created successfully add it to our Database.
                     Guild finalGuild = guild;
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setWelcomeWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook -> SQLSession.getSqlConnector().getSqlWorker().setWelcomeWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
                 }
             }
         }
@@ -687,12 +700,12 @@ public class FrontendController {
         model.addAttribute("roles", guild.getRoles());
         model.addAttribute("channels", guild.getTextChannels());
 
-        if (Server.getInstance().getSqlConnector().getSqlWorker().isWelcomeSetup(guild.getId())) {
+        if (SQLSession.getSqlConnector().getSqlWorker().isWelcomeSetup(guild.getId())) {
             Guild finalGuild1 = guild;
-            model.addAttribute("welcomeChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getWelcomeWebhook(finalGuild1.getId()).getChannelId())).findFirst().orElse(null));
+            model.addAttribute("welcomeChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(finalGuild1.getId()).getChannelId())).findFirst().orElse(null));
         }
 
-        model.addAttribute("joinMessage", new Setting(guild.getId(), "message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
+        model.addAttribute("joinMessage", new Setting(guild.getId(), "message_join", SQLSession.getSqlConnector().getSqlWorker().getMessage(guild.getId())));
 
         return SOCIAL_PATH;
     }
@@ -725,21 +738,21 @@ public class FrontendController {
 
         // Change the setting Data.
         if (!settingChangeForm.getSetting().getName().equalsIgnoreCase("message_join")) {
-            Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());
+            SQLSession.getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());
         } else {
-            Server.getInstance().getSqlConnector().getSqlWorker().setMessage(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
+            SQLSession.getSqlConnector().getSqlWorker().setMessage(settingChangeForm.getGuild(), settingChangeForm.getSetting().getStringValue());
         }
 
         // Retrieve every Role and Channel of the Guild and set them as Attribute.
         model.addAttribute("roles", guild.getRoles());
         model.addAttribute("channels", guild.getTextChannels());
 
-        if (Server.getInstance().getSqlConnector().getSqlWorker().isWelcomeSetup(guild.getId())) {
+        if (SQLSession.getSqlConnector().getSqlWorker().isWelcomeSetup(guild.getId())) {
             Guild finalGuild = guild;
-            model.addAttribute("welcomeChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getWelcomeWebhook(finalGuild.getId()).getChannelId())).findFirst().orElse(null));
+            model.addAttribute("welcomeChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(finalGuild.getId()).getChannelId())).findFirst().orElse(null));
         }
 
-        model.addAttribute("joinMessage", new Setting(guild.getId(), "message_join", Server.getInstance().getSqlConnector().getSqlWorker().getMessage(guild.getId())));
+        model.addAttribute("joinMessage", new Setting(guild.getId(), "message_join", SQLSession.getSqlConnector().getSqlWorker().getMessage(guild.getId())));
 
         return SOCIAL_PATH;
     }
@@ -782,11 +795,11 @@ public class FrontendController {
         if (guild == null) return ERROR_404_PATH;
 
         // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
-        model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).toList());
+        model.addAttribute("logs", SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).toList());
         model.addAttribute("channels", guild.getTextChannels());
 
-        if (Server.getInstance().getSqlConnector().getSqlWorker().isLogSetup(guildId))
-            model.addAttribute("logChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getLogWebhook(guildId).getChannelId())).findFirst().orElse(null));
+        if (SQLSession.getSqlConnector().getSqlWorker().isLogSetup(guildId))
+            model.addAttribute("logChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guildId).getChannelId())).findFirst().orElse(null));
 
         // Return to the Logging Panel Page.
         return LOGGING_PATH;
@@ -818,23 +831,23 @@ public class FrontendController {
         // Change the channel Data.
         // Check if null.
         if (channelChangeForm.getChannel().equalsIgnoreCase("-1")) {
-            Webhook webhookEntity = Server.getInstance().getSqlConnector().getSqlWorker().getLogWebhook(guild.getId());
+            Webhook webhookEntity = SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guild.getId());
             // Delete the existing Webhook.
             guild.retrieveWebhooks().queue(webhooks -> webhooks.stream().filter(webhook -> webhook.getToken() != null).filter(webhook -> webhook.getId().equalsIgnoreCase(webhookEntity.getChannelId()) && webhook.getToken().equalsIgnoreCase(webhookEntity.getToken())).forEach(webhook -> webhook.delete().queue()));
         } else {
             if (channelChangeForm.getType().equalsIgnoreCase("logChannel") && guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
                 // Create new Webhook, If it has been created successfully add it to our Database.
                 Guild finalGuild = guild;
-                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook -> Server.getInstance().getSqlConnector().getSqlWorker().setLogWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook -> SQLSession.getSqlConnector().getSqlWorker().setLogWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
             }
         }
 
         // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
-        model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).toList());
+        model.addAttribute("logs", SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).toList());
         model.addAttribute("channels", guild.getTextChannels());
-        if (Server.getInstance().getSqlConnector().getSqlWorker().isLogSetup(guild.getId())) {
+        if (SQLSession.getSqlConnector().getSqlWorker().isLogSetup(guild.getId())) {
             Guild finalGuild1 = guild;
-            model.addAttribute("logChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getLogWebhook(finalGuild1.getId()).getChannelId())).findFirst().orElse(null));
+            model.addAttribute("logChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(finalGuild1.getId()).getChannelId())).findFirst().orElse(null));
         }
         // Return to the Logging Panel Page.
         return LOGGING_PATH;
@@ -867,13 +880,13 @@ public class FrontendController {
             return ERROR_400_PATH;
 
         // Change the setting Data.
-        Server.getInstance().getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());
+        SQLSession.getSqlConnector().getSqlWorker().setSetting(settingChangeForm.getSetting());
         // Retrieve every Log Option and Channel of the Guild and set them as Attribute.
-        model.addAttribute("logs", Server.getInstance().getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).toList());
+        model.addAttribute("logs", SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guild.getId()).stream().filter(setting -> setting.getName().startsWith("log")).toList());
         model.addAttribute("channels", guild.getTextChannels());
-        if (Server.getInstance().getSqlConnector().getSqlWorker().isLogSetup(guild.getId())) {
+        if (SQLSession.getSqlConnector().getSqlWorker().isLogSetup(guild.getId())) {
             Guild finalGuild = guild;
-            model.addAttribute("logChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(Server.getInstance().getSqlConnector().getSqlWorker().getLogWebhook(finalGuild.getId()).getChannelId())).findFirst().orElse(null));
+            model.addAttribute("logChannel", guild.getTextChannels().stream().filter(x -> x.getId().equalsIgnoreCase(SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(finalGuild.getId()).getChannelId())).findFirst().orElse(null));
         }
         // Return to the Logging Panel Page.
         return LOGGING_PATH;
@@ -916,7 +929,7 @@ public class FrontendController {
 
             model.addAttribute("isLogged", true);
 
-            Recording recording = Server.getInstance().getSqlConnector().getSqlWorker().getEntity(new Recording(), "SELECT * FROM Recording WHERE ID=:id", Map.of("id", recordIdentifier));
+            Recording recording = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Recording(), "SELECT * FROM Recording WHERE ID=:id", Map.of("id", recordIdentifier));
 
             if (recording == null) {
                 model.addAttribute("errorCode", 404);
@@ -946,7 +959,7 @@ public class FrontendController {
                 if (found) {
                     model.addAttribute("guild", BotWorker.getShardManager().getGuildById(recording.getGuildId()));
                     model.addAttribute("recording", Base64.getEncoder().encodeToString(recording.getRecording()));
-                    Server.getInstance().getSqlConnector().getSqlWorker().deleteEntity(recording);
+                    SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
                     return RECORDING_PATH;
                 } else {
                     model.addAttribute("errorCode", 403);

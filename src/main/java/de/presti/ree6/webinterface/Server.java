@@ -1,10 +1,12 @@
 package de.presti.ree6.webinterface;
 
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
+import de.presti.ree6.sql.DatabaseTyp;
+import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
-import de.presti.ree6.webinterface.sql.SQLConnector;
-import de.presti.ree6.webinterface.sql.entities.Recording;
+import de.presti.ree6.sql.SQLConnector;
+import de.presti.ree6.sql.entities.Recording;
 import de.presti.ree6.webinterface.utils.data.Config;
 import de.presti.ree6.webinterface.utils.others.ThreadUtil;
 import org.slf4j.Logger;
@@ -24,9 +26,6 @@ public class Server {
 
     // OAuth Instance.
     OAuth2Client oAuth2Client;
-
-    // SQL-Connector Instance.
-    SQLConnector sqlConnector;
 
     // Config Instance
     Config config;
@@ -85,18 +84,30 @@ public class Server {
         oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfiguration().getLong("discord.client.id")).setClientSecret(config.getConfiguration().getString("discord.client.secret")).build();
 
         // Creating a new SQL-Connector Instance.
-        sqlConnector = new SQLConnector(config.getConfiguration().getString("hikari.sql.user"), config.getConfiguration().getString("hikari.sql.db"),
-                config.getConfiguration().getString("hikari.sql.pw"), config.getConfiguration().getString("hikari.sql.host"), config.getConfiguration().getInt("hikari.sql.port"));
+        DatabaseTyp databaseTyp;
+
+        switch (getInstance().getConfig().getConfiguration().getString("hikari.misc.storage").toLowerCase()) {
+            case "mariadb" -> databaseTyp = DatabaseTyp.MariaDB;
+
+            default -> databaseTyp = DatabaseTyp.SQLite;
+        }
+
+        new SQLSession(getConfig().getConfiguration().getString("hikari.sql.user"),
+                getConfig().getConfiguration().getString("hikari.sql.db"), getConfig().getConfiguration().getString("hikari.sql.pw"),
+                getConfig().getConfiguration().getString("hikari.sql.host"), getConfig().getConfiguration().getInt("hikari.sql.port"),
+                getConfig().getConfiguration().getString("hikari.misc.storageFile"), databaseTyp,
+                getConfig().getConfiguration().getInt("hikari.misc.poolSize"));
+
 
         // Add onShutdown as call methode when Shutdown.
         Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
 
         ThreadUtil.createNewThread(x -> {
-            List<Recording> recordings = sqlConnector.getSqlWorker().getEntityList(new Recording(), "SELECT * FROM Recording", null);
+            List<Recording> recordings = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Recording(), "SELECT * FROM Recording", null);
             if (recordings != null && !recordings.isEmpty()) {
                 for (Recording recording : recordings) {
                     if (recording.getCreation() < System.currentTimeMillis() - Duration.ofDays(1).toMillis()) {
-                        sqlConnector.getSqlWorker().deleteEntity(recording);
+                        SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
                     }
                 }
             }
@@ -111,7 +122,7 @@ public class Server {
         BotWorker.shutdown();
 
         // Shutdown the SQL Connection.
-        getSqlConnector().close();
+        SQLSession.getSqlConnector().close();
     }
 
     /**
@@ -129,12 +140,6 @@ public class Server {
     public OAuth2Client getOAuth2Client() {
         return oAuth2Client;
     }
-
-    /**
-     * Retrieve the Instance of the SQL-Connector.
-     * @return {@link SQLConnector} Instance of the SQL-Connector.
-     */
-    public SQLConnector getSqlConnector() { return sqlConnector; }
 
     /**
      * Retrieve the Instance of the Config.

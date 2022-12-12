@@ -194,11 +194,11 @@
     </section>
     <section class="leaderboard">
         <div class="number-placement">
-            <span th:each="userlevel: ${userLevels}" th:text="'0' + ${userlevel.getRank()}">01</span>
+            <span th:each="userlevel: ${userLevels}" th:text="'0' + ${userlevel.getUserLevel().getRank()}">01</span>
         </div>
         <div class="people-container">
             <!-- INPUT PERCENT PROGRESS AS A STRICT INTEGER BETWEEN 1 - 100 -->
-            <div th:each="userlevel: ${userLevels}" th:data-percent="${userlevel.getProgress()}" class="person-stat">
+            <div th:each="userlevel: ${userLevels}" th:data-percent="${userlevel.getUserLevel().getProgress()}" class="person-stat">
                 <div class="leaderboard-avatar">
                     <img
                             th:src="${userlevel.getUser().getEffectiveAvatarUrl()}"
@@ -210,13 +210,13 @@
                 <div class="leaderboard-stats">
                     <h2 th:inline="text" > [[${userlevel.getUser().getName()}]]<span class="dim-text" th:text="'#' + ${userlevel.getUser().getDiscriminator()}">#0000</span></h2>
                     <span class="sub-stats">
-                Level <strong th:text="${userlevel.getLevel()}">0<!-- INSERT LEVEL HERE--></strong>
+                Level <strong th:text="${userlevel.getUserLevel().getLevel()}">0<!-- INSERT LEVEL HERE--></strong>
               </span>
                     <span class="sub-stats">
-                xp <strong th:text="${userlevel.getExperience()}">0<!-- INSERT XP-AMOUNT HERE--></strong>
+                xp <strong th:text="${userlevel.getUserLevel().getExperience()}">0<!-- INSERT XP-AMOUNT HERE--></strong>
               </span>
                     <div class="progress-bar-wrapper">
-                        <span class="percentage" th:text="${userlevel.getProgress()} + '%'">0%</span>
+                        <span class="percentage" th:text="${userlevel.getUserLevel().getProgress()} + '%'">0%</span>
                         <span class="bar"></span>
                     </div>
                 </div>

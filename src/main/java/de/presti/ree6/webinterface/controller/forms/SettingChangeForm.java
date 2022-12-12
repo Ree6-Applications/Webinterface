@@ -1,6 +1,6 @@
 package de.presti.ree6.webinterface.controller.forms;
 
-import de.presti.ree6.webinterface.sql.entities.Setting;
+import de.presti.ree6.sql.entities.Setting;
 
 /**
  * Class called to give info about the Setting change to the FrontendController.
