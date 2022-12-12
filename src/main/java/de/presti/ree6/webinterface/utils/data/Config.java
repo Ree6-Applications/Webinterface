@@ -35,7 +35,7 @@ public class Config {
                     #                              #
                     ################################
                     """);
-            yamlFile.addDefault("config.version", "2.0.0");
+            yamlFile.addDefault("config.version", "3.0.6");
             yamlFile.addDefault("config.creation", System.currentTimeMillis());
             yamlFile.addDefault("hikari.sql.user", "root");
             yamlFile.addDefault("hikari.sql.db", "root");
@@ -47,6 +47,7 @@ public class Config {
             yamlFile.addDefault("hikari.misc.poolSize", 10);
             yamlFile.addDefault("discord.bot.tokens.release", "ReleaseTokenhere");
             yamlFile.addDefault("discord.bot.tokens.dev", "DevTokenhere");
+            yamlFile.addDefault("discord.bot.tokens.beta", "BetaTokenhere");
             yamlFile.addDefault("discord.client.id", 0);
             yamlFile.addDefault("discord.client.secret", "yourDiscordClientSecrethere");
 

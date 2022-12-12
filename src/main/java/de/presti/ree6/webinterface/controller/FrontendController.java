@@ -20,8 +20,8 @@ import de.presti.ree6.webinterface.sql.entities.stats.GuildCommandStats;
 import de.presti.ree6.webinterface.sql.entities.webhook.Webhook;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
 import de.presti.ree6.webinterface.utils.others.SessionUtil;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -44,7 +44,9 @@ import java.util.Map;
 @Controller
 public class FrontendController {
 
-    // Paths to Thymeleaf Templates.
+    /**
+     * Paths to Thymeleaf Templates.
+     */
     private static final String MAIN_PATH = "main/index", ERROR_400_PATH = "error/400/index", ERROR_403_PATH = "error/403/index", ERROR_404_PATH = "error/404/index", ERROR_500_PATH = "error/500/index", MODERATION_PATH = "panel/moderation/index", SOCIAL_PATH = "panel/social/index", LOGGING_PATH = "panel/logging/index", RECORDING_PATH = "panel/recording/index";
 
     /**

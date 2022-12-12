@@ -80,7 +80,7 @@
 <div class="cursor-modal"></div>
 <header id="float-home">
    <nav class="desktop-nav">
-      <a href="/panel/">Panel</a>
+      <a th:href="@{'/panel'}">Panel</a>
       <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
       <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
       <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}" class="slide-active">Moderation</a>
@@ -93,7 +93,7 @@
    </button>
    <nav class="hamburger-wrapper">
       <div class="hamburger-container">
-         <a href="/panel/"><span>Panel</span></a>
+         <a th:href="@{'/panel'}"><span>Panel</span></a>
          <a th:href="@{'/server?guildId=' + ${guild.getId()}}"><span>Server</span></a>
          <a th:href="@{'/logging?guildId=' + ${guild.getId()}}"><span>Logging</span></a>
          <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}"><span>Moderation</span></a>
@@ -293,7 +293,7 @@
    <div class="footer-nav">
       <div class="nav-list">
          <strong>Navigation</strong>
-         <a href="/panel/">Panel</a>
+         <a th:href="@{'/panel'}">Panel</a>
          <a th:href="@{'/server?guildId=' + ${guild.getId()}}">Server</a>
          <a th:href="@{'/logging?guildId=' + ${guild.getId()}}">Logging</a>
          <a th:href="@{'/moderation?guildId=' + ${guild.getId()}}">Moderation</a>

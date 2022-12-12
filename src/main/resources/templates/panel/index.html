@@ -67,7 +67,7 @@
 <div class="cursor-modal"></div>
 <header id="float-home">
     <nav class="desktop-nav">
-        <a href="/panel/" class="slide-active">Panel</a>
+        <a th:href="@{'/panel'}" class="slide-active">Panel</a>
     </nav>
     <button class="hamburger-button">
         <span class="line-one"></span>
@@ -75,7 +75,7 @@
     </button>
     <nav class="hamburger-wrapper">
         <div class="hamburger-container">
-            <a href="/panel/"><span>Panel</span></a>
+            <a th:href="@{'/panel'}"><span>Panel</span></a>
             <a href="/"><span>Home</span></a>
         </div>
     </nav>
@@ -138,7 +138,7 @@
     <div class="footer-nav">
         <div class="nav-list">
             <strong>Navigation</strong>
-            <a href="/panel/">Panel</a>
+            <a th:href="@{'/panel'}">Panel</a>
             <a href="/">Home</a>
         </div>
         <div class="nav-list">
