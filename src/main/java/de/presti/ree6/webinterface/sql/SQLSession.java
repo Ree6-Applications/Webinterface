@@ -63,6 +63,7 @@ public class SQLSession {
 
             Set<Class<?>> classSet = new Reflections("de.presti.ree6.webinterface.sql.entities").getTypesAnnotatedWith(Table.class);
             classSet.forEach(configuration::addAnnotatedClass);
+            System.out.println(classSet);
 
             ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
 

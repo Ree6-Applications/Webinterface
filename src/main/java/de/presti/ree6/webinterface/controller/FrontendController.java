@@ -11,6 +11,7 @@ import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.webinterface.controller.forms.ChannelChangeForm;
 import de.presti.ree6.webinterface.controller.forms.SettingChangeForm;
+import de.presti.ree6.webinterface.invite.InviteContainer;
 import de.presti.ree6.webinterface.sql.entities.Recording;
 import de.presti.ree6.webinterface.sql.entities.Setting;
 import de.presti.ree6.webinterface.sql.entities.level.ChatUserLevel;
