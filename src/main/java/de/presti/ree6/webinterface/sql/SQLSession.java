@@ -1,14 +1,14 @@
 package de.presti.ree6.webinterface.sql;
 
 import de.presti.ree6.webinterface.Server;
-import de.presti.ree6.webinterface.bot.BotWorker;
-import jakarta.persistence.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.reflections.Reflections;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.util.Properties;
 import java.util.Set;
@@ -61,8 +61,15 @@ public class SQLSession {
 
             configuration.addProperties(properties);
 
-            Set<Class<?>> classSet = new Reflections("de.presti.ree6.webinterface.sql.entities").getTypesAnnotatedWith(Table.class);
+            Set<Class<?>> classSet = new Reflections(
+                    ConfigurationBuilder
+                            .build()
+                            .forPackages("de.presti.ree6.webinterface.sql.entities")
+                            .addClassLoaders(ClasspathHelper.staticClassLoader()))
+                    .getTypesAnnotatedWith(jakarta.persistence.Table.class);
+
             classSet.forEach(configuration::addAnnotatedClass);
+
             System.out.println(classSet);
 
             ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
