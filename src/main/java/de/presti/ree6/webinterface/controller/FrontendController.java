@@ -22,6 +22,7 @@ import de.presti.ree6.webinterface.invite.InviteContainerManager;
 import de.presti.ree6.webinterface.utils.data.UserLevelContainer;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
 import de.presti.ree6.webinterface.utils.others.SessionUtil;
+import io.sentry.Sentry;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import net.dv8tion.jda.api.Permission;
@@ -43,7 +44,7 @@ import java.util.Map;
  * Controller for the Frontend to manage what the user sees.
  */
 @SuppressWarnings("DuplicatedCode")
-@Controller
+@Controller(value = "/")
 public class FrontendController {
 
     /**
@@ -125,11 +126,16 @@ public class FrontendController {
                     if (oAuth2User != null) {
                         Guild guild = BotWorker.getShardManager().getGuildById(805149057004732457L);
                         if (guild != null) {
-                            Server.getInstance().getOAuth2Client().joinGuild(oAuth2User, guild).queue();
+                            try {
+                                Server.getInstance().getOAuth2Client().joinGuild(oAuth2User, guild).queue();
+                            } catch (Exception exception) {
+                                Sentry.captureException(exception);
+                            }
                         }
                     }
                 });
-            } catch (Exception ignore) {
+            } catch (Exception exception) {
+                Sentry.captureException(exception);
             }
 
             return new ModelAndView("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://localhost:8888") + "/panel");
@@ -197,6 +203,7 @@ public class FrontendController {
 
             model.addAttribute("guild", guild);
         } catch (Exception exception) {
+            Sentry.captureException(exception);
             model.addAttribute("title", "Unexpected Error, please Report!");
             model.addAttribute("errorMessage", "We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")");
             return ERROR_500_PATH;
@@ -259,6 +266,7 @@ public class FrontendController {
 
             model.addAttribute("guild", guild);
         } catch (Exception exception) {
+            Sentry.captureException(exception);
             model.addAttribute("errorMessage", "We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")");
             return ERROR_500_PATH;
         }
@@ -341,6 +349,7 @@ public class FrontendController {
 
             model.addAttribute("guild", guild);
         } catch (Exception exception) {
+            Sentry.captureException(exception);
             model.addAttribute("errorMessage", "We received an unexpected error, please report this to the developer! (" + exception.getMessage() + ")");
             return ERROR_500_PATH;
         }

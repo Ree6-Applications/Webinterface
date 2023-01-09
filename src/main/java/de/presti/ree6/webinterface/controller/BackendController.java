@@ -1,5 +1,6 @@
 package de.presti.ree6.webinterface.controller;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -16,10 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Used as an BackendController for API Request for Ree6.
  */
-@RestController
 public class BackendController {
 
+    public Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
     //region API 1.0
+
+    @GetMapping(value = "/api/v1/")
+    public String mainBackend() {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("sucess", false);
+        jsonObject.addProperty("message", "Unknown endpoint!");
+
+        return gson.toJson(jsonObject);
+    }
 
     //region Level API
 
@@ -33,6 +44,8 @@ public class BackendController {
     public String getLeaderboard(@RequestParam(name = "guildId") String guildId, @RequestParam int count) {
         JsonObject jsonObject = new JsonObject();
 
+        jsonObject.addProperty("success", true);
+        jsonObject.addProperty("message", "Successfully fetched the leaderboard!");
         jsonObject.addProperty("count", count);
 
         JsonArray chatLeaderboardArray = new JsonArray();
@@ -96,7 +109,7 @@ public class BackendController {
         jsonObject.add("list.chat", chatLeaderboardArray);
         jsonObject.add("list.voice", voiceLeaderboardArray);
 
-        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
+        return gson.toJson(jsonObject);
     }
 
     /**
@@ -109,6 +122,8 @@ public class BackendController {
     public String getLeaderboard(@RequestParam(name = "guildId") String guildId, @RequestParam String userID) {
         JsonObject jsonObject = new JsonObject();
 
+        jsonObject.addProperty("success", true);
+        jsonObject.addProperty("message", "Successfully fetched the user level!");
         jsonObject.addProperty("userId", userID);
 
         JsonObject voiceJsonObject = new JsonObject();
@@ -144,7 +159,7 @@ public class BackendController {
         jsonObject.add("chat", chatJsonObject);
         jsonObject.add("voice", voiceJsonObject);
 
-        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
+        return gson.toJson(jsonObject);
     }
     //endregion
 
@@ -161,10 +176,12 @@ public class BackendController {
     public String getStatsCommand(@RequestParam String command) {
         JsonObject jsonObject = new JsonObject();
 
+        jsonObject.addProperty("success", true);
+        jsonObject.addProperty("message", "Successfully fetched the global command stats!");
         jsonObject.addProperty("command", command);
         jsonObject.addProperty("usage", SQLSession.getSqlConnector().getSqlWorker().getStatsCommandGlobal(command).getUses());
 
-        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
+        return gson.toJson(jsonObject);
     }
 
     /**
@@ -175,11 +192,13 @@ public class BackendController {
     public String getStatsGlobal() {
         JsonObject jsonObject = new JsonObject();
 
+        jsonObject.addProperty("success", true);
+        jsonObject.addProperty("message", "Successfully fetched the all global command stats!");
         for (CommandStats entry : SQLSession.getSqlConnector().getSqlWorker().getStatsGlobal()) {
             jsonObject.addProperty(entry.getCommand(), entry.getUses());
         }
 
-        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
+        return gson.toJson(jsonObject);
     }
 
     //endregion
@@ -196,10 +215,12 @@ public class BackendController {
     public String getStatsGuildCommand(@RequestParam(name = "guildId") String guildId, @RequestParam String command) {
         JsonObject jsonObject = new JsonObject();
 
+        jsonObject.addProperty("success", true);
+        jsonObject.addProperty("message", "Successfully fetched the command stats!");
         jsonObject.addProperty("command", command);
         jsonObject.addProperty("usage", SQLSession.getSqlConnector().getSqlWorker().getStatsCommand(guildId, command).getUses());
 
-        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
+        return gson.toJson(jsonObject);
     }
 
     /**
@@ -211,11 +232,13 @@ public class BackendController {
     public String getStatsGuildAll(@RequestParam(name = "guildId") String guildId) {
         JsonObject jsonObject = new JsonObject();
 
+        jsonObject.addProperty("success", true);
+        jsonObject.addProperty("message", "Successfully fetched the all command stats!");
         for (GuildCommandStats entry : SQLSession.getSqlConnector().getSqlWorker().getStats(guildId)) {
             jsonObject.addProperty(entry.getCommand(), entry.getUses());
         }
 
-        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonObject);
+        return gson.toJson(jsonObject);
     }
 
     //endregion
