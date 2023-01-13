@@ -1,5 +1,6 @@
 package de.presti.ree6.webinterface.controller;
 
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.jagrosh.jdautilities.oauth2.Scope;
@@ -75,6 +76,15 @@ public class FrontendController {
         }
         return MAIN_PATH;
     }
+
+    //region Twitch
+
+    @GetMapping("/twitch/auth")
+    public ModelAndView startTwitchAuth() {
+        return new ModelAndView("redirect: " + Server.getInstance().getCredentialManager());
+    }
+
+    //endregion
 
     //region Discord.
 
