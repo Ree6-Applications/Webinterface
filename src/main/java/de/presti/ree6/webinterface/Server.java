@@ -5,12 +5,10 @@ import de.presti.ree6.sql.DatabaseTyp;
 import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
-import de.presti.ree6.sql.SQLConnector;
 import de.presti.ree6.sql.entities.Recording;
 import de.presti.ree6.webinterface.utils.data.Config;
 import de.presti.ree6.webinterface.utils.others.ThreadUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -19,19 +17,23 @@ import java.util.List;
 /**
  * The "Main" Class used to store Instance of the needed Classes.
  */
+@Slf4j
 public class Server {
 
-    // Class Instance.
+    /**
+     * Class Instance.
+     */
     private static Server instance;
 
-    // OAuth Instance.
+    /**
+     * OAuth Instance.
+     */
     OAuth2Client oAuth2Client;
 
-    // Config Instance
+    /**
+     * Config Instance
+     */
     Config config;
-
-    // Logger Instance.
-    Logger logger;
 
     /**
      * Call when the Class should be Initialized.
@@ -51,14 +53,14 @@ public class Server {
      */
     public void load(String[] args) {
 
-        // Create the Logger with a LoggerFactory.
-        logger = LoggerFactory.getLogger(Server.class);
-
         // Create Config Instance.
         config = new Config();
 
         // Initialize the Config.
         config.init();
+
+        // Creating OAuth2 Instance.
+        oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfiguration().getLong("discord.client.id")).setClientSecret(config.getConfiguration().getString("discord.client.secret")).build();
 
         // Create a new JDA Session.
         try {
@@ -67,21 +69,18 @@ public class Server {
             if (argList.contains("--dev")) {
                 BotWorker.createBot(BotVersion.DEVELOPMENT_BUILD, "2.1.3");
             } else if (argList.contains("--prod")) {
-                BotWorker.createBot(BotVersion.RELEASE,"2.1.3");
+                BotWorker.createBot(BotVersion.RELEASE, "2.1.3");
             } else if (argList.contains("--beta")) {
-                BotWorker.createBot(BotVersion.BETA_BUILD,"2.1.3");
+                BotWorker.createBot(BotVersion.BETA_BUILD, "2.1.3");
             } else {
-                BotWorker.createBot(BotVersion.RELEASE,"2.1.3");
+                BotWorker.createBot(BotVersion.RELEASE, "2.1.3");
             }
 
-            logger.info("Service (JDA) has been started. Creation was successful.");
+            log.info("Service (JDA) has been started. Creation was successful.");
         } catch (Exception exception) {
             //Inform if not successful.
-            logger.error("Service (JDA) couldn't be started. Creation was unsuccessful.", exception);
+            log.error("Service (JDA) couldn't be started. Creation was unsuccessful.", exception);
         }
-
-        // Creating OAuth2 Instance.
-        oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfiguration().getLong("discord.client.id")).setClientSecret(config.getConfiguration().getString("discord.client.secret")).build();
 
         // Creating a new SQL-Connector Instance.
         DatabaseTyp databaseTyp;
@@ -111,7 +110,7 @@ public class Server {
                     }
                 }
             }
-        }, throwable -> logger.error("Failed running Data clear Thread", throwable), Duration.ofMinutes(30), true, false);
+        }, throwable -> log.error("Failed running Data clear Thread", throwable), Duration.ofMinutes(30), true, false);
     }
 
     /**
@@ -127,6 +126,7 @@ public class Server {
 
     /**
      * Retrieve an Instance of the Server.
+     *
      * @return instance of Server.
      */
     public static Server getInstance() {
@@ -135,6 +135,7 @@ public class Server {
 
     /**
      * Retrieve an Instance of the OAuthClient-
+     *
      * @return {@link OAuth2Client} Instance of OAuthClient.
      */
     public OAuth2Client getOAuth2Client() {
@@ -143,13 +144,10 @@ public class Server {
 
     /**
      * Retrieve the Instance of the Config.
+     *
      * @return {@link Config} Instance of the Config.
      */
-    public Config getConfig() { return config; }
-
-    /**
-     * Retrieve the Instance of the Logger.
-     * @return {@link Logger} Instance of the Logger.
-     */
-    public Logger getLogger() { return logger; }
+    public Config getConfig() {
+        return config;
+    }
 }
