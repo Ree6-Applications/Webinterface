@@ -93,11 +93,11 @@ public class Server {
             if (argList.contains("--dev")) {
                 BotWorker.createBot(BotVersion.DEVELOPMENT_BUILD, "2.1.3");
             } else if (argList.contains("--prod")) {
-                BotWorker.createBot(BotVersion.RELEASE,"2.1.3");
+                BotWorker.createBot(BotVersion.RELEASE, "2.1.3");
             } else if (argList.contains("--beta")) {
-                BotWorker.createBot(BotVersion.BETA_BUILD,"2.1.3");
+                BotWorker.createBot(BotVersion.BETA_BUILD, "2.1.3");
             } else {
-                BotWorker.createBot(BotVersion.RELEASE,"2.1.3");
+                BotWorker.createBot(BotVersion.RELEASE, "2.1.3");
             }
 
             log.info("Service (JDA) has been started. Creation was successful.");
@@ -109,7 +109,7 @@ public class Server {
         // Creating OAuth2 Instance.
         oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfiguration().getLong("discord.client.id")).setClientSecret(config.getConfiguration().getString("discord.client.secret")).build();
 
-        CredentialManager credentialManager = CredentialManagerBuilder.builder()
+        credentialManager = CredentialManagerBuilder.builder()
                 .withStorageBackend(new DatabaseStorageBackend())
                 .build();
 
@@ -170,6 +170,7 @@ public class Server {
 
     /**
      * Retrieve an Instance of the Server.
+     *
      * @return instance of Server.
      */
     public static Server getInstance() {
@@ -178,6 +179,7 @@ public class Server {
 
     /**
      * Retrieve an Instance of the OAuthClient-
+     *
      * @return {@link OAuth2Client} Instance of OAuthClient.
      */
     public OAuth2Client getOAuth2Client() {
@@ -186,7 +188,10 @@ public class Server {
 
     /**
      * Retrieve the Instance of the Config.
+     *
      * @return {@link Config} Instance of the Config.
      */
-    public Config getConfig() { return config; }
+    public Config getConfig() {
+        return config;
+    }
 }
