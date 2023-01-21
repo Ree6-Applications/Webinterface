@@ -1,6 +1,7 @@
 package de.presti.ree6.webinterface.controller;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.auth.domain.TwitchScopes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.jagrosh.jdautilities.oauth2.Scope;
@@ -79,9 +80,76 @@ public class FrontendController {
 
     //region Twitch
 
+    /**
+     * A Get Mapper for generation of a Twitch OAuth2 Credentials
+     *
+     * @param httpServletResponse the HTTP Response.
+     * @param id                  the Identifier.
+     * @return {@link ModelAndView} with the redirect data.
+     */
     @GetMapping("/twitch/auth")
-    public ModelAndView startTwitchAuth() {
-        return new ModelAndView("redirect: " + Server.getInstance().getCredentialManager());
+    public ModelAndView startTwitchAuth(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id) {
+        ModelAndView modelAndView = new ModelAndView();
+
+        // Check and decode the Identifier saved in the Cookies.
+        id = SessionUtil.getIdentifier(id);
+
+        if (SessionUtil.checkIdentifier(id)) {
+            modelAndView.getModelMap().addAttribute("errorMessage", "Insufficient Permissions - Please check if you are logged in!");
+            deleteSessionCookie(httpServletResponse);
+            modelAndView.setViewName(ERROR_403_PATH);
+        } else {
+            modelAndView.setViewName("redirect: " +
+                    Server.getInstance().getTwitchIdentityProvider()
+                            .getAuthenticationUrl(List.of(TwitchScopes.CHAT_CHANNEL_MODERATE, TwitchScopes.CHAT_READ,
+                                            TwitchScopes.HELIX_CHANNEL_SUBSCRIPTIONS_READ, TwitchScopes.HELIX_CHANNEL_HYPE_TRAIN_READ,
+                                            TwitchScopes.HELIX_CHANNEL_REDEMPTIONS_READ),
+                                    RandomUtils.randomString(6)));
+        }
+
+        return modelAndView;
+    }
+
+    /**
+     * The Request Mapper for the Twitch Auth callback.
+     *
+     * @param httpServletResponse the HTTP Response.
+     * @param id                  the Identifier.
+     * @param code                the OAuth2 Code from Twitch.
+     * @param state               the local State of the OAuth2 Credentials.
+     * @return {@link ModelAndView} with the redirect data.
+     */
+    @GetMapping(value = "/twitch/auth/callback")
+    public ModelAndView twitchLogin(HttpServletResponse httpServletResponse, @CookieValue(name = "identifier", defaultValue = "-1") String id, @RequestParam String code, @RequestParam String state) {
+        ModelAndView modelAndView = new ModelAndView();
+
+        // Check and decode the Identifier saved in the Cookies.
+        id = SessionUtil.getIdentifier(id);
+
+        if (SessionUtil.checkIdentifier(id)) {
+            modelAndView.getModelMap().addAttribute("errorMessage", "Insufficient Permissions - Please check if you are logged in!");
+            deleteSessionCookie(httpServletResponse);
+            modelAndView.setViewName(ERROR_403_PATH);
+        } else {
+            OAuth2Credential oAuth2Credential = null;
+
+            try {
+                // Try building the credentials.
+                oAuth2Credential = Server.getInstance().getTwitchIdentityProvider().getCredentialByCode(code);
+            } catch (Exception ignore) {
+            }
+
+            // If the given data was valid and the credentials are build. Redirect to success page.
+            if (oAuth2Credential != null) {
+                Server.getInstance().getCredentialManager().addCredential("twitch", oAuth2Credential);
+                modelAndView.setViewName("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://localhost:8888") + "/twitch/auth/success");
+            } else {
+                modelAndView.getModelMap().addAttribute("errorMessage", "Invalid Credentials - Please check if everything is correct!");
+                modelAndView.setViewName(ERROR_403_PATH);
+            }
+        }
+
+        return modelAndView;
     }
 
     //endregion
