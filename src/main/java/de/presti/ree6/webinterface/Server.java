@@ -86,6 +86,9 @@ public class Server {
         // Initialize the Config.
         config.init();
 
+        // Creating OAuth2 Instance.
+        oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfiguration().getLong("discord.client.id")).setClientSecret(config.getConfiguration().getString("discord.client.secret")).build();
+
         // Create a new JDA Session.
         try {
             List<String> argList = Arrays.stream(args).map(String::toLowerCase).toList();
@@ -105,9 +108,6 @@ public class Server {
             //Inform if not successful.
             log.error("Service (JDA) couldn't be started. Creation was unsuccessful.", exception);
         }
-
-        // Creating OAuth2 Instance.
-        oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfiguration().getLong("discord.client.id")).setClientSecret(config.getConfiguration().getString("discord.client.secret")).build();
 
         credentialManager = CredentialManagerBuilder.builder()
                 .withStorageBackend(new DatabaseStorageBackend())
