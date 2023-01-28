@@ -6,10 +6,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.sql.entities.TwitchIntegration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class DatabaseStorageBackend implements IStorageBackend {
 
@@ -22,7 +19,8 @@ public class DatabaseStorageBackend implements IStorageBackend {
         List<Credential> credentials = new ArrayList<>();
 
         twitchIntegrations.forEach(twitchIntegration -> {
-            credentials.add(new OAuth2Credential("twitch", twitchIntegration.getToken(), twitchIntegration.getRefresh(), twitchIntegration.getChannelId(), twitchIntegration.getName(), twitchIntegration.getExpiresIn(), twitchIntegration.getScopes()));
+            credentials.add(new OAuth2Credential("twitch", twitchIntegration.getToken(),
+                    twitchIntegration.getRefresh(), twitchIntegration.getChannelId(), twitchIntegration.getName(), twitchIntegration.getExpiresIn(), Collections.emptyList()));
         });
 
         return credentials;
@@ -46,7 +44,6 @@ public class DatabaseStorageBackend implements IStorageBackend {
                 twitchIntegration.setRefresh(oAuth2Credential.getRefreshToken());
                 twitchIntegration.setName(oAuth2Credential.getUserName());
                 twitchIntegration.setExpiresIn(oAuth2Credential.getExpiresIn());
-                twitchIntegration.setScopes(oAuth2Credential.getScopes());
                 SQLSession.getSqlConnector().getSqlWorker().updateEntity(twitchIntegration);
             }
         });
@@ -61,8 +58,7 @@ public class DatabaseStorageBackend implements IStorageBackend {
             TwitchIntegration twitchIntegration1 = twitchIntegration.get();
             OAuth2Credential oAuth2Credential
                     = new OAuth2Credential("twitch", twitchIntegration1.getToken(),
-                    twitchIntegration1.getRefresh(), twitchIntegration1.getChannelId(), twitchIntegration1.getName(),
-                    twitchIntegration1.getExpiresIn(),twitchIntegration1.getScopes());
+                    twitchIntegration1.getRefresh(), twitchIntegration1.getChannelId(), twitchIntegration1.getName(), twitchIntegration1.getExpiresIn(), Collections.emptyList());
 
             return Optional.of(oAuth2Credential);
         } else {
