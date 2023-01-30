@@ -29,8 +29,7 @@ public class DatabaseStorageBackend implements IStorageBackend {
     @Override
     public void saveCredentials(List<Credential> list) {
         list.forEach(credential -> {
-            if (credential instanceof OAuth2Credential) {
-                OAuth2Credential oAuth2Credential = (OAuth2Credential) credential;
+            if (credential instanceof OAuth2Credential oAuth2Credential) {
                 TwitchIntegration twitchIntegration =
                         SQLSession.getSqlConnector().getSqlWorker().getEntity(new TwitchIntegration(),
                                 "SELECT * FROM TwitchIntegration WHERE channelId = :userid", Map.of("userid",oAuth2Credential.getUserId()));
