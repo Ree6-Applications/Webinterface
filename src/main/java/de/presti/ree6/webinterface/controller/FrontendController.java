@@ -158,7 +158,7 @@ public class FrontendController {
                 oAuth2Credential1.setDiscordId(oAuth2User.getIdLong());
                 Server.getInstance().getCredentialManager().addCredential("twitch", oAuth2Credential1);
                 Server.getInstance().getCredentialManager().save();
-                modelAndView.setViewName("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/auth/twitch/index");
+                modelAndView.setViewName("auth/twitch/index");
             } else {
                 modelAndView.getModelMap().addAttribute("errorMessage", "Invalid Credentials - Please check if everything is correct!");
                 modelAndView.setViewName(ERROR_403_PATH);
