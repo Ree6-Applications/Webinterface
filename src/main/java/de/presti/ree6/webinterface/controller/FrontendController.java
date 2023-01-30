@@ -22,6 +22,7 @@ import de.presti.ree6.sql.entities.stats.GuildCommandStats;
 import de.presti.ree6.sql.entities.webhook.Webhook;
 import de.presti.ree6.webinterface.invite.InviteContainerManager;
 import de.presti.ree6.webinterface.utils.data.CustomOAuth2Credential;
+import de.presti.ree6.webinterface.utils.data.CustomOAuth2Util;
 import de.presti.ree6.webinterface.utils.data.UserLevelContainer;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
 import de.presti.ree6.webinterface.utils.others.SessionUtil;
@@ -154,7 +155,7 @@ public class FrontendController {
 
             // If the given data was valid and the credentials are build. Redirect to success page.
             if (oAuth2Credential != null && oAuth2User != null) {
-                Server.getInstance().getCredentialManager().addCredential("twitch", new CustomOAuth2Credential(oAuth2User.getIdLong(), oAuth2Credential));
+                Server.getInstance().getCredentialManager().addCredential("twitch", CustomOAuth2Util.convert(oAuth2User.getIdLong(), oAuth2Credential));
                 Server.getInstance().getCredentialManager().save();
                 modelAndView.setViewName("auth/twitch/index");
             } else {
