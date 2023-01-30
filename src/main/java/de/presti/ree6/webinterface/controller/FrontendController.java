@@ -154,9 +154,7 @@ public class FrontendController {
 
             // If the given data was valid and the credentials are build. Redirect to success page.
             if (oAuth2Credential != null && oAuth2User != null) {
-                CustomOAuth2Credential oAuth2Credential1 = new CustomOAuth2Credential(oAuth2Credential);
-                oAuth2Credential1.setDiscordId(oAuth2User.getIdLong());
-                Server.getInstance().getCredentialManager().addCredential("twitch", oAuth2Credential1);
+                Server.getInstance().getCredentialManager().addCredential("twitch", new CustomOAuth2Credential(oAuth2User.getIdLong(), oAuth2Credential));
                 Server.getInstance().getCredentialManager().save();
                 modelAndView.setViewName("auth/twitch/index");
             } else {
