@@ -127,6 +127,34 @@ public class CustomOAuth2Credential extends Credential {
         this.context = context != null ? context : new HashMap<>(0);
     }
 
+    /**
+     * Constructor
+     *
+     * @param identityProvider Identity Provider
+     * @param accessToken      Authentication Token
+     * @param refreshToken     Refresh Token
+     * @param userId           User Id
+     * @param userName         User Name
+     * @param expiresIn        Expires in x seconds
+     * @param scopes           Scopes
+     */
+    public CustomOAuth2Credential(long discordId, String identityProvider, String accessToken, String refreshToken, String userId, String userName, Integer expiresIn, List<String> scopes) {
+        super(identityProvider, userId);
+        this.discordId = discordId;
+        this.accessToken = accessToken.startsWith("oauth:") ? accessToken.replace("oauth:", "") : accessToken;
+        this.refreshToken = refreshToken;
+        this.userName = userName;
+        this.expiresIn = expiresIn;
+        this.scopes = scopes != null ? scopes : new ArrayList<>(0);
+        this.context = new HashMap<>(0);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param discordId        the Discord ID of the Owner.
+     * @param credential the original credential.
+     */
     public CustomOAuth2Credential(long discordId, OAuth2Credential credential) {
         super(credential.getIdentityProvider(), credential.getUserId());
         this.accessToken = credential.getAccessToken();
