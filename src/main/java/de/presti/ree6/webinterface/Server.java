@@ -1,5 +1,11 @@
 package de.presti.ree6.webinterface;
 
+import com.github.philippheuer.credentialmanager.CredentialManager;
+import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
+import com.github.twitch4j.TwitchClient;
+import com.github.twitch4j.TwitchClientBuilder;
+import com.github.twitch4j.auth.TwitchAuth;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
 import de.presti.ree6.sql.DatabaseTyp;
 import de.presti.ree6.sql.SQLSession;
@@ -7,7 +13,10 @@ import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.sql.entities.Recording;
 import de.presti.ree6.webinterface.utils.data.Config;
+import de.presti.ree6.webinterface.utils.data.DatabaseStorageBackend;
 import de.presti.ree6.webinterface.utils.others.ThreadUtil;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -26,12 +35,30 @@ public class Server {
     private static Server instance;
 
     /**
-     * OAuth Instance.
+     * Discord OAuth2 Client instance.
      */
     OAuth2Client oAuth2Client;
 
     /**
-     * Config Instance
+     * Twitch Client instance.
+     */
+    @Getter(AccessLevel.PUBLIC)
+    TwitchClient twitchClient;
+
+    /**
+     * Twitch Credential Manager instance.
+     */
+    @Getter(AccessLevel.PUBLIC)
+    CredentialManager credentialManager;
+
+    /**
+     * Twitch Identity Provider instance.
+     */
+    @Getter(AccessLevel.PUBLIC)
+    TwitchIdentityProvider twitchIdentityProvider;
+
+    /**
+     * Yaml Config Manager instance.
      */
     Config config;
 
@@ -81,6 +108,23 @@ public class Server {
             //Inform if not successful.
             log.error("Service (JDA) couldn't be started. Creation was unsuccessful.", exception);
         }
+
+        credentialManager = CredentialManagerBuilder.builder()
+                .withStorageBackend(new DatabaseStorageBackend())
+                .build();
+
+        TwitchAuth.registerIdentityProvider(credentialManager, getConfig().getConfiguration().getString("twitch.client.id"),
+                getConfig().getConfiguration().getString("twitch.client.secret"),
+                (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://localhost:8888") + "/twitch/auth/callback");
+
+        twitchIdentityProvider = (TwitchIdentityProvider) credentialManager.getIdentityProviderByName("twitch").orElse(null);
+
+        twitchClient = TwitchClientBuilder.builder()
+                .withClientId(getConfig().getConfiguration().getString("twitch.client.id"))
+                .withClientSecret(getConfig().getConfiguration().getString("twitch.client.secret"))
+                .withCredentialManager(credentialManager)
+                .withEnablePubSub(false)
+                .build();
 
         // Creating a new SQL-Connector Instance.
         DatabaseTyp databaseTyp;

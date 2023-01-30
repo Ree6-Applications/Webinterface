@@ -45,6 +45,8 @@ public class Config {
             yamlFile.addDefault("hikari.misc.storage", "sqlite");
             yamlFile.addDefault("hikari.misc.storageFile", "storage/Ree6.db");
             yamlFile.addDefault("hikari.misc.poolSize", 10);
+            yamlFile.addDefault("twitch.client.id", "yourtwitchclientidhere");
+            yamlFile.addDefault("twitch.client.secret", "yourtwitchclientsecrethere");
             yamlFile.addDefault("discord.bot.tokens.release", "ReleaseTokenhere");
             yamlFile.addDefault("discord.bot.tokens.dev", "DevTokenhere");
             yamlFile.addDefault("discord.bot.tokens.beta", "BetaTokenhere");
