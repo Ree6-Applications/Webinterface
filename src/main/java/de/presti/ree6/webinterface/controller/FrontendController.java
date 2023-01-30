@@ -21,6 +21,7 @@ import de.presti.ree6.sql.entities.level.VoiceUserLevel;
 import de.presti.ree6.sql.entities.stats.GuildCommandStats;
 import de.presti.ree6.sql.entities.webhook.Webhook;
 import de.presti.ree6.webinterface.invite.InviteContainerManager;
+import de.presti.ree6.webinterface.utils.data.CustomOAuth2Credential;
 import de.presti.ree6.webinterface.utils.data.UserLevelContainer;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
 import de.presti.ree6.webinterface.utils.others.SessionUtil;
@@ -99,7 +100,7 @@ public class FrontendController {
             deleteSessionCookie(httpServletResponse);
             modelAndView.setViewName(ERROR_403_PATH);
         } else {
-            modelAndView.setViewName("redirect: " +
+            modelAndView.setViewName("redirect:" +
                     Server.getInstance().getTwitchIdentityProvider()
                             .getAuthenticationUrl(List.of(TwitchScopes.CHAT_CHANNEL_MODERATE, TwitchScopes.CHAT_READ,
                                             TwitchScopes.HELIX_CHANNEL_SUBSCRIPTIONS_READ, TwitchScopes.HELIX_CHANNEL_HYPE_TRAIN_READ,
@@ -133,16 +134,31 @@ public class FrontendController {
         } else {
             OAuth2Credential oAuth2Credential = null;
 
+            Session session = null;
+
+            OAuth2User oAuth2User = null;
+
             try {
+                // Try retrieving the Session from the Identifier.
+                session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+
                 // Try building the credentials.
                 oAuth2Credential = Server.getInstance().getTwitchIdentityProvider().getCredentialByCode(code);
+
+                if (session != null) {
+                    // Try retrieving the User from the Session.
+                    oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
+                }
             } catch (Exception ignore) {
             }
 
             // If the given data was valid and the credentials are build. Redirect to success page.
-            if (oAuth2Credential != null) {
-                Server.getInstance().getCredentialManager().addCredential("twitch", oAuth2Credential);
-                modelAndView.setViewName("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://localhost:8888") + "/twitch/auth/success");
+            if (oAuth2Credential != null && oAuth2User != null) {
+                CustomOAuth2Credential oAuth2Credential1 = new CustomOAuth2Credential(oAuth2Credential);
+                oAuth2Credential1.setDiscordId(oAuth2User.getIdLong());
+                Server.getInstance().getCredentialManager().addCredential("twitch", oAuth2Credential1);
+                Server.getInstance().getCredentialManager().save();
+                modelAndView.setViewName("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/twitch/auth/success");
             } else {
                 modelAndView.getModelMap().addAttribute("errorMessage", "Invalid Credentials - Please check if everything is correct!");
                 modelAndView.setViewName(ERROR_403_PATH);
@@ -163,7 +179,7 @@ public class FrontendController {
      */
     @GetMapping("/discord/auth")
     public ModelAndView startDiscordAuth() {
-        return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL((BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://localhost:8888") + "/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
+        return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL((BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
     }
 
     /**
@@ -216,9 +232,9 @@ public class FrontendController {
                 Sentry.captureException(exception);
             }
 
-            return new ModelAndView("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://localhost:8888") + "/panel");
+            return new ModelAndView("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/panel");
         } else {
-            return new ModelAndView("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://localhost:8888") + "/error");
+            return new ModelAndView("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/error");
         }
     }
 

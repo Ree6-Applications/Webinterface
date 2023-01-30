@@ -109,23 +109,6 @@ public class Server {
             log.error("Service (JDA) couldn't be started. Creation was unsuccessful.", exception);
         }
 
-        credentialManager = CredentialManagerBuilder.builder()
-                .withStorageBackend(new DatabaseStorageBackend())
-                .build();
-
-        TwitchAuth.registerIdentityProvider(credentialManager, getConfig().getConfiguration().getString("twitch.client.id"),
-                getConfig().getConfiguration().getString("twitch.client.secret"),
-                (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://localhost:8888") + "/twitch/auth/callback");
-
-        twitchIdentityProvider = (TwitchIdentityProvider) credentialManager.getIdentityProviderByName("twitch").orElse(null);
-
-        twitchClient = TwitchClientBuilder.builder()
-                .withClientId(getConfig().getConfiguration().getString("twitch.client.id"))
-                .withClientSecret(getConfig().getConfiguration().getString("twitch.client.secret"))
-                .withCredentialManager(credentialManager)
-                .withEnablePubSub(false)
-                .build();
-
         // Creating a new SQL-Connector Instance.
         DatabaseTyp databaseTyp;
 
@@ -141,6 +124,21 @@ public class Server {
                 getConfig().getConfiguration().getString("hikari.misc.storageFile"), databaseTyp,
                 getConfig().getConfiguration().getInt("hikari.misc.poolSize"));
 
+        credentialManager = CredentialManagerBuilder.builder()
+                .withStorageBackend(new DatabaseStorageBackend())
+                .build();
+
+        TwitchAuth.registerIdentityProvider(credentialManager, getConfig().getConfiguration().getString("twitch.client.id"),
+                getConfig().getConfiguration().getString("twitch.client.secret"), "https://cp.ree6.de/twitch/auth/callback");
+
+        twitchIdentityProvider = (TwitchIdentityProvider) credentialManager.getIdentityProviderByName("twitch").orElse(null);
+
+        twitchClient = TwitchClientBuilder.builder()
+                .withClientId(getConfig().getConfiguration().getString("twitch.client.id"))
+                .withClientSecret(getConfig().getConfiguration().getString("twitch.client.secret"))
+                .withCredentialManager(credentialManager)
+                .withEnablePubSub(false)
+                .build();
 
         // Add onShutdown as call methode when Shutdown.
         Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
