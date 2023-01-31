@@ -9,6 +9,7 @@ import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2User;
 import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.sql.SQLSession;
+import de.presti.ree6.sql.entities.TwitchIntegration;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
@@ -155,9 +156,15 @@ public class FrontendController {
 
             // If the given data was valid and the credentials are build. Redirect to success page.
             if (oAuth2Credential != null && oAuth2User != null) {
-                Server.getInstance().getCredentialManager().addCredential("twitch", CustomOAuth2Util.convert(oAuth2User.getIdLong(), oAuth2Credential));
-                Server.getInstance().getCredentialManager().save();
-                modelAndView.setViewName("auth/twitch/index");
+                if (SQLSession.getSqlConnector().getSqlWorker()
+                        .getEntity(new TwitchIntegration(), "SELECT * FROM TwitchIntegration WHERE user_id= :id", Map.of("id", oAuth2User.getIdLong())) != null) {
+                    modelAndView.getModelMap().addAttribute("errorMessage", "Already linked - You already linked an Twitch Account to your Discord Account!");
+                    modelAndView.setViewName(ERROR_403_PATH);
+                } else {
+                    Server.getInstance().getCredentialManager().addCredential("twitch", CustomOAuth2Util.convert(oAuth2User.getIdLong(), oAuth2Credential));
+                    Server.getInstance().getCredentialManager().save();
+                    modelAndView.setViewName("auth/twitch/index");
+                }
             } else {
                 modelAndView.getModelMap().addAttribute("errorMessage", "Invalid Credentials - Please check if everything is correct!");
                 modelAndView.setViewName(ERROR_403_PATH);
