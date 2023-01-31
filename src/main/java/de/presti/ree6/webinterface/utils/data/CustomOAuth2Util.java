@@ -2,6 +2,7 @@ package de.presti.ree6.webinterface.utils.data;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
+import de.presti.ree6.sql.entities.TwitchIntegration;
 import de.presti.ree6.webinterface.Server;
 
 import java.util.Optional;
@@ -10,6 +11,17 @@ import java.util.Optional;
  * Class used to convert a OAuth2Credential to a CustomOAuth2Credential.
  */
 public class CustomOAuth2Util {
+
+    /**
+     * A bridge method to convert a CustomOAuth2Credential to an enriched CustomOAuth2Credential.
+     * @param customOAuth2Credential The CustomOAuth2Credential to convert.
+     * @return The converted CustomOAuth2Credential.
+     */
+    public static CustomOAuth2Credential convert(CustomOAuth2Credential customOAuth2Credential) {
+        return convert(customOAuth2Credential.getDiscordId(), new OAuth2Credential(customOAuth2Credential.getIdentityProvider(),
+                customOAuth2Credential.getAccessToken(), customOAuth2Credential.getRefreshToken(), customOAuth2Credential.getUserId(),
+                customOAuth2Credential.getUserName(), customOAuth2Credential.getExpiresIn(), customOAuth2Credential.getScopes()));
+    }
 
     /**
      * Converts a OAuth2Credential to a CustomOAuth2Credential.
@@ -30,5 +42,16 @@ public class CustomOAuth2Util {
         }
 
         return new CustomOAuth2Credential(discordId, oAuth2Credential);
+    }
+
+    /**
+     * Converts a TwitchIntegration to a CustomOAuth2Credential.
+     * @param twitchIntegration The TwitchIntegration to convert.
+     * @return The converted CustomOAuth2Credential.
+     */
+    public static CustomOAuth2Credential convert(TwitchIntegration twitchIntegration) {
+        return new CustomOAuth2Credential(twitchIntegration.getUserId(), "twitch",twitchIntegration.getToken(),
+                twitchIntegration.getRefresh(), twitchIntegration.getChannelId(), twitchIntegration.getName(),
+                twitchIntegration.getExpiresIn(), null);
     }
 }

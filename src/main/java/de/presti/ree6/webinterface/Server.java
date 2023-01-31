@@ -9,10 +9,13 @@ import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
 import de.presti.ree6.sql.DatabaseTyp;
 import de.presti.ree6.sql.SQLSession;
+import de.presti.ree6.sql.entities.TwitchIntegration;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.sql.entities.Recording;
 import de.presti.ree6.webinterface.utils.data.Config;
+import de.presti.ree6.webinterface.utils.data.CustomOAuth2Credential;
+import de.presti.ree6.webinterface.utils.data.CustomOAuth2Util;
 import de.presti.ree6.webinterface.utils.data.DatabaseStorageBackend;
 import de.presti.ree6.webinterface.utils.others.ThreadUtil;
 import lombok.AccessLevel;
@@ -145,6 +148,7 @@ public class Server {
 
         ThreadUtil.createNewThread(x -> {
             List<Recording> recordings = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Recording(), "SELECT * FROM Recording", null);
+
             if (recordings != null && !recordings.isEmpty()) {
                 for (Recording recording : recordings) {
                     if (recording.getCreation() < System.currentTimeMillis() - Duration.ofDays(1).toMillis()) {
@@ -152,7 +156,22 @@ public class Server {
                     }
                 }
             }
-        }, throwable -> log.error("Failed running Data clear Thread", throwable), Duration.ofMinutes(30), true, false);
+
+            List<TwitchIntegration> twitchIntegrations = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new TwitchIntegration(), "SELECT * FROM TwitchIntegration", null);
+            twitchIntegrations.forEach(twitchIntegration -> {
+                if (twitchIntegration.getExpiresIn() * 1000L < System.currentTimeMillis()) {
+                    CustomOAuth2Credential customOAuth2Credential = CustomOAuth2Util.convert(twitchIntegration);
+                    credentialManager.getCredentials().removeIf(credential -> {
+                        if (credential instanceof CustomOAuth2Credential customOAuth2CredentialLocal) {
+                            return customOAuth2CredentialLocal.getDiscordId() == customOAuth2Credential.getDiscordId();
+                        }
+                        return false;
+                    });
+
+                    credentialManager.addCredential("twitch", customOAuth2Credential);
+                }
+            });
+        }, throwable -> log.error("Failed running Data clear Thread", throwable), Duration.ofMinutes(5), true, false);
     }
 
     /**
