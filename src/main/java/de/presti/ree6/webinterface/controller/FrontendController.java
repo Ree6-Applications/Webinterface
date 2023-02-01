@@ -45,6 +45,8 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+// TODO:: add a notification if Ree6 doesn't have the required permissions.
+
 /**
  * Controller for the Frontend to manage what the user sees.
  */
@@ -800,7 +802,8 @@ public class FrontendController {
                 if (channelChangeForm.getType().equalsIgnoreCase("welcomeChannel")) {
                     // Create new Webhook, If it has been created successfully add it to our Database.
                     Guild finalGuild = guild;
-                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook -> SQLSession.getSqlConnector().getSqlWorker().setWelcomeWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+                    if (guild.getSelfMember().hasPermission(Permission.MANAGE_WEBHOOKS))
+                        guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Welcome").queue(webhook -> SQLSession.getSqlConnector().getSqlWorker().setWelcomeWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
                 }
             }
         }
@@ -947,7 +950,8 @@ public class FrontendController {
             if (channelChangeForm.getType().equalsIgnoreCase("logChannel") && guild.getTextChannelById(channelChangeForm.getChannel()) != null) {
                 // Create new Webhook, If it has been created successfully add it to our Database.
                 Guild finalGuild = guild;
-                guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook -> SQLSession.getSqlConnector().getSqlWorker().setLogWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
+                if (guild.getSelfMember().hasPermission(Permission.MANAGE_WEBHOOKS))
+                    guild.getTextChannelById(channelChangeForm.getChannel()).createWebhook("Ree6-Logs").queue(webhook -> SQLSession.getSqlConnector().getSqlWorker().setLogWebhook(finalGuild.getId(), webhook.getId(), webhook.getToken()));
             }
         }
 
