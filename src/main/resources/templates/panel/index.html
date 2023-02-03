@@ -61,6 +61,9 @@
     </style>
 </head>
 <body>
+<script th:if="${firstTime}">
+    window.open("https://support.ree6.de", "_blank");
+</script>
 <div class="transition-fade"></div>
 <div class="cursor"></div>
 <div class="inner-cursor"></div>

@@ -10,6 +10,7 @@ import com.jagrosh.jdautilities.oauth2.entities.OAuth2User;
 import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.sql.entities.TwitchIntegration;
+import de.presti.ree6.sql.entities.WebinterfaceUser;
 import de.presti.ree6.webinterface.Server;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
@@ -22,7 +23,6 @@ import de.presti.ree6.sql.entities.level.VoiceUserLevel;
 import de.presti.ree6.sql.entities.stats.GuildCommandStats;
 import de.presti.ree6.sql.entities.webhook.Webhook;
 import de.presti.ree6.webinterface.invite.InviteContainerManager;
-import de.presti.ree6.webinterface.utils.data.CustomOAuth2Credential;
 import de.presti.ree6.webinterface.utils.data.CustomOAuth2Util;
 import de.presti.ree6.webinterface.utils.data.UserLevelContainer;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
@@ -200,6 +200,8 @@ public class FrontendController {
      */
     @GetMapping(value = "/discord/auth/callback")
     public ModelAndView discordLogin(HttpServletResponse httpServletResponse, @RequestParam String code, @RequestParam String state) {
+        ModelAndView modelAndView = new ModelAndView();
+
         Session session = null;
 
         // Generate a secure Base64 String for the Identifier.
@@ -226,24 +228,26 @@ public class FrontendController {
             try {
                 Server.getInstance().getOAuth2Client().getUser(session).queue(oAuth2User -> {
                     if (oAuth2User != null) {
-                        Guild guild = BotWorker.getShardManager().getGuildById(805149057004732457L);
-                        if (guild != null) {
-                            try {
-                                Server.getInstance().getOAuth2Client().joinGuild(oAuth2User, guild).queue();
-                            } catch (Exception exception) {
-                                Sentry.captureException(exception);
-                            }
-                        }
+                        /* Guild guild = BotWorker.getShardManager().getGuildById(805149057004732457L);
+                            if (guild != null) {
+                                try {
+                                    Server.getInstance().getOAuth2Client().joinGuild(oAuth2User, guild).queue();
+                                } catch (Exception exception) {
+                                    Sentry.captureException(exception);
+                                }
+                            }*/
                     }
                 });
             } catch (Exception exception) {
                 Sentry.captureException(exception);
             }
 
-            return new ModelAndView("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/panel");
+            modelAndView.setViewName("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/panel");
         } else {
-            return new ModelAndView("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/error");
+            modelAndView.setViewName("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/error");
         }
+
+        return modelAndView;
     }
 
     //endregion
@@ -505,11 +509,20 @@ public class FrontendController {
         }
 
         Session session = null;
+        OAuth2User user;
         List<OAuth2Guild> guilds;
 
         try {
             // Try retrieving the Session from the Identifier.
             session = Server.getInstance().getOAuth2Client().getSessionController().getSession(id);
+
+            user = Server.getInstance().getOAuth2Client().getUser(session).complete();
+
+            boolean firstTime = SQLSession.getSqlConnector().getSqlWorker().getEntity(new WebinterfaceUser(), "SELECT * FROM WebinterfaceUser WHERE userId=:id", Map.of("id", user.getIdLong())) == null;
+            model.addAttribute("firstTime", firstTime);
+
+            if (firstTime)
+                SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebinterfaceUser(user.getIdLong()));
 
             // Try retrieving the Guilds of the OAuth2 User.
             guilds = Server.getInstance().getOAuth2Client().getGuilds(session).complete();

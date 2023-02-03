@@ -38,6 +38,8 @@
       }
    </style>
    <title>REE6 | Discord Bot</title>
+   <script>
+   </script>
 </head>
 <body>
 <div class="transition-fade"></div>
@@ -50,7 +52,8 @@
       <a href="/#features" aria-disabled="true">Features</a>
       <a href="/#team" aria-disabled="true">Team</a>
       <a href="https://ree6.de/#invite" aria-disabled="true">Invite</a>
-      <a th:text="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth">Login</a>
+      <a th:if="${isLogged}" href="https://cp.ree6.de/panel">Dashboard</a>
+      <a th:unless="${isLogged}" href="https://cp.ree6.de/discord/auth">Login</a>
    </nav>
    <button class="hamburger-button">
       <span class="line-one"></span>
@@ -62,7 +65,8 @@
          <a href="https://ree6.de/#features" aria-disabled="true"><span>Features</span></a>
          <a href="https://ree6.de/#team" aria-disabled="true"><span>Team</span></a>
          <a href="https://ree6.de/#invite" aria-disabled="true"><span>Invite</span></a>
-         <a th:text="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth"><span>Login</span></a>
+         <a th:if="${isLogged}" href="https://cp.ree6.de/panel"><span>Dashboard</span></a>
+         <a th:unless="${isLogged}" href="https://cp.ree6.de/discord/auth"><span>Login</span></a>
       </div>
    </nav>
 </header>
