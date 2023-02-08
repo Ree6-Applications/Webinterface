@@ -2,6 +2,7 @@ package de.presti.ree6.webinterface;
 
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.auth.TwitchAuth;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The "Main" Class used to store Instance of the needed Classes.
@@ -159,16 +161,17 @@ public class Server {
 
             List<TwitchIntegration> twitchIntegrations = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new TwitchIntegration(), "SELECT * FROM TwitchIntegration", null);
             twitchIntegrations.forEach(twitchIntegration -> {
-                if (twitchIntegration.getExpiresIn() * 1000L < System.currentTimeMillis()) {
-                    CustomOAuth2Credential customOAuth2Credential = CustomOAuth2Util.convert(twitchIntegration);
+                if (twitchIntegration.getExpiresIn() - Duration.ofMinutes(10).toMillis() <= System.currentTimeMillis()) {
+                    Optional<OAuth2Credential> cred = twitchIdentityProvider.refreshCredential(CustomOAuth2Util.convertToOriginal(twitchIntegration));
+
                     credentialManager.getCredentials().removeIf(credential -> {
                         if (credential instanceof CustomOAuth2Credential customOAuth2CredentialLocal) {
-                            return customOAuth2CredentialLocal.getDiscordId() == customOAuth2Credential.getDiscordId();
+                            return customOAuth2CredentialLocal.getDiscordId() == twitchIntegration.getUserId();
                         }
                         return false;
                     });
 
-                    credentialManager.addCredential("twitch", customOAuth2Credential);
+                    cred.ifPresent(oAuth2Credential -> credentialManager.addCredential("twitch", CustomOAuth2Util.convert(twitchIntegration.getUserId(), oAuth2Credential)));
                 }
             });
         }, throwable -> log.error("Failed running Data clear Thread", throwable), Duration.ofMinutes(5), true, false);

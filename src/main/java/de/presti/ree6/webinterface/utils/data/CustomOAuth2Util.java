@@ -54,4 +54,10 @@ public class CustomOAuth2Util {
                 twitchIntegration.getRefresh(), twitchIntegration.getChannelId(), twitchIntegration.getName(),
                 twitchIntegration.getExpiresIn(), null);
     }
+
+    public static OAuth2Credential convertToOriginal(TwitchIntegration twitchIntegration) {
+        return new OAuth2Credential("twitch",twitchIntegration.getToken(),
+                twitchIntegration.getRefresh(), twitchIntegration.getChannelId(), twitchIntegration.getName(),
+                twitchIntegration.getExpiresIn(), null);
+    }
 }
