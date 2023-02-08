@@ -62,7 +62,9 @@
 </head>
 <body>
 <script th:if="${firstTime}">
-    window.open("https://support.ree6.de", "_blank");
+    function openInvite(){
+        window.open("https://support.ree6.de", "_blank");
+    }
 </script>
 <div class="transition-fade"></div>
 <div class="cursor"></div>
@@ -126,7 +128,9 @@
                 <img th:src="${guild.getIconUrl()}" src="https://ree6.de/serverlogo/base.svg" alt="Base Server Logo" />
             </div>
             <h3 th:text="${guild.getName()}">SERVER</h3>
-            <a th:text="${guild.botJoined()} ? 'Manage' : 'Setup'" th:href="${!guild.botJoined()} ?
+            <a th:if="${firstTime}" th:text="${guild.botJoined()} ? 'Manage' : 'Setup'" onclick="openInvite()" th:href="${!guild.botJoined()} ?
+            'https://discord.com/oauth2/authorize?client_id=723655291681505380&scope=applications.commands%20bot&permissions=8&redirect_uri=https%3A%2F%2Fcp.ree6.de%2Fserver%2F&guild_id=' + ${guild.getIdLong()} : '/server?guildId=' + ${guild.getIdLong()}" href="/server/">Manage</a>
+            <a th:unless="${firstTime}" th:text="${guild.botJoined()} ? 'Manage' : 'Setup'" onclick="openInvite()" th:href="${!guild.botJoined()} ?
             'https://discord.com/oauth2/authorize?client_id=723655291681505380&scope=applications.commands%20bot&permissions=8&redirect_uri=https%3A%2F%2Fcp.ree6.de%2Fserver%2F&guild_id=' + ${guild.getIdLong()} : '/server?guildId=' + ${guild.getIdLong()}" href="/server/">Manage</a>
         </div>
     </section>
