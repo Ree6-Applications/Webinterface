@@ -161,7 +161,7 @@ public class Server {
 
             List<TwitchIntegration> twitchIntegrations = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new TwitchIntegration(), "SELECT * FROM TwitchIntegration", null);
             twitchIntegrations.forEach(twitchIntegration -> {
-                if (twitchIntegration.getExpiresIn() - Duration.ofMinutes(10).toMillis() <= System.currentTimeMillis()) {
+                if (twitchIntegration.getLastUpdated().getTime() + (twitchIntegration.getExpiresIn() * 1000L) - Duration.ofMinutes(10).toMillis() <= System.currentTimeMillis()) {
                     Optional<OAuth2Credential> cred = twitchIdentityProvider.refreshCredential(CustomOAuth2Util.convertToOriginal(twitchIntegration));
 
                     credentialManager.getCredentials().removeIf(credential -> {
