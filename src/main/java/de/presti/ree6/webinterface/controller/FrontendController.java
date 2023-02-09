@@ -107,6 +107,7 @@ public class FrontendController {
             modelAndView.setViewName("redirect:" +
                     Server.getInstance().getTwitchIdentityProvider()
                             .getAuthenticationUrl(List.of(TwitchScopes.CHAT_CHANNEL_MODERATE, TwitchScopes.CHAT_READ,
+                                            TwitchScopes.HELIX_BITS_READ,
                                             TwitchScopes.HELIX_CHANNEL_SUBSCRIPTIONS_READ, TwitchScopes.HELIX_CHANNEL_HYPE_TRAIN_READ,
                                             TwitchScopes.HELIX_CHANNEL_REDEMPTIONS_READ),
                                     RandomUtils.randomString(6)));
