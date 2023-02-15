@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.simpleyaml.configuration.file.YamlFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -21,6 +24,15 @@ public class Config {
      * Initialize the Configuration.
      */
     public void init() {
+
+        Path storage = Path.of("storage/");
+        if (Files.notExists(storage)) {
+            try {
+                Files.createDirectory(storage);
+            } catch (IOException e) {
+                log.error("Could not create storage", e);
+            }
+        }
 
         yamlFile = createConfiguration();
 
