@@ -24,6 +24,7 @@ import de.presti.ree6.sql.entities.stats.GuildCommandStats;
 import de.presti.ree6.sql.entities.webhook.Webhook;
 import de.presti.ree6.webinterface.invite.InviteContainerManager;
 import de.presti.ree6.webinterface.utils.data.CustomOAuth2Util;
+import de.presti.ree6.webinterface.utils.data.Data;
 import de.presti.ree6.webinterface.utils.data.UserLevelContainer;
 import de.presti.ree6.webinterface.utils.others.RandomUtils;
 import de.presti.ree6.webinterface.utils.others.SessionUtil;
@@ -188,7 +189,7 @@ public class FrontendController {
      */
     @GetMapping("/discord/auth")
     public ModelAndView startDiscordAuth() {
-        return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL((BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
+        return new ModelAndView("redirect:" + Server.getInstance().getOAuth2Client().generateAuthorizationURL(Data.getHostUrl() + "/discord/auth/callback", Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN));
     }
 
     /**
@@ -243,9 +244,9 @@ public class FrontendController {
                 Sentry.captureException(exception);
             }
 
-            modelAndView.setViewName("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/panel");
+            modelAndView.setViewName("redirect:" + Data.getHostUrl() + "/panel");
         } else {
-            modelAndView.setViewName("redirect:" + (BotWorker.getVersion() != BotVersion.DEVELOPMENT_BUILD ? "https://cp.ree6.de" : "http://10.8.0.1:8887") + "/error");
+            modelAndView.setViewName("redirect:" + Data.getHostUrl() + "/error");
         }
 
         return modelAndView;

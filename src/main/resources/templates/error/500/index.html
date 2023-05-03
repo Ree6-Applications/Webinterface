@@ -56,7 +56,8 @@
         <a href="https://ree6.de/#features">Features</a>
         <a href="https://ree6.de/#team">Team</a>
         <a href="https://ree6.de/#invite">Invite</a>
-        <a th:text="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth">Login</a>
+        <a th:if="${isLogged}" th:ref="@{'/panel'}" href="https://cp.ree6.de/panel">Dashboard</a>
+        <a th:unless="${isLogged}" th:ref="@{'/discord/auth'}" href="https://cp.ree6.de/discord/auth">Login</a>
     </nav>
     <button class="hamburger-button">
         <span class="line-one"></span>
@@ -68,7 +69,8 @@
             <a href="https://ree6.de/#features"><span>Features</span></a>
             <a href="https://ree6.de/#team"><span>Team</span></a>
             <a href="https://ree6.de/#invite"><span>Invite</span></a>
-            <a th:text="${isLogged} ? 'Dashboard' : 'Login'" th:href="${isLogged} ? 'https://cp.ree6.de/panel' : 'https://cp.ree6.de/discord/auth'" href="https://cp.ree6.de/discord/auth"><span>Login</span></a>
+            <a th:if="${isLogged}" th:ref="@{'/panel'}" href="https://cp.ree6.de/panel"><span>Dashboard</span></a>
+            <a th:unless="${isLogged}" th:ref="@{'/discord/auth'}" href="https://cp.ree6.de/discord/auth"><span>Login</span></a>
         </div>
     </nav>
 </header>
@@ -95,7 +97,7 @@
                 </strong>
                 <p th:if="${errorMessage != null}" th:text="${errorMessage}">Message</p>
             </div>
-            <a href="https://cp.ree6.de" data-highlight="" class="hero-cta"
+            <a th:href="@{'/'}" href="https://cp.ree6.de" data-highlight="" class="hero-cta"
             >Ree6 Respawn</a
             >
         </div>

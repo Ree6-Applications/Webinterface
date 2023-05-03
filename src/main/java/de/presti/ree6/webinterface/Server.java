@@ -14,10 +14,7 @@ import de.presti.ree6.sql.entities.TwitchIntegration;
 import de.presti.ree6.webinterface.bot.BotWorker;
 import de.presti.ree6.webinterface.bot.version.BotVersion;
 import de.presti.ree6.sql.entities.Recording;
-import de.presti.ree6.webinterface.utils.data.Config;
-import de.presti.ree6.webinterface.utils.data.CustomOAuth2Credential;
-import de.presti.ree6.webinterface.utils.data.CustomOAuth2Util;
-import de.presti.ree6.webinterface.utils.data.DatabaseStorageBackend;
+import de.presti.ree6.webinterface.utils.data.*;
 import de.presti.ree6.webinterface.utils.others.ThreadUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -134,7 +131,7 @@ public class Server {
                 .build();
 
         TwitchAuth.registerIdentityProvider(credentialManager, getConfig().getConfiguration().getString("twitch.client.id"),
-                getConfig().getConfiguration().getString("twitch.client.secret"), "https://cp.ree6.de/twitch/auth/callback");
+                getConfig().getConfiguration().getString("twitch.client.secret"), Data.getHostUrl() + "/twitch/auth/callback");
 
         twitchIdentityProvider = (TwitchIdentityProvider) credentialManager.getIdentityProviderByName("twitch").orElse(null);
 
