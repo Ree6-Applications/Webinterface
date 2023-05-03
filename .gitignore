@@ -38,3 +38,5 @@ build/
 
 ### Config file ###
 config.yml
+config-old.yml
+*.db
