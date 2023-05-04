@@ -20,9 +20,17 @@ public class Data {
         return Server.getInstance().getConfig().getConfiguration().getString("webinterface.hostname", "cp.ree6.de");
     }
 
-    public static  String getHostUrl() {
+    public static String getHostUrl() {
         boolean useSSL = Server.getInstance().getConfig().getConfiguration().getBoolean("webinterface.usingSSL", true);
         return (useSSL ? "https://" : "http://") + getHostname();
+    }
+
+    public static String getDiscordRedirectUrl() {
+        return Server.getInstance().getConfig().getConfiguration().getString("webinterface.discordRedirectUrl", "https://cp.ree6.de/auth/discord/callback");
+    }
+
+    public static String getTwitchRedirectUrl() {
+        return Server.getInstance().getConfig().getConfiguration().getString("webinterface.twitchRedirect", "https://cp.ree6.de/auth/twitch/callback");
     }
 
     // Current Domain of the Website.

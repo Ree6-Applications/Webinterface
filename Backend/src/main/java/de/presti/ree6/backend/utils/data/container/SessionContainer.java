@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.utils.data.container;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2User;
 import com.jagrosh.jdautilities.oauth2.session.Session;
 import lombok.AllArgsConstructor;
@@ -13,9 +14,16 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SessionContainer {
 
+    public SessionContainer(String identifier, Session session, OAuth2User user) {
+        this(identifier, session, new UserContainer(user), user);
+    }
+
     String identifier;
 
     Session session;
 
-    OAuth2User user;
+    UserContainer user;
+
+    @JsonIgnore
+    OAuth2User oAuthUser;
 }

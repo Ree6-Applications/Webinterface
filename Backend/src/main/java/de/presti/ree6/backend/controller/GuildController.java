@@ -1,10 +1,8 @@
 package de.presti.ree6.backend.controller;
 
 
-import de.presti.ree6.backend.repository.SettingRepository;
 import de.presti.ree6.backend.service.SessionService;
 import de.presti.ree6.backend.utils.data.container.GuildContainer;
-import de.presti.ree6.sql.entities.Setting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
