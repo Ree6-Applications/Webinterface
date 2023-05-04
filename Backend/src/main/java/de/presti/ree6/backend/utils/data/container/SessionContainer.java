@@ -7,19 +7,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class SessionContainer {
 
-    @Getter
-    @Setter
     String identifier;
 
-    @Getter
-    @Setter
     Session session;
 
-    @Getter
-    @Setter
     OAuth2User user;
 }

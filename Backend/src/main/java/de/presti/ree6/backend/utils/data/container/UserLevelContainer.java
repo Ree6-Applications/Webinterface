@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.entities.User;
 /**
  * Container class to store a UserLevel and the User.
  */
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserLevelContainer {
@@ -17,14 +19,10 @@ public class UserLevelContainer {
     /**
      * The UserLevel.
      */
-    @Getter
-    @Setter
     public UserLevel userLevel;
 
     /**
      * The User.
      */
-    @Getter
-    @Setter
     public User user;
 }

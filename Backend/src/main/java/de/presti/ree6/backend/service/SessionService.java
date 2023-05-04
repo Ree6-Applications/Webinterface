@@ -1,17 +1,22 @@
 package de.presti.ree6.backend.service;
 
 import com.jagrosh.jdautilities.oauth2.Scope;
+import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2User;
 import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.backend.Server;
+import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.utils.RandomUtils;
+import de.presti.ree6.backend.utils.data.container.GuildContainer;
 import de.presti.ree6.backend.utils.data.container.SessionContainer;
-import io.sentry.Sentry;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class SessionService {
@@ -67,4 +72,39 @@ public class SessionService {
         }
     }
 
+    public Mono<GuildContainer> retrieveGuild(String identifier, String guildId) {
+        return retrieveGuild(identifier, guildId, false);
+    }
+
+    public Mono<GuildContainer> retrieveGuild(String identifier, String guildId, boolean retrieveChannels) {
+        return retrieveSession(identifier).flatMap(sessionContainer -> {
+
+            // Retrieve the Guild by its giving ID.
+            Guild guild = BotWorker.getShardManager().getGuildById(guildId);
+
+            // If the Guild couldn't be loaded redirect to Error page.
+            if (guild == null) return Mono.error(new Exception("Guild not found!"));
+
+            Member member = guild.retrieveMemberById(sessionContainer.getUser().getId()).complete();
+
+            if (member != null && member.hasPermission(Permission.ADMINISTRATOR)) {
+                return Mono.just(new GuildContainer(guild, retrieveChannels));
+            }
+
+            return Mono.error(new Exception("Not enough permissions!"));
+        });
+    }
+
+    public Mono<List<GuildContainer>> retrieveGuilds(String identifier) {
+        return retrieveSession(identifier).flatMap(sessionContainer -> {
+            List<OAuth2Guild> guilds = Collections.emptyList();
+            try {
+                guilds = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete();
+                guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
+            } catch (Exception ignore) {
+            }
+
+            return Mono.just(guilds.stream().map(GuildContainer::new).toList());
+        });
+    }
 }

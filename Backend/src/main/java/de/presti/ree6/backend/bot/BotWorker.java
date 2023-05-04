@@ -4,7 +4,6 @@ import de.presti.ree6.backend.Server;
 import de.presti.ree6.backend.bot.version.BotState;
 import de.presti.ree6.backend.bot.version.BotVersion;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
