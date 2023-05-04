@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface VoiceLevelRepository extends CrudRepository<VoiceUserLevel, Integer> {
 
-    List<VoiceUserLevel> getChatUserLevelsByGuildId(@Param("gid") String guildId);
+    List<VoiceUserLevel> getFirst5VoiceLevelsByGuildIdOrderByExperienceDesc(@Param("gid") String guildId);
 
 }

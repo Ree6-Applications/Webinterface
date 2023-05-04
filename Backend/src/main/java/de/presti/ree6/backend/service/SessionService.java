@@ -95,6 +95,21 @@ public class SessionService {
         });
     }
 
+    public Mono<GuildContainer> retrieveGuild(String guildId) {
+        return retrieveGuild(guildId, false);
+    }
+
+    public Mono<GuildContainer> retrieveGuild(String guildId, boolean retrieveChannels) {
+
+        // Retrieve the Guild by its giving ID.
+        Guild guild = BotWorker.getShardManager().getGuildById(guildId);
+
+        // If the Guild couldn't be loaded redirect to Error page.
+        if (guild == null) return Mono.error(new Exception("Guild not found!"));
+
+        return Mono.just(new GuildContainer(guild, retrieveChannels));
+    }
+
     public Mono<List<GuildContainer>> retrieveGuilds(String identifier) {
         return retrieveSession(identifier).flatMap(sessionContainer -> {
             List<OAuth2Guild> guilds = Collections.emptyList();

@@ -24,5 +24,5 @@ public class UserLevelContainer {
     /**
      * The User.
      */
-    public User user;
+    public UserContainer user;
 }
