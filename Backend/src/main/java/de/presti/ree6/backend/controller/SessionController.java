@@ -25,7 +25,7 @@ public class SessionController {
 
     @CrossOrigin
     @GetMapping(value = "/check", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<AuthResponse> checkSession(@RequestHeader(name = "X-Authentication") String sessionIdentifier) {
+    public Mono<AuthResponse> checkSession(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
         return sessionService.retrieveSession(sessionIdentifier).map(sessionContainer ->
                         new AuthResponse(true, sessionContainer, "Session valid!"))
                 .onErrorResume(e -> Mono.just(new AuthResponse(false, null, e.getMessage())))
@@ -54,7 +54,7 @@ public class SessionController {
 
     @CrossOrigin
     @GetMapping(value = "/twitch", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<TwitchAuthResponse> authenticateTwitch(@RequestHeader(name = "X-Authentication") String sessionIdentifier, @RequestParam(name = "code") String code) {
+    public Mono<TwitchAuthResponse> authenticateTwitch(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "code") String code) {
         return sessionService.retrieveSession(sessionIdentifier).flatMap(sessionContainer -> {
                     OAuth2Credential oAuth2Credential;
                     try {
