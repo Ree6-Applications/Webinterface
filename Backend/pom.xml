@@ -99,7 +99,7 @@
         <dependency>
             <groupId>com.github.DxsSucuk.JDA-Utilities</groupId>
             <artifactId>jda-utilities-oauth2</artifactId>
-            <version>883d842a5f</version>
+            <version>fdbc298475</version>
         </dependency>
     </dependencies>
 
