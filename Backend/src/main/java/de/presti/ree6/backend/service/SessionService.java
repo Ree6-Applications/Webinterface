@@ -77,6 +77,10 @@ public class SessionService {
     }
 
     public Mono<GuildContainer> retrieveGuild(String identifier, String guildId, boolean retrieveChannels) {
+        return retrieveGuild(identifier, guildId, retrieveChannels, false);
+    }
+
+    public Mono<GuildContainer> retrieveGuild(String identifier, String guildId, boolean retrieveChannels, boolean retrieveRoles) {
         return retrieveSession(identifier).flatMap(sessionContainer -> {
 
             // Retrieve the Guild by its giving ID.
@@ -88,7 +92,7 @@ public class SessionService {
             Member member = guild.retrieveMemberById(sessionContainer.getUser().getId()).complete();
 
             if (member != null && member.hasPermission(Permission.ADMINISTRATOR)) {
-                return Mono.just(new GuildContainer(guild, retrieveChannels));
+                return Mono.just(new GuildContainer(guild, retrieveChannels, retrieveRoles));
             }
 
             return Mono.error(new Exception("Not enough permissions!"));
