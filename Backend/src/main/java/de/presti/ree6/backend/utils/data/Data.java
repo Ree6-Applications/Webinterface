@@ -38,5 +38,7 @@ public class Data {
 
     // Advertisement, because of Sponsors.
     public static final String ADVERTISEMENT = "powered by Tube-Hosting";
+
+    public static final String defaultIconUrl = "https://i0.wp.com/www.alphr.com/wp-content/uploads/2019/02/Discord-Spoiler-Tag-Featured.jpg?resize=1200%2C1080&ssl=1";
 }
 

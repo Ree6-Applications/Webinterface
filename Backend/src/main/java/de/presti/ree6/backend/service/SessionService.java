@@ -83,11 +83,24 @@ public class SessionService {
     public Mono<GuildContainer> retrieveGuild(String identifier, String guildId, boolean retrieveChannels, boolean retrieveRoles) {
         return retrieveSession(identifier).flatMap(sessionContainer -> {
 
+            OAuth2Guild oAuth2Guild = null;
+            try {
+                oAuth2Guild = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete()
+                        .stream().filter(c -> c.getId().equals(guildId) && c.hasPermission(Permission.ADMINISTRATOR)).findFirst().orElse(null);
+            } catch (Exception ignore) {
+            }
+
             // Retrieve the Guild by its giving ID.
             Guild guild = BotWorker.getShardManager().getGuildById(guildId);
 
             // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) return Mono.error(new Exception("Guild not found!"));
+            if (guild == null) {
+                if (oAuth2Guild != null) {
+                    return Mono.just(new GuildContainer(oAuth2Guild));
+                } else {
+                    return Mono.error(new Exception("Guild not found!"));
+                }
+            }
 
             Member member = guild.retrieveMemberById(sessionContainer.getUser().getId()).complete();
 

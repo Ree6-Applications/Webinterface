@@ -54,7 +54,7 @@ public class GuildController {
     @GetMapping(value = "/{guildId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<GuildResponse> retrieveGuild(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                              @PathVariable(name = "guildId") String guildId) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, true).flatMap(guild -> Mono.just(new GuildResponse(true, guild, "Guilds retrieved!")))
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, true, true).flatMap(guild -> Mono.just(new GuildResponse(true, guild, "Guilds retrieved!")))
                 .onErrorResume(e -> Mono.just(new GuildResponse(false, null, e.getMessage())))
                 .onErrorReturn(new GuildResponse(false, null, "Server error!"));
     }
@@ -67,7 +67,7 @@ public class GuildController {
     @GetMapping(value = "/{guildId}/channels", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<GuildChannelResponse> retrieveGuildChannels(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                             @PathVariable(name = "guildId") String guildId) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, true).flatMap(guild -> Mono.just(new GuildChannelResponse(true, guild.getChannels(), "Roles retrieved!")))
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, true).flatMap(guild -> Mono.just(new GuildChannelResponse(true, guild.getChannels(), "Channels retrieved!")))
                 .onErrorResume(e -> Mono.just(new GuildChannelResponse(false, null, e.getMessage())))
                 .onErrorReturn(new GuildChannelResponse(false, null, "Server error!"));
     }
@@ -139,7 +139,7 @@ public class GuildController {
     public Mono<GuildRoleResponse> retrieveGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                                @PathVariable(name = "guildId") String guildId) {
         return sessionService.retrieveGuild(sessionIdentifier, guildId, false, true).publishOn(Schedulers.boundedElastic()).flatMap(guild -> {
-                    List<Role> autoRoles = autoRoleRepository.getAutoRoleByGuildId(guildId).stream().map(c -> guild.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList();
+                    List<RoleContainer> autoRoles = autoRoleRepository.getAutoRoleByGuildId(guildId).stream().map(c -> guild.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList();
                     return Mono.just(new GuildRoleResponse(true, autoRoles, "AutoRole retrieved!"));
                 })
                 .onErrorResume(e -> Mono.just(new GuildRoleResponse(false, null, e.getMessage())))
@@ -215,10 +215,10 @@ public class GuildController {
     public record LeaderboardResponse(boolean success, LeaderboardContainer leaderboard, String message) {
     }
 
-    public record GuildChannelResponse(boolean success, List<GuildChannel> channels, String message) {
+    public record GuildChannelResponse(boolean success, List<ChannelContainer> channels, String message) {
     }
 
-    public record GuildRoleResponse(boolean success, List<Role> roles, String message) {
+    public record GuildRoleResponse(boolean success, List<RoleContainer> roles, String message) {
     }
 
     public record GuildBlacklistResponse(boolean success, List<String> blacklist, String message) {
