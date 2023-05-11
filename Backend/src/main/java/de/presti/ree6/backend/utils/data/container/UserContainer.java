@@ -22,7 +22,6 @@ public class UserContainer {
 
     String avatarUrl;
 
-
     public UserContainer(OAuth2User oAuth2User) {
         this(oAuth2User.getIdLong(), oAuth2User.getName(), oAuth2User.getDiscriminator(), oAuth2User.getEffectiveAvatarUrl());
     }
