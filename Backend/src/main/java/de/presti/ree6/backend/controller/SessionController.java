@@ -12,6 +12,7 @@ import de.presti.ree6.backend.utils.data.container.SessionContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -56,8 +57,13 @@ public class SessionController {
 
     @CrossOrigin
     @GetMapping(value = "/discord/request")
-    public Mono<ErrorControllerImpl.GenericResponse> createSession() {
-        return Mono.just(new ErrorControllerImpl.GenericResponse(true, Server.getInstance().getOAuth2Client().generateAuthorizationURL(Data.getDiscordRedirectUrl(), Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN)));
+    public RedirectView createSession() {
+        return new RedirectView(Server.getInstance().getOAuth2Client().generateAuthorizationURL(
+                Data.getDiscordRedirectUrl(),
+                Scope.GUILDS,
+                Scope.IDENTIFY,
+                Scope.GUILDS_JOIN
+        ));
     }
 
     //endregion

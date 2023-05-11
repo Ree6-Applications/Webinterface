@@ -14,13 +14,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SessionContainer {
 
-    public SessionContainer(String identifier, Session session, OAuth2User user) {
-        this(identifier, session, new UserContainer(user), user);
+    public SessionContainer(String identifier, OAuth2User user) {
+        this(identifier, new UserContainer(user), user);
     }
 
     String identifier;
-
-    Session session;
 
     UserContainer user;
 
