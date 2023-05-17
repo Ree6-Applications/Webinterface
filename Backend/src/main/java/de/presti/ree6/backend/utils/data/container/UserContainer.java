@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.entities.User;
 @AllArgsConstructor
 public class UserContainer {
 
-    long id;
+    String id;
 
     String name;
 
@@ -23,11 +23,11 @@ public class UserContainer {
     String avatarUrl;
 
     public UserContainer(OAuth2User oAuth2User) {
-        this(oAuth2User.getIdLong(), oAuth2User.getName(), oAuth2User.getDiscriminator(), oAuth2User.getEffectiveAvatarUrl());
+        this(oAuth2User.getId(), oAuth2User.getName(), oAuth2User.getDiscriminator(), oAuth2User.getEffectiveAvatarUrl());
     }
 
     public UserContainer(User user) {
-        this(user.getIdLong(), user.getName(), user.getDiscriminator(), user.getEffectiveAvatarUrl());
+        this(user.getId(), user.getName(), user.getDiscriminator(), user.getEffectiveAvatarUrl());
     }
 
 }

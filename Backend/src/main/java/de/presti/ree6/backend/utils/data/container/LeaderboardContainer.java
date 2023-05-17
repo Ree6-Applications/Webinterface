@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class LeaderboardContainer {
 
-    long guildId;
+    String guildId;
 
     List<UserLevelContainer> chatLeaderboard;
 

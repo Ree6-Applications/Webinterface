@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GuildContainer {
 
-    long id;
+    String id;
 
     String name;
 
@@ -39,17 +39,17 @@ public class GuildContainer {
     @JsonIgnore
     List<GuildChannel> guildChannels;
 
-    public GuildContainer(long id, String name, String iconUrl, boolean hasBot) {
+    public GuildContainer(String id, String name, String iconUrl, boolean hasBot) {
         this(id, name, iconUrl, hasBot, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
     }
 
     public GuildContainer(OAuth2Guild oAuth2Guild) {
-        this(oAuth2Guild.getIdLong(), oAuth2Guild.getName(), oAuth2Guild.getIconUrl() != null ? oAuth2Guild.getIconUrl() : Data.defaultIconUrl,
+        this(oAuth2Guild.getId(), oAuth2Guild.getName(), oAuth2Guild.getIconUrl() != null ? oAuth2Guild.getIconUrl() : Data.defaultIconUrl,
                 oAuth2Guild.botJoined(BotWorker.getShardManager()));
     }
 
     public GuildContainer(Guild guild) {
-        this(guild.getIdLong(), guild.getName(), guild.getIconUrl() != null ? guild.getIconUrl() : Data.defaultIconUrl,
+        this(guild.getId(), guild.getName(), guild.getIconUrl() != null ? guild.getIconUrl() : Data.defaultIconUrl,
                 BotWorker.getShardManager().getGuildById(guild.getId()) != null);
     }
 
@@ -58,7 +58,7 @@ public class GuildContainer {
     }
 
     public GuildContainer(Guild guild, boolean retrieveChannels, boolean retrieveRoles) {
-        setId(guild.getIdLong());
+        setId(guild.getId());
         setName(guild.getName());
         setIconUrl(guild.getIconUrl() != null ? guild.getIconUrl() : Data.defaultIconUrl);
         setHasBot(BotWorker.getShardManager().getGuildById(guild.getId()) != null);
