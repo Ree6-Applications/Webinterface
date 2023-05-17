@@ -26,11 +26,19 @@ public class Data {
     }
 
     public static String getDiscordRedirectUrl() {
-        return Server.getInstance().getConfig().getConfiguration().getString("webinterface.discordRedirectUrl", "https://cp.ree6.de/auth/discord/callback");
+        return Server.getInstance().getConfig().getConfiguration().getString("webinterface.discordRedirect", "https://cp.ree6.de/auth/discord/callback");
     }
 
     public static String getTwitchRedirectUrl() {
         return Server.getInstance().getConfig().getConfiguration().getString("webinterface.twitchRedirect", "https://cp.ree6.de/auth/twitch/callback");
+    }
+
+    public static String getErrorRedirectUrl() {
+        return Server.getInstance().getConfig().getConfiguration().getString("webinterface.errorRedirect", "https://cp.ree6.de/error");
+    }
+
+    public static String getLoginRedirectUrl() {
+        return Server.getInstance().getConfig().getConfiguration().getString("webinterface.loginRedirect", "https://cp.ree6.de/login");
     }
 
     // Current Domain of the Website.

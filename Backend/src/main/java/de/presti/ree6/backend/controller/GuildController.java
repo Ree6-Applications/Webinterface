@@ -10,13 +10,9 @@ import de.presti.ree6.backend.service.SessionService;
 import de.presti.ree6.backend.utils.data.container.*;
 import de.presti.ree6.sql.entities.Blacklist;
 import de.presti.ree6.sql.entities.roles.AutoRole;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,19 +40,23 @@ public class GuildController {
 
     @CrossOrigin
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GuildListResponse> retrieveGuilds(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
-        return sessionService.retrieveGuilds(sessionIdentifier).flatMap(guilds -> Mono.just(new GuildListResponse(true, guilds, "Guilds retrieved!")))
-                .onErrorResume(e -> Mono.just(new GuildListResponse(false, null, e.getMessage())))
-                .onErrorReturn(new GuildListResponse(false, null, "Server error!"));
+    public GuildListResponse retrieveGuilds(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
+        try {
+            return new GuildListResponse(true, sessionService.retrieveGuilds(sessionIdentifier), "Guilds retrieved!");
+        } catch (Exception e) {
+            return new GuildListResponse(false, null, e.getMessage());
+        }
     }
 
     @CrossOrigin
     @GetMapping(value = "/{guildId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GuildResponse> retrieveGuild(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                             @PathVariable(name = "guildId") String guildId) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, true, true).flatMap(guild -> Mono.just(new GuildResponse(true, guild, "Guilds retrieved!")))
-                .onErrorResume(e -> Mono.just(new GuildResponse(false, null, e.getMessage())))
-                .onErrorReturn(new GuildResponse(false, null, "Server error!"));
+    public GuildResponse retrieveGuild(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                       @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GuildResponse(true, sessionService.retrieveGuild(sessionIdentifier, guildId, true, true), "Guild retrieved!");
+        } catch (Exception e) {
+            return new GuildResponse(false, null, e.getMessage());
+        }
     }
 
     //endregion
@@ -65,20 +65,24 @@ public class GuildController {
 
     @CrossOrigin
     @GetMapping(value = "/{guildId}/channels", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GuildChannelResponse> retrieveGuildChannels(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                            @PathVariable(name = "guildId") String guildId) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, true).flatMap(guild -> Mono.just(new GuildChannelResponse(true, guild.getChannels(), "Channels retrieved!")))
-                .onErrorResume(e -> Mono.just(new GuildChannelResponse(false, null, e.getMessage())))
-                .onErrorReturn(new GuildChannelResponse(false, null, "Server error!"));
+    public GuildChannelResponse retrieveGuildChannels(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                      @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GuildChannelResponse(true, sessionService.retrieveGuild(sessionIdentifier, guildId, true).getChannels(), "Channels retrieved!");
+        } catch (Exception e) {
+            return new GuildChannelResponse(false, null, e.getMessage());
+        }
     }
 
     @CrossOrigin
     @GetMapping(value = "/{guildId}/roles", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GuildRoleResponse> retrieveGuildRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                      @PathVariable(name = "guildId") String guildId) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, true).flatMap(guild -> Mono.just(new GuildRoleResponse(true, guild.getRoles(), "Roles retrieved!")))
-                .onErrorResume(e -> Mono.just(new GuildRoleResponse(false, null, e.getMessage())))
-                .onErrorReturn(new GuildRoleResponse(false, null, "Server error!"));
+    public GuildRoleResponse retrieveGuildRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GuildRoleResponse(true, sessionService.retrieveGuild(sessionIdentifier, guildId, false, true).getRoles(), "Roles retrieved!");
+        } catch (Exception e) {
+            return new GuildRoleResponse(false, null, e.getMessage());
+        }
     }
 
     //endregion
@@ -87,47 +91,53 @@ public class GuildController {
 
     @CrossOrigin
     @GetMapping(value = "/{guildId}/blacklist", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GuildBlacklistResponse> retrieveGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                               @PathVariable(name = "guildId") String guildId) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, false).publishOn(Schedulers.boundedElastic()).flatMap(guild -> {
-                    List<String> blacklist = blacklistRepository.getBlacklistByGuildId(guildId).stream().map(Blacklist::getWord).toList();
-                    return Mono.just(new GuildBlacklistResponse(true, blacklist, "Blacklist retrieved!"));
-                })
-                .onErrorResume(e -> Mono.just(new GuildBlacklistResponse(false, null, e.getMessage())))
-                .onErrorReturn(new GuildBlacklistResponse(false, null, "Server error!"));
+    public GuildBlacklistResponse retrieveGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                  @PathVariable(name = "guildId") String guildId) {
+        try {
+            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+            List<String> blacklist = blacklistRepository.getBlacklistByGuildId(guildId).stream().map(Blacklist::getWord).toList();
+            return new GuildBlacklistResponse(true, blacklist, "Blacklist retrieved!");
+        } catch (Exception e) {
+            return new GuildBlacklistResponse(false, Collections.emptyList(), e.getMessage());
+        }
     }
 
     @CrossOrigin
     @GetMapping(value = "/{guildId}/blacklist/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GuildBlacklistResponse> removeGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                             @PathVariable(name = "guildId") String guildId,
-                                                             @RequestBody String word) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, false).publishOn(Schedulers.boundedElastic()).flatMap(guild -> {
-                    Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, word);
-                    blacklistRepository.delete(blacklist);
-                    return Mono.just(new GuildBlacklistResponse(true, Collections.emptyList(), "Blacklist removed!"));
-                })
-                .onErrorResume(e -> Mono.just(new GuildBlacklistResponse(false, null, e.getMessage())))
-                .onErrorReturn(new GuildBlacklistResponse(false, null, "Server error!"));
+    public GuildBlacklistResponse removeGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                @PathVariable(name = "guildId") String guildId,
+                                                @RequestBody String word) {
+        try {
+            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+
+            Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, word);
+            blacklistRepository.delete(blacklist);
+
+            return new GuildBlacklistResponse(true, Collections.emptyList(), "Blacklist removed!");
+        } catch (Exception e) {
+            return new GuildBlacklistResponse(false, Collections.emptyList(), e.getMessage());
+        }
     }
 
     @CrossOrigin
     @GetMapping(value = "/{guildId}/blacklist/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GuildBlacklistResponse> addGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                          @PathVariable(name = "guildId") String guildId,
-                                                          @RequestBody String word) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, false).publishOn(Schedulers.boundedElastic()).flatMap(guild -> {
-                    Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, word);
-                    if (blacklist == null) {
-                        blacklist = new Blacklist(guildId, word);
-                        blacklistRepository.save(blacklist);
-                        return Mono.just(new GuildBlacklistResponse(true, null, "Blacklist added!"));
-                    } else {
-                        return Mono.just(new GuildBlacklistResponse(false, null, "Word already blacklisted!"));
-                    }
-                })
-                .onErrorResume(e -> Mono.just(new GuildBlacklistResponse(false, null, e.getMessage())))
-                .onErrorReturn(new GuildBlacklistResponse(false, null, "Server error!"));
+    public GuildBlacklistResponse addGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                             @PathVariable(name = "guildId") String guildId,
+                                             @RequestBody String word) {
+        try {
+            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+
+            Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, word);
+            if (blacklist == null) {
+                blacklist = new Blacklist(guildId, word);
+                blacklistRepository.save(blacklist);
+                return new GuildBlacklistResponse(true, Collections.emptyList(), "Blacklist added!");
+            } else {
+                return new GuildBlacklistResponse(false, Collections.emptyList(), "Word already blacklisted!");
+            }
+        } catch (Exception e) {
+            return new GuildBlacklistResponse(false, Collections.emptyList(), e.getMessage());
+        }
     }
 
     //endregion
@@ -136,47 +146,50 @@ public class GuildController {
 
     @CrossOrigin
     @GetMapping(value = "/{guildId}/autorole", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GuildRoleResponse> retrieveGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                               @PathVariable(name = "guildId") String guildId) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, true).publishOn(Schedulers.boundedElastic()).flatMap(guild -> {
-                    List<RoleContainer> autoRoles = autoRoleRepository.getAutoRoleByGuildId(guildId).stream().map(c -> guild.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList();
-                    return Mono.just(new GuildRoleResponse(true, autoRoles, "AutoRole retrieved!"));
-                })
-                .onErrorResume(e -> Mono.just(new GuildRoleResponse(false, null, e.getMessage())))
-                .onErrorReturn(new GuildRoleResponse(false, null, "Server error!"));
+    public GuildRoleResponse retrieveGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                   @PathVariable(name = "guildId") String guildId) {
+        try {
+            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+            List<RoleContainer> autoRoles = autoRoleRepository.getAutoRoleByGuildId(guildId).stream().map(c -> guildContainer.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList();
+            return new GuildRoleResponse(true, autoRoles, "AutoRole retrieved!");
+        } catch (Exception e) {
+            return new GuildRoleResponse(false, Collections.emptyList(), e.getMessage());
+        }
     }
 
     @CrossOrigin
     @GetMapping(value = "/{guildId}/autorole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GuildRoleResponse> removeGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                             @PathVariable(name = "guildId") String guildId,
-                                                             @RequestBody String roleId) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, false).publishOn(Schedulers.boundedElastic()).flatMap(guild -> {
-                    AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, roleId);
-                    autoRoleRepository.delete(autoRole);
-                    return Mono.just(new GuildRoleResponse(true, Collections.emptyList(), "AutoRole removed!"));
-                })
-                .onErrorResume(e -> Mono.just(new GuildRoleResponse(false, null, e.getMessage())))
-                .onErrorReturn(new GuildRoleResponse(false, null, "Server error!"));
+    public GuildRoleResponse removeGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                 @PathVariable(name = "guildId") String guildId,
+                                                 @RequestBody String roleId) {
+        try {
+            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+            AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, roleId);
+            autoRoleRepository.delete(autoRole);
+            return new GuildRoleResponse(true, Collections.emptyList(), "AutoRole removed!");
+        } catch (Exception e) {
+            return new GuildRoleResponse(false, Collections.emptyList(), e.getMessage());
+        }
     }
 
     @CrossOrigin
     @GetMapping(value = "/{guildId}/autorole/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GuildRoleResponse> addGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                          @PathVariable(name = "guildId") String guildId,
-                                                          @RequestBody String roleId) {
-        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, false).publishOn(Schedulers.boundedElastic()).flatMap(guild -> {
-                    AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, roleId);
-                    if (autoRole == null) {
-                        autoRole = new AutoRole(guildId, roleId);
-                        autoRoleRepository.save(autoRole);
-                        return Mono.just(new GuildRoleResponse(true, null, "AutoRole added!"));
-                    } else {
-                        return Mono.just(new GuildRoleResponse(false, null, "Role is already in AutoRole!"));
-                    }
-                })
-                .onErrorResume(e -> Mono.just(new GuildRoleResponse(false, null, e.getMessage())))
-                .onErrorReturn(new GuildRoleResponse(false, null, "Server error!"));
+    public GuildRoleResponse addGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                              @PathVariable(name = "guildId") String guildId,
+                                              @RequestBody String roleId) {
+        try {
+            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+            AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, roleId);
+            if (autoRole == null) {
+                autoRole = new AutoRole(guildId, roleId);
+                autoRoleRepository.save(autoRole);
+                return new GuildRoleResponse(true, Collections.emptyList(), "AutoRole added!");
+            } else {
+                return new GuildRoleResponse(false, Collections.emptyList(), "Role is already in AutoRole!");
+            }
+        } catch (Exception e) {
+            return new GuildRoleResponse(false, Collections.emptyList(), e.getMessage());
+        }
     }
 
     //endregion
@@ -185,22 +198,25 @@ public class GuildController {
 
     @CrossOrigin
     @GetMapping(value = "/{guildId}/leaderboard", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<LeaderboardResponse> retrieveSetting(@PathVariable(name = "guildId") String guildId) {
-        return sessionService.retrieveGuild(guildId).publishOn(Schedulers.boundedElastic()).flatMap(guild -> {
-                    LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
+    public LeaderboardResponse retrieveSetting(@PathVariable(name = "guildId") String guildId) {
+        try {
+            // Call this to check if guild exists. If not exception is thrown.
+            GuildContainer guildContainer = sessionService.retrieveGuild(guildId);
 
-                    leaderboardContainer.setChatLeaderboard(chatLevelRepository.getFirst5getChatUserLevelsByGuildIdOrderByExperienceDesc(guildId).stream()
-                            .map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
+            LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
 
-                    leaderboardContainer.setVoiceLeaderboard(voiceLevelRepository.getFirst5VoiceLevelsByGuildIdOrderByExperienceDesc(guildId).stream()
-                            .map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
+            leaderboardContainer.setChatLeaderboard(chatLevelRepository.getFirst5getChatUserLevelsByGuildIdOrderByExperienceDesc(guildId).stream()
+                    .map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
 
-                    leaderboardContainer.setGuildId(Long.parseLong(guildId));
+            leaderboardContainer.setVoiceLeaderboard(voiceLevelRepository.getFirst5VoiceLevelsByGuildIdOrderByExperienceDesc(guildId).stream()
+                    .map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
 
-                    return Mono.just(new LeaderboardResponse(true, leaderboardContainer, "Leaderboard retrieved!"));
-                })
-                .onErrorResume(e -> Mono.just(new LeaderboardResponse(false, null, e.getMessage())))
-                .onErrorReturn(new LeaderboardResponse(false, null, "Server error!"));
+            leaderboardContainer.setGuildId(guildContainer.getId());
+
+            return new LeaderboardResponse(true, leaderboardContainer, "Leaderboard retrieved!");
+        } catch (Exception e) {
+            return new LeaderboardResponse(false, null, e.getMessage());
+        }
     }
 
     //endregion

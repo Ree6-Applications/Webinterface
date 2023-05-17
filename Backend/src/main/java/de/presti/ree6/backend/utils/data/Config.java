@@ -85,7 +85,9 @@ public class Config {
                     .path("hostname").addDefault("cp.ree6.de").commentSide("Hostname of the Webinterface.")
                     .parent().path("usingSSL").addDefault(true).commentSide("Whether you are using SSL or not.")
                     .parent().path("discordRedirect").addDefault("https://cp.ree6.de/auth/discord/callback").commentSide("Redirect URL for Discord OAuth.")
-                    .parent().path("twitchRedirect").addDefault("https://cp.ree6.de/auth/twitch/callback").commentSide("Redirect URL for Twitch OAuth.");
+                    .parent().path("twitchRedirect").addDefault("https://cp.ree6.de/auth/twitch/callback").commentSide("Redirect URL for Twitch OAuth.")
+                    .parent().path("errorRedirect").addDefault("https://cp.ree6.de/error").commentSide("Redirect URL for errors.")
+                    .parent().path("loginRedirect").addDefault("https://cp.ree6.de/login").commentSide("Redirect URL if the user is not logged-in.");
 
             try {
                 yamlFile.save(getFile());

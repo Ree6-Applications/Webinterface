@@ -21,30 +21,29 @@ import java.util.List;
 @Service
 public class SessionService {
 
-    public Mono<SessionContainer> retrieveSession(String identifier) {
+    public SessionContainer retrieveSession(String identifier) throws IllegalAccessException {
         try {
             // Try retrieving the Session from the Identifier.
             Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(identifier);
 
             if (session == null) {
-                return Mono.error(new IllegalAccessException("Session not found!"));
+                throw new IllegalAccessException("Session not found!");
             }
 
             // Try retrieving the User from the Session.
             OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
 
             if (oAuth2User == null) {
-                return Mono.error(new IllegalAccessException("User not found!"));
+                throw new IllegalAccessException("User not found!");
             }
 
-            return Mono.just(new SessionContainer("", session, oAuth2User));
+            return new SessionContainer("", session, oAuth2User);
         } catch (Exception ignore) {
+            throw new IllegalAccessException("Session not found!");
         }
-
-        return Mono.error(new IllegalAccessException("Session not found!"));
     }
 
-    public Mono<SessionContainer> createSession(String code, String state) {
+    public SessionContainer createSession(String code, String state) throws IllegalAccessException {
         // Generate a secure Base64 String for the Identifier.
         String identifier = RandomUtils.getRandomBase64String(128);
 
@@ -59,84 +58,83 @@ public class SessionService {
                 OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
 
                 if (oAuth2User == null) {
-                    return Mono.error(new IllegalAccessException("User not found!"));
+                    throw new IllegalAccessException("User not found!");
                 }
 
-                return Mono.just(new SessionContainer(identifier, session, Server.getInstance().getOAuth2Client().getUser(session).complete()));
+                return new SessionContainer(identifier, session, Server.getInstance().getOAuth2Client().getUser(session).complete());
             } else {
-                return Mono.error(new IllegalStateException("Session creation failed!"));
+                throw new IllegalStateException("Session creation failed!");
             }
 
         } catch (Exception ignore) {
-            return Mono.error(new IllegalStateException("Session creation failed!"));
+            throw new IllegalStateException("Session creation failed!");
         }
     }
 
-    public Mono<GuildContainer> retrieveGuild(String identifier, String guildId) {
+    public GuildContainer retrieveGuild(String identifier, String guildId) throws IllegalAccessException {
         return retrieveGuild(identifier, guildId, false);
     }
 
-    public Mono<GuildContainer> retrieveGuild(String identifier, String guildId, boolean retrieveChannels) {
+    public GuildContainer retrieveGuild(String identifier, String guildId, boolean retrieveChannels) throws IllegalAccessException {
         return retrieveGuild(identifier, guildId, retrieveChannels, false);
     }
 
-    public Mono<GuildContainer> retrieveGuild(String identifier, String guildId, boolean retrieveChannels, boolean retrieveRoles) {
-        return retrieveSession(identifier).flatMap(sessionContainer -> {
+    public GuildContainer retrieveGuild(String identifier, String guildId, boolean retrieveChannels, boolean retrieveRoles) throws IllegalAccessException {
+        SessionContainer sessionContainer = retrieveSession(identifier);
 
-            OAuth2Guild oAuth2Guild = null;
-            try {
-                oAuth2Guild = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete()
-                        .stream().filter(c -> c.getId().equals(guildId) && c.hasPermission(Permission.ADMINISTRATOR)).findFirst().orElse(null);
-            } catch (Exception ignore) {
-            }
-
-            // Retrieve the Guild by its giving ID.
-            Guild guild = BotWorker.getShardManager().getGuildById(guildId);
-
-            // If the Guild couldn't be loaded redirect to Error page.
-            if (guild == null) {
-                if (oAuth2Guild != null) {
-                    return Mono.just(new GuildContainer(oAuth2Guild));
-                } else {
-                    return Mono.error(new Exception("Guild not found!"));
-                }
-            }
-
-            Member member = guild.retrieveMemberById(sessionContainer.getUser().getId()).complete();
-
-            if (member != null && member.hasPermission(Permission.ADMINISTRATOR)) {
-                return Mono.just(new GuildContainer(guild, retrieveChannels, retrieveRoles));
-            }
-
-            return Mono.error(new Exception("Not enough permissions!"));
-        });
-    }
-
-    public Mono<GuildContainer> retrieveGuild(String guildId) {
-        return retrieveGuild(guildId, false);
-    }
-
-    public Mono<GuildContainer> retrieveGuild(String guildId, boolean retrieveChannels) {
+        OAuth2Guild oAuth2Guild = null;
+        try {
+            oAuth2Guild = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete()
+                    .stream().filter(c -> c.getId().equals(guildId) && c.hasPermission(Permission.ADMINISTRATOR)).findFirst().orElse(null);
+        } catch (Exception ignore) {
+        }
 
         // Retrieve the Guild by its giving ID.
         Guild guild = BotWorker.getShardManager().getGuildById(guildId);
 
         // If the Guild couldn't be loaded redirect to Error page.
-        if (guild == null) return Mono.error(new Exception("Guild not found!"));
+        if (guild == null) {
+            if (oAuth2Guild != null) {
+                return new GuildContainer(oAuth2Guild);
+            } else {
+                throw new IllegalAccessException("Guild not found!");
+            }
+        }
 
-        return Mono.just(new GuildContainer(guild, retrieveChannels));
+        Member member = guild.retrieveMemberById(sessionContainer.getUser().getId()).complete();
+
+        if (member != null && member.hasPermission(Permission.ADMINISTRATOR)) {
+            return new GuildContainer(guild, retrieveChannels, retrieveRoles);
+        }
+
+        throw new IllegalAccessException("Not enough permissions!");
     }
 
-    public Mono<List<GuildContainer>> retrieveGuilds(String identifier) {
-        return retrieveSession(identifier).flatMap(sessionContainer -> {
-            List<OAuth2Guild> guilds = Collections.emptyList();
-            try {
-                guilds = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete();
-                guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
-            } catch (Exception ignore) {
-            }
+    public GuildContainer retrieveGuild(String guildId) throws IllegalAccessException {
+        return retrieveGuild(guildId, false);
+    }
 
-            return Mono.just(guilds.stream().map(GuildContainer::new).toList());
-        });
+    public GuildContainer retrieveGuild(String guildId, boolean retrieveChannels) throws IllegalAccessException {
+
+        // Retrieve the Guild by its giving ID.
+        Guild guild = BotWorker.getShardManager().getGuildById(guildId);
+
+        // If the Guild couldn't be loaded redirect to Error page.
+        if (guild == null) throw new IllegalAccessException("Guild not found!");
+
+        return new GuildContainer(guild, retrieveChannels);
+    }
+
+    public List<GuildContainer> retrieveGuilds(String identifier) throws IllegalAccessException {
+        SessionContainer sessionContainer = retrieveSession(identifier);
+        List<OAuth2Guild> guilds = Collections.emptyList();
+
+        try {
+            guilds = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete();
+            guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
+        } catch (Exception ignore) {
+        }
+
+        return guilds.stream().map(GuildContainer::new).toList();
     }
 }

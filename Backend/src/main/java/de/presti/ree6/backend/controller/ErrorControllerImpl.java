@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.controller;
 
+import de.presti.ree6.backend.utils.data.GenericResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
@@ -26,10 +27,10 @@ public class ErrorControllerImpl implements ErrorController {
     }
 
     @RequestMapping(value = "/error", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<GenericResponse> handleError(HttpServletRequest request) {
+    public GenericResponse handleError(HttpServletRequest request) {
         HttpStatus httpStatus = getStatus(request);
 
-        return Mono.just(new GenericResponse(false, httpStatus.getReasonPhrase()));
+        return new GenericResponse(false, httpStatus.getReasonPhrase());
     }
 
     private HttpStatus getStatus(HttpServletRequest request) {
@@ -44,6 +45,4 @@ public class ErrorControllerImpl implements ErrorController {
             }
         }
     }
-
-    public record GenericResponse(boolean success, String message) {}
 }
