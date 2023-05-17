@@ -60,7 +60,7 @@ public class GuildService {
     public void updateLogChannel(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
         Guild guild = guildContainer.getGuild();
-        StandardGuildMessageChannel channel = (StandardGuildMessageChannel) guildContainer.getGuildChannelById(channelId);
+        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
         WebhookLog webhook = (WebhookLog) SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guildId);
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-Log").complete();
@@ -77,8 +77,7 @@ public class GuildService {
     public void updateWelcomeChannel(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
         Guild guild = guildContainer.getGuild();
-
-        StandardGuildMessageChannel channel = (StandardGuildMessageChannel) guildContainer.getGuildChannelById(channelId);
+        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
         WebhookWelcome webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId);
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-Welcome").complete();
