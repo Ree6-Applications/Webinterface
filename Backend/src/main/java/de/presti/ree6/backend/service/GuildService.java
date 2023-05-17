@@ -1,11 +1,12 @@
 package de.presti.ree6.backend.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.repository.GuildStatsRepository;
-import de.presti.ree6.backend.utils.data.container.ChannelContainer;
-import de.presti.ree6.backend.utils.data.container.CommandStatsContainer;
-import de.presti.ree6.backend.utils.data.container.GuildContainer;
+import de.presti.ree6.backend.utils.data.container.*;
 import de.presti.ree6.sql.SQLSession;
+import de.presti.ree6.sql.entities.Recording;
 import de.presti.ree6.sql.entities.webhook.Webhook;
 import de.presti.ree6.sql.entities.webhook.WebhookLog;
 import de.presti.ree6.sql.entities.webhook.WebhookWelcome;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GuildService {
@@ -40,16 +42,16 @@ public class GuildService {
     }
 
     public ChannelContainer getLogChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
         Webhook webhook = SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guildId);
         if (webhook == null) {
             return new ChannelContainer();
         }
-        return new ChannelContainer(BotWorker.getShardManager().getGuildChannelById(webhook.getChannelId()));
+        return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getChannelId()));
     }
 
     public ChannelContainer getWelcomeChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
         Webhook webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId);
         if (webhook == null) {
             return new ChannelContainer();
@@ -89,6 +91,49 @@ public class GuildService {
 
         webhook = new WebhookWelcome(guildId, newWebhook.getId(), newWebhook.getToken());
         SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
+    }
+
+    public List<RoleLevelContainer> getChatAutoRoles(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
+        return SQLSession.getSqlConnector().getSqlWorker().getChatLevelRewards(guildId).entrySet().stream().map(x -> new RoleLevelContainer(x.getKey(), guildContainer.getRoleById(x.getValue()))).toList();
+    }
+
+    public List<RoleLevelContainer> getVoiceAutoRoles(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
+        return SQLSession.getSqlConnector().getSqlWorker().getVoiceLevelRewards(guildId).entrySet().stream().map(x -> new RoleLevelContainer(x.getKey(), guildContainer.getRoleById(x.getValue()))).toList();
+    }
+
+    public RecordContainer getRecording(String sessionIdentifier, String recordId) throws IllegalAccessException {
+        SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
+        List<GuildContainer> guilds = sessionService.retrieveGuilds(sessionIdentifier);
+
+        // TODO:: fix this filters the list wrong!!!!!
+
+        Recording recording = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Recording(), "SELECT * FROM Recording WHERE ID=:id", Map.of("id", recordId));
+
+        if (guilds.stream().map(GuildContainer::getId).anyMatch(g -> g.equalsIgnoreCase(recording.getGuildId()))) {
+            boolean found = false;
+
+            for (JsonElement element : recording.getJsonArray()) {
+                if (found) break;
+
+                if (element.isJsonPrimitive()) {
+                    JsonPrimitive primitive = element.getAsJsonPrimitive();
+                    if (primitive.isString() && primitive.getAsString().equalsIgnoreCase(sessionContainer.getUser().getId())) {
+                        found = true;
+                    }
+                }
+            }
+
+            if (found) {
+                SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
+                return new RecordContainer(recording);
+            } else {
+                throw new IllegalAccessException("You were not part of this recording.");
+            }
+        } else {
+            throw new IllegalAccessException("You were not part of the Guild this recording was made in!");
+        }
     }
 
 }
