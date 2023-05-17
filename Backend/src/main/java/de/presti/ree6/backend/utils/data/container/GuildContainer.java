@@ -39,8 +39,11 @@ public class GuildContainer {
     @JsonIgnore
     List<GuildChannel> guildChannels;
 
+    @JsonIgnore
+    Guild guild;
+
     public GuildContainer(String id, String name, String iconUrl, boolean hasBot) {
-        this(id, name, iconUrl, hasBot, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        this(id, name, iconUrl, hasBot, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), null);
     }
 
     public GuildContainer(OAuth2Guild oAuth2Guild) {
@@ -51,6 +54,7 @@ public class GuildContainer {
     public GuildContainer(Guild guild) {
         this(guild.getId(), guild.getName(), guild.getIconUrl() != null ? guild.getIconUrl() : Data.defaultIconUrl,
                 BotWorker.getShardManager().getGuildById(guild.getId()) != null);
+        this.guild = guild;
     }
 
     public GuildContainer(Guild guild, boolean retrieveChannels) {
@@ -92,6 +96,14 @@ public class GuildContainer {
 
     public GuildChannel getGuildChannelById(String id) {
         return getGuildChannels().stream().filter(channel -> channel.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    public Guild getGuild() {
+        if (guild == null) {
+            return BotWorker.getShardManager().getGuildById(getId());
+        }
+
+        return guild;
     }
 
 }
