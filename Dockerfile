@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM maven:3.9.1-amazoncorretto-17 AS build
+FROM maven:3.9.2-amazoncorretto-17 AS build
 COPY Backend/src /usr/src/app/src
 COPY Backend/pom.xml /usr/src/app
 RUN mvn -f /usr/src/app/pom.xml clean package
