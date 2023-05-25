@@ -8,6 +8,7 @@ import de.presti.ree6.backend.service.SessionService;
 import de.presti.ree6.backend.utils.RandomUtils;
 import de.presti.ree6.backend.utils.data.CustomOAuth2Util;
 import de.presti.ree6.backend.utils.data.Data;
+import de.presti.ree6.backend.utils.data.GenericObjectResponse;
 import de.presti.ree6.backend.utils.data.GenericResponse;
 import de.presti.ree6.backend.utils.data.container.SessionContainer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,15 +33,12 @@ public class SessionController {
 
     @CrossOrigin
     @GetMapping(value = "/check", produces = MediaType.APPLICATION_JSON_VALUE)
-    public AuthResponse checkSession(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
+    public GenericObjectResponse<SessionContainer> checkSession(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
         try {
-            return new AuthResponse(true, sessionService.retrieveSession(sessionIdentifier), "Session valid!");
+            return new GenericObjectResponse<>(true, sessionService.retrieveSession(sessionIdentifier), "Session valid!");
         } catch (Exception e) {
-            return new AuthResponse(false, null, e.getMessage());
+            return new GenericObjectResponse<>(false, null, e.getMessage());
         }
-    }
-
-    public record AuthResponse(boolean success, SessionContainer session, String message) {
     }
 
     //endregion
@@ -49,11 +47,11 @@ public class SessionController {
 
     @CrossOrigin
     @GetMapping(value = "/discord", produces = MediaType.APPLICATION_JSON_VALUE)
-    public AuthResponse completeSession(@RequestParam(name = "code") String code, @RequestParam(name = "state") String state) {
+    public GenericObjectResponse<SessionContainer> completeSession(@RequestParam(name = "code") String code, @RequestParam(name = "state") String state) {
         try {
-            return new AuthResponse(true, sessionService.createSession(code, state), "Session created!");
+            return new GenericObjectResponse<>(true, sessionService.createSession(code, state), "Session created!");
         } catch (Exception e) {
-            return new AuthResponse(false, null, e.getMessage());
+            return new GenericObjectResponse<>(false, null, e.getMessage());
         }
     }
 
