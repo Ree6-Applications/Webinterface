@@ -108,19 +108,19 @@ public class GuildService {
         List<GuildContainer> guilds = sessionService.retrieveGuilds(sessionIdentifier);
 
         // TODO:: fix this filters the list wrong!!!!!
+        // 26.05.2023 me: I don't know what I meant with this comment.
 
         Recording recording = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Recording(), "SELECT * FROM Recording WHERE ID=:id", Map.of("id", recordId));
 
-        if (guilds.stream().map(GuildContainer::getId).anyMatch(g -> g.equalsIgnoreCase(recording.getGuildId()))) {
+        if (guilds.stream().anyMatch(g -> g.getId().equalsIgnoreCase(recording.getGuildId()))) {
             boolean found = false;
 
             for (JsonElement element : recording.getJsonArray()) {
-                if (found) break;
-
                 if (element.isJsonPrimitive()) {
                     JsonPrimitive primitive = element.getAsJsonPrimitive();
                     if (primitive.isString() && primitive.getAsString().equalsIgnoreCase(sessionContainer.getUser().getId())) {
                         found = true;
+                        break;
                     }
                 }
             }
