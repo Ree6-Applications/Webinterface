@@ -31,7 +31,13 @@ public class GuildService {
         this.guildStatsRepository = guildStatsRepository;
     }
 
-    public List<CommandStatsContainer> getStats(String sessionIdentifier, String guildId) throws IllegalAccessException {
+    public GuildStatsContainer getStats(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        return new GuildStatsContainer(SQLSession.getSqlConnector().getSqlWorker().getInvites(guildId).size(),
+                guildStatsRepository.getGuildCommandStatsByGuildId(guildId).stream().map(CommandStatsContainer::new).toList());
+    }
+
+    public List<CommandStatsContainer> getCommandStats(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
         return guildStatsRepository.getGuildCommandStatsByGuildId(guildId).stream().map(CommandStatsContainer::new).toList();
     }
@@ -93,16 +99,47 @@ public class GuildService {
         SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
     }
 
+    //region LevelRewards
+
+    //region Chat
+
     public List<RoleLevelContainer> getChatAutoRoles(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
         return SQLSession.getSqlConnector().getSqlWorker().getChatLevelRewards(guildId).entrySet().stream().map(x -> new RoleLevelContainer(x.getKey(), guildContainer.getRoleById(x.getValue()))).toList();
     }
+
+    public void addChatAutoRole(String sessionIdentifier, String guildId, String roleId, long level) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+        SQLSession.getSqlConnector().getSqlWorker().addChatLevelReward(guildId, roleId, level);
+    }
+
+    public void removeChatAutoRole(String sessionIdentifier, String guildId, long level) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+        SQLSession.getSqlConnector().getSqlWorker().removeChatLevelReward(guildId, level);
+    }
+
+    //endregion
+
+    //region Voice
 
     public List<RoleLevelContainer> getVoiceAutoRoles(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
         return SQLSession.getSqlConnector().getSqlWorker().getVoiceLevelRewards(guildId).entrySet().stream().map(x -> new RoleLevelContainer(x.getKey(), guildContainer.getRoleById(x.getValue()))).toList();
     }
 
+    public void addVoiceAutoRole(String sessionIdentifier, String guildId, String roleId, long level) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+        SQLSession.getSqlConnector().getSqlWorker().addVoiceLevelReward(guildId, roleId, level);
+    }
+
+    public void removeVoiceAutoRole(String sessionIdentifier, String guildId, long level) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+        SQLSession.getSqlConnector().getSqlWorker().removeVoiceLevelReward(guildId, level);
+    }
+
+    //endregion
+
+    //endregion
     public RecordContainer getRecording(String sessionIdentifier, String recordId) throws IllegalAccessException {
         SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
         List<GuildContainer> guilds = sessionService.retrieveGuilds(sessionIdentifier);
