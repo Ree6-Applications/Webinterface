@@ -2,6 +2,8 @@ package de.presti.ree6.backend.controller;
 
 import de.presti.ree6.backend.repository.SettingRepository;
 import de.presti.ree6.backend.service.SessionService;
+import de.presti.ree6.backend.utils.data.GenericObjectResponse;
+import de.presti.ree6.backend.utils.data.GenericResponse;
 import de.presti.ree6.backend.utils.data.container.GuildContainer;
 import de.presti.ree6.sql.entities.Setting;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,26 +30,26 @@ public class SettingsController {
 
     @CrossOrigin
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SettingListResponse retrieveSettings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                @PathVariable(name = "guildId") String guildId) {
+    public GenericObjectResponse<List<Setting>> retrieveSettings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                  @PathVariable(name = "guildId") String guildId) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            return new SettingListResponse(true, settingRepository.getSettingsByGuildId(guildId), "Setting retrieved!");
+            return new GenericObjectResponse<>(true, settingRepository.getSettingsByGuildId(guildId), "Setting retrieved!");
         } catch (Exception e) {
-            return new SettingListResponse(false, Collections.emptyList(), e.getMessage());
+            return new GenericObjectResponse<>(false, Collections.emptyList(), e.getMessage());
         }
     }
 
     @CrossOrigin
     @GetMapping(value = "/{settingName}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SettingResponse retrieveSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+    public GenericObjectResponse<Setting> retrieveSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                            @PathVariable(name = "guildId") String guildId,
                                            @PathVariable(name = "settingName") String settingName) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            return new SettingResponse(true, settingRepository.getSettingByGuildIdAndName(guildId, settingName), "Setting retrieved!");
+            return new GenericObjectResponse<>(true, settingRepository.getSettingByGuildIdAndName(guildId, settingName), "Setting retrieved!");
         } catch (Exception e) {
-            return new SettingResponse(false, null, e.getMessage());
+            return new GenericObjectResponse<>(false, null, e.getMessage());
         }
     }
 
@@ -57,7 +59,7 @@ public class SettingsController {
 
     @CrossOrigin
     @GetMapping(value = "/{settingName}/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SettingResponse updateSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+    public GenericObjectResponse<Setting> updateSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") String guildId,
                                          @PathVariable(name = "settingName") String settingName,
                                          @RequestBody String value) {
@@ -66,9 +68,9 @@ public class SettingsController {
             Setting setting = settingRepository.getSettingByGuildIdAndName(guildId, settingName);
             setting.setValue(value);
             settingRepository.save(setting);
-            return new SettingResponse(true, setting, "Setting updated!");
+            return new GenericObjectResponse<>(true, setting, "Setting updated!");
         } catch (Exception e) {
-            return new SettingResponse(false, null, e.getMessage());
+            return new GenericObjectResponse<>(false, null, e.getMessage());
         }
     }
 
@@ -78,25 +80,18 @@ public class SettingsController {
 
     @CrossOrigin
     @GetMapping(value = "/{settingName}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SettingResponse deleteSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+    public GenericResponse deleteSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") String guildId,
                                          @PathVariable(name = "settingName") String settingName) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
             Setting setting = settingRepository.getSettingByGuildIdAndName(guildId, settingName);
             settingRepository.delete(setting);
-            return new SettingResponse(true, null, "Setting deleted!");
+            return new GenericResponse(true,"Setting deleted!");
         } catch (Exception e) {
-            return new SettingResponse(false, null, e.getMessage());
+            return new GenericResponse(false, e.getMessage());
         }
     }
 
     //endregion
-
-
-    public record SettingResponse(boolean success, Setting setting, String message) {
-    }
-
-    public record SettingListResponse(boolean success, List<Setting> settings, String message) {
-    }
 }
