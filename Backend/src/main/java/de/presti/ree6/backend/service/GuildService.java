@@ -31,6 +31,8 @@ public class GuildService {
         this.guildStatsRepository = guildStatsRepository;
     }
 
+    //region Stats
+
     public GuildStatsContainer getStats(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
         return new GuildStatsContainer(SQLSession.getSqlConnector().getSqlWorker().getInvites(guildId).size(),
@@ -46,6 +48,8 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
         return SQLSession.getSqlConnector().getSqlWorker().getInvites(guildId).size();
     }
+
+    //endregion
 
     //region Log channel
 
