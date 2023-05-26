@@ -47,18 +47,11 @@ public class GuildService {
         return SQLSession.getSqlConnector().getSqlWorker().getInvites(guildId).size();
     }
 
+    //region Log channel
+
     public ChannelContainer getLogChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
         Webhook webhook = SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guildId);
-        if (webhook == null) {
-            return new ChannelContainer();
-        }
-        return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getChannelId()));
-    }
-
-    public ChannelContainer getWelcomeChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
-        Webhook webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId);
         if (webhook == null) {
             return new ChannelContainer();
         }
@@ -69,35 +62,70 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
         Guild guild = guildContainer.getGuild();
         StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
-        WebhookLog webhook = (WebhookLog) SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guildId);
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-Log").complete();
 
-        if (webhook != null) {
-            Webhook finalWebhook = webhook;
-            guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null).filter(entry -> entry.getId().equalsIgnoreCase(finalWebhook.getChannelId()) && entry.getToken().equalsIgnoreCase(finalWebhook.getToken())).forEach(entry -> entry.delete().queue()));
-        }
+        deleteLogChannel(guild);
 
-        webhook = new WebhookLog(guildId, newWebhook.getId(), newWebhook.getToken());
+        WebhookLog webhook = new WebhookLog(guildId, newWebhook.getId(), newWebhook.getToken());
         SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
+    }
+
+    public void removeLogChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        deleteWelcomeChannel(sessionService.retrieveGuild(sessionIdentifier, guildId).getGuild());
+    }
+
+    private void deleteLogChannel(Guild guild) {
+        Webhook webhook = SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guild.getId());
+
+        if (webhook != null) {
+            guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
+                    .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getChannelId()) && entry.getToken().equalsIgnoreCase(webhook.getToken()))
+                    .forEach(entry -> entry.delete().queue()));
+        }
+    }
+
+    //endregion
+
+    //region Welcome channel
+
+    public ChannelContainer getWelcomeChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
+        Webhook webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId);
+        if (webhook == null) {
+            return new ChannelContainer();
+        }
+        return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getChannelId()));
     }
 
     public void updateWelcomeChannel(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
         Guild guild = guildContainer.getGuild();
+
         StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
-        WebhookWelcome webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId);
+
+        deleteWelcomeChannel(guild);
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-Welcome").complete();
 
-        if (webhook != null) {
-            Webhook finalWebhook = webhook;
-            guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null).filter(entry -> entry.getId().equalsIgnoreCase(finalWebhook.getChannelId()) && entry.getToken().equalsIgnoreCase(finalWebhook.getToken())).forEach(entry -> entry.delete().queue()));
-        }
-
-        webhook = new WebhookWelcome(guildId, newWebhook.getId(), newWebhook.getToken());
-        SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookWelcome(guildId, newWebhook.getId(), newWebhook.getToken()));
     }
+
+    public void removeWelcomeChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        deleteWelcomeChannel(sessionService.retrieveGuild(sessionIdentifier, guildId).getGuild());
+    }
+
+    private void deleteWelcomeChannel(Guild guild) {
+        WebhookWelcome webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guild.getId());
+
+        if (webhook != null) {
+            guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
+                    .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getChannelId()) && entry.getToken().equalsIgnoreCase(webhook.getToken()))
+                    .forEach(entry -> entry.delete().queue()));
+        }
+    }
+
+    //endregion
 
     //region LevelRewards
 
@@ -140,6 +168,7 @@ public class GuildService {
     //endregion
 
     //endregion
+
     public RecordContainer getRecording(String sessionIdentifier, String recordId) throws IllegalAccessException {
         SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
         List<GuildContainer> guilds = sessionService.retrieveGuilds(sessionIdentifier, false);

@@ -341,4 +341,84 @@ public class GuildController {
     }
 
     //endregion
+
+    //region Guild Welcome Channel
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/welcome", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<ChannelContainer> retrieveWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                              @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getWelcomeChannel(sessionIdentifier, guildId), "Welcome channel retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/welcome/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                               @PathVariable(name = "guildId") String guildId) {
+        try {
+            guildService.removeWelcomeChannel(sessionIdentifier, guildId);
+            return new GenericResponse(true, "Welcome channel removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/welcome/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                            @PathVariable(name = "guildId") String guildId,
+                                            @RequestBody String channelId) {
+        try {
+            guildService.updateWelcomeChannel(sessionIdentifier, guildId, channelId);
+            return new GenericResponse(true, "Welcome channel added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
+    //region Guild Log Channel
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/log", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<ChannelContainer> retrieveLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                          @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getLogChannel(sessionIdentifier, guildId), "Log channel retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/log/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                @PathVariable(name = "guildId") String guildId) {
+        try {
+            guildService.removeLogChannel(sessionIdentifier, guildId);
+            return new GenericResponse(true, "Log channel removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/log/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                             @PathVariable(name = "guildId") String guildId,
+                                             @RequestBody String channelId) {
+        try {
+            guildService.updateLogChannel(sessionIdentifier, guildId, channelId);
+            return new GenericResponse(true, "Log channel added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
 }
