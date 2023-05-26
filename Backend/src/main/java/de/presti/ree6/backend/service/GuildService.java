@@ -142,10 +142,7 @@ public class GuildService {
     //endregion
     public RecordContainer getRecording(String sessionIdentifier, String recordId) throws IllegalAccessException {
         SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
-        List<GuildContainer> guilds = sessionService.retrieveGuilds(sessionIdentifier);
-
-        // TODO:: fix this filters the list wrong!!!!!
-        // 26.05.2023 me: I don't know what I meant with this comment.
+        List<GuildContainer> guilds = sessionService.retrieveGuilds(sessionIdentifier, false);
 
         Recording recording = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Recording(), "SELECT * FROM Recording WHERE ID=:id", Map.of("id", recordId));
 

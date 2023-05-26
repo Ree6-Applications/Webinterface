@@ -125,12 +125,18 @@ public class SessionService {
     }
 
     public List<GuildContainer> retrieveGuilds(String identifier) throws IllegalAccessException {
+        return retrieveGuilds(identifier, true);
+    }
+
+    public List<GuildContainer> retrieveGuilds(String identifier, boolean filter) throws IllegalAccessException {
         SessionContainer sessionContainer = retrieveSession(identifier);
         List<OAuth2Guild> guilds = Collections.emptyList();
 
         try {
             guilds = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete();
-            guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
+
+            if (filter)
+                guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
         } catch (Exception ignore) {
         }
 
