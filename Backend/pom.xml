@@ -59,9 +59,9 @@
 
         <!-- Database -->
         <dependency>
-            <groupId>com.github.Ree6-Applications</groupId>
+            <groupId>de.ree6</groupId>
             <artifactId>Ree6-SQL</artifactId>
-            <version>14d020f672</version>
+            <version>413e935ebb</version>
         </dependency>
 
         <!-- Discord -->
@@ -102,7 +102,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.DxsSucuk.JDA-Utilities</groupId>
+            <groupId>me.presti.jda-utilities</groupId>
             <artifactId>jda-utilities-oauth2</artifactId>
             <version>fdbc298475</version>
         </dependency>
