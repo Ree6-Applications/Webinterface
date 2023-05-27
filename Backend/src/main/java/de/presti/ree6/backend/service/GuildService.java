@@ -9,6 +9,7 @@ import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.sql.entities.Recording;
 import de.presti.ree6.sql.entities.webhook.Webhook;
 import de.presti.ree6.sql.entities.webhook.WebhookLog;
+import de.presti.ree6.sql.entities.webhook.WebhookReddit;
 import de.presti.ree6.sql.entities.webhook.WebhookWelcome;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
@@ -127,6 +128,21 @@ public class GuildService {
                     .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getChannelId()) && entry.getToken().equalsIgnoreCase(webhook.getToken()))
                     .forEach(entry -> entry.delete().queue()));
         }
+    }
+
+    //endregion
+
+    //region Reddit Notifications
+
+    public List<NotifierContainer> getRedditNotifier(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
+        List<String> subreddits = SQLSession.getSqlConnector().getSqlWorker().getAllSubreddits(guildId);
+
+        return subreddits.stream().map(subreddit -> {
+            WebhookReddit webhookReddit = SQLSession.getSqlConnector().getSqlWorker().getRedditWebhook(guildId, subreddit);
+
+            return new NotifierContainer(subreddit, webhookReddit.getMessage());
+        }).toList();
     }
 
     //endregion
