@@ -65,8 +65,8 @@ public class SessionService {
                 throw new IllegalStateException("Session creation failed!");
             }
 
-        } catch (Exception ignore) {
-            throw new IllegalStateException("Session creation failed!");
+        } catch (Exception exception) {
+            throw new IllegalStateException(exception.getMessage());
         }
     }
 
@@ -128,14 +128,14 @@ public class SessionService {
         return retrieveGuilds(identifier, true);
     }
 
-    public List<GuildContainer> retrieveGuilds(String identifier, boolean filter) throws IllegalAccessException {
+    public List<GuildContainer> retrieveGuilds(String identifier, boolean permissionFilter) throws IllegalAccessException {
         SessionContainer sessionContainer = retrieveSession(identifier);
         List<OAuth2Guild> guilds = Collections.emptyList();
 
         try {
             guilds = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete();
 
-            if (filter)
+            if (permissionFilter)
                 guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
         } catch (Exception ignore) {
         }

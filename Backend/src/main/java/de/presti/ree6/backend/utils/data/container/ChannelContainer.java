@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.attribute.IWebhookContainer;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 
 @Getter
@@ -23,5 +25,13 @@ public class ChannelContainer {
         this.guildId = guildChannel.getGuild().getId();
         this.name = guildChannel.getName();
         this.type = guildChannel.getType();
+    }
+
+    public ChannelContainer(Webhook webhook) {
+        IWebhookContainer webhookContainer = webhook.getChannel();
+        this.id = webhookContainer.getId();
+        this.guildId = webhook.getSourceGuild().getId();
+        this.name = webhookContainer.getName();
+        this.type = webhookContainer.getType();
     }
 }

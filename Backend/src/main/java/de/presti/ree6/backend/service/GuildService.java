@@ -136,13 +136,25 @@ public class GuildService {
 
     public List<NotifierContainer> getRedditNotifier(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
-        List<String> subreddits = SQLSession.getSqlConnector().getSqlWorker().getAllSubreddits(guildId);
+        List<WebhookReddit> subreddits = SQLSession.getSqlConnector().getSqlWorker().getAllRedditWebhooks(guildId);
 
-        return subreddits.stream().map(subreddit -> {
-            WebhookReddit webhookReddit = SQLSession.getSqlConnector().getSqlWorker().getRedditWebhook(guildId, subreddit);
+        return subreddits.stream().map(subreddit -> new NotifierContainer(subreddit.getSubreddit(), subreddit.getMessage(), guildContainer.getGuild().retrieveWebhooks()
+                .complete().stream().filter(c -> c.getId().equals(subreddit.getGuildId())).map(ChannelContainer::new).findFirst().orElse(null))).toList();
+    }
 
-            return new NotifierContainer(subreddit, webhookReddit.getMessage());
-        }).toList();
+    public void addRedditNotifier(String sessionIdentifier, String guildId, String subreddit, String message, String channelId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
+        Guild guild = guildContainer.getGuild();
+        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
+
+        net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-RedditNotifier-" + subreddit).complete();
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, subreddit, message, newWebhook.getId(), newWebhook.getToken()));
+    }
+
+    // TODO:: make a universal delete method for webhooks, safe code.
+    public void removeRedditNotifier(String sessionIdentifier, String guildId, String subreddit) throws IllegalAccessException {
+        SQLSession.getSqlConnector().getSqlWorker().removeRedditWebhook(guildId, subreddit);
     }
 
     //endregion
