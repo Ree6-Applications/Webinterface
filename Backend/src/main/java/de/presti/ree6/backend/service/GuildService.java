@@ -4,15 +4,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import de.presti.ree6.backend.repository.GuildStatsRepository;
 import de.presti.ree6.backend.utils.data.container.*;
+import de.presti.ree6.backend.utils.data.container.api.GenericNotifierRequest;
 import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
 import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
 import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
 import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.sql.entities.Recording;
-import de.presti.ree6.sql.entities.webhook.Webhook;
-import de.presti.ree6.sql.entities.webhook.WebhookLog;
-import de.presti.ree6.sql.entities.webhook.WebhookReddit;
-import de.presti.ree6.sql.entities.webhook.WebhookWelcome;
+import de.presti.ree6.sql.entities.webhook.*;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,30 +132,153 @@ public class GuildService {
 
     //endregion
 
+    //region Notifier
+
     //region Reddit Notifications
 
     public List<NotifierContainer> getRedditNotifier(String sessionIdentifier, String guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
         List<WebhookReddit> subreddits = SQLSession.getSqlConnector().getSqlWorker().getAllRedditWebhooks(guildId);
 
         return subreddits.stream().map(subreddit -> new NotifierContainer(subreddit.getSubreddit(), subreddit.getMessage(), guildContainer.getGuild().retrieveWebhooks()
                 .complete().stream().filter(c -> c.getId().equals(subreddit.getGuildId())).map(ChannelContainer::new).findFirst().orElse(null))).toList();
     }
 
-    public void addRedditNotifier(String sessionIdentifier, String guildId, String subreddit, String message, String channelId) throws IllegalAccessException {
+    public void addRedditNotifier(String sessionIdentifier, String guildId, GenericNotifierRequest notifierRequest) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
         Guild guild = guildContainer.getGuild();
-        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
+        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, notifierRequest.channelId());
 
-        net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-RedditNotifier-" + subreddit).complete();
+        net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-RedditNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, subreddit, message, newWebhook.getId(), newWebhook.getToken()));
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, notifierRequest.name(),
+                notifierRequest.message() != null ? notifierRequest.message() : "%name% got a new post check it out <%url%>!",
+                newWebhook.getId(), newWebhook.getToken()));
     }
 
     // TODO:: make a universal delete method for webhooks, safe code.
     public void removeRedditNotifier(String sessionIdentifier, String guildId, String subreddit) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
         SQLSession.getSqlConnector().getSqlWorker().removeRedditWebhook(guildId, subreddit);
     }
+
+    //endregion
+
+    //region Twitch Notifications
+
+    public List<NotifierContainer> getTwitchNotifier(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        List<WebhookTwitch> twitchChannels = SQLSession.getSqlConnector().getSqlWorker().getAllTwitchWebhooks(guildId);
+
+        return twitchChannels.stream().map(twitchChannel -> new NotifierContainer(twitchChannel.getName(), twitchChannel.getMessage(), guildContainer.getGuild().retrieveWebhooks()
+                .complete().stream().filter(c -> c.getId().equals(twitchChannel.getGuildId())).map(ChannelContainer::new).findFirst().orElse(null))).toList();
+    }
+
+    public void addTwitchNotifier(String sessionIdentifier, String guildId, GenericNotifierRequest notifierRequest) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
+        Guild guild = guildContainer.getGuild();
+        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, notifierRequest.channelId());
+
+        net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-TwitchNotifier-" + notifierRequest.name()).complete();
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, notifierRequest.name(),
+                notifierRequest.message() != null ? notifierRequest.message() : "%name% is now Live on Twitch! Come and join the stream <%url%>!",
+                newWebhook.getId(), newWebhook.getToken()));
+    }
+
+    public void removeTwitchNotifier(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        SQLSession.getSqlConnector().getSqlWorker().removeTwitchWebhook(guildId, channelId);
+    }
+
+    //endregion
+
+    //region YouTube Notifications
+
+    public List<NotifierContainer> getYouTubeNotifier(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        List<WebhookYouTube> youtubers = SQLSession.getSqlConnector().getSqlWorker().getAllYouTubeWebhooks(guildId);
+
+        return youtubers.stream().map(youtuber -> new NotifierContainer(youtuber.getName(), youtuber.getMessage(), guildContainer.getGuild().retrieveWebhooks()
+                .complete().stream().filter(c -> c.getId().equals(youtuber.getGuildId())).map(ChannelContainer::new).findFirst().orElse(null))).toList();
+    }
+
+    public void addYouTubeNotifier(String sessionIdentifier, String guildId, GenericNotifierRequest notifierRequest) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
+        Guild guild = guildContainer.getGuild();
+        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, notifierRequest.channelId());
+
+        net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-YoutubeNotifier-" + notifierRequest.name()).complete();
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, notifierRequest.name(),
+                notifierRequest.message() != null ? notifierRequest.message() : "%name% just uploaded a new Video! Check it out <%url%>!",
+                newWebhook.getId(), newWebhook.getToken()));
+    }
+
+    public void removeYouTubeNotifier(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        SQLSession.getSqlConnector().getSqlWorker().removeYouTubeWebhook(guildId, channelId);
+    }
+
+    //endregion
+
+    //region Twitter Notifications
+
+    public List<NotifierContainer> getTwitterNotifier(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        List<WebhookTwitter> twitterUsers = SQLSession.getSqlConnector().getSqlWorker().getAllTwitterWebhooks(guildId);
+
+        return twitterUsers.stream().map(twitterUser -> new NotifierContainer(twitterUser.getName(), twitterUser.getMessage(), guildContainer.getGuild().retrieveWebhooks()
+                .complete().stream().filter(c -> c.getId().equals(twitterUser.getGuildId())).map(ChannelContainer::new).findFirst().orElse(null))).toList();
+    }
+
+    public void addTwitterNotifier(String sessionIdentifier, String guildId, GenericNotifierRequest notifierRequest) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
+        Guild guild = guildContainer.getGuild();
+        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, notifierRequest.channelId());
+
+        net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-TwitterNotifier-" + notifierRequest.name()).complete();
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, notifierRequest.name(),
+                notifierRequest.message() != null ? notifierRequest.message() : "%name% tweeted something! Check it out <%url%>!",
+                newWebhook.getId(), newWebhook.getToken()));
+    }
+
+    public void removeTwitterNotifier(String sessionIdentifier, String guildId, String name) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        SQLSession.getSqlConnector().getSqlWorker().removeTwitterWebhook(guildId, name);
+    }
+
+    //endregion
+
+    //region Instagram Notifications
+
+    public List<NotifierContainer> getInstagramNotifier(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        List<WebhookInstagram> instagramUsers = SQLSession.getSqlConnector().getSqlWorker().getAllInstagramWebhooks(guildId);
+
+        return instagramUsers.stream().map(instagramUser -> new NotifierContainer(instagramUser.getName(), instagramUser.getMessage(), guildContainer.getGuild().retrieveWebhooks()
+                .complete().stream().filter(c -> c.getId().equals(instagramUser.getGuildId())).map(ChannelContainer::new).findFirst().orElse(null))).toList();
+    }
+
+    public void addInstagramNotifier(String sessionIdentifier, String guildId, GenericNotifierRequest notifierRequest) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
+        Guild guild = guildContainer.getGuild();
+        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, notifierRequest.channelId());
+
+        net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-InstagramNotifier-" + notifierRequest.name()).complete();
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, notifierRequest.name(),
+                notifierRequest.message() != null ? notifierRequest.message() : "%name% posted something on their Instagram!",
+                newWebhook.getId(), newWebhook.getToken()));
+    }
+
+    public void removeInstagramNotifier(String sessionIdentifier, String guildId, String name) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        SQLSession.getSqlConnector().getSqlWorker().removeInstagramWebhook(guildId, name);
+    }
+
+    //endregion
 
     //endregion
 

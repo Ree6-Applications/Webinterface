@@ -428,6 +428,8 @@ public class GuildController {
 
     //endregion
 
+    //region Notifier
+
     //region Reddit Notifier
 
     @CrossOrigin
@@ -460,13 +462,179 @@ public class GuildController {
                                              @PathVariable(name = "guildId") String guildId,
                                              @RequestBody GenericNotifierRequest notifierRequestObject) {
         try {
-            guildService.addRedditNotifier(sessionIdentifier, guildId, notifierRequestObject.name(),
-                    notifierRequestObject.message() != null ? notifierRequestObject.message() : "%name% got a new post check it out <%url%>!", notifierRequestObject.channelId());
+            guildService.addRedditNotifier(sessionIdentifier, guildId, notifierRequestObject);
             return new GenericResponse(true, "Reddit Notifier added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
         }
     }
+
+    //endregion
+
+    //region Twitch Notifier
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/twitch", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<NotifierContainer>> retrieveTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                                 @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getTwitchNotifier(sessionIdentifier, guildId), "Twitch Notifiers retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/twitch/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                @PathVariable(name = "guildId") String guildId,
+                                                @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removeTwitchNotifier(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "Twitch Notifier removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/twitch/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                             @PathVariable(name = "guildId") String guildId,
+                                             @RequestBody GenericNotifierRequest notifierRequestObject) {
+        try {
+            guildService.addTwitchNotifier(sessionIdentifier, guildId, notifierRequestObject);
+            return new GenericResponse(true, "Twitch Notifier added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+
+    //endregion
+
+    //region Twitter Notifier
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/twitter", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<NotifierContainer>> retrieveTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                                  @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getTwitterNotifier(sessionIdentifier, guildId), "Twitter Notifiers retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/twitter/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                 @PathVariable(name = "guildId") String guildId,
+                                                 @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removeTwitterNotifier(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "Twitter Notifier removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/twitter/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                              @PathVariable(name = "guildId") String guildId,
+                                              @RequestBody GenericNotifierRequest notifierRequestObject) {
+        try {
+            guildService.addTwitterNotifier(sessionIdentifier, guildId, notifierRequestObject);
+            return new GenericResponse(true, "Twitter Notifier added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
+    //region YouTube Notifier
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/youtube", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<NotifierContainer>> retrieveYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                                  @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getYouTubeNotifier(sessionIdentifier, guildId), "Youtube Notifiers retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/youtube/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                 @PathVariable(name = "guildId") String guildId,
+                                                 @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removeYouTubeNotifier(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "Youtube Notifier removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/youtube/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                              @PathVariable(name = "guildId") String guildId,
+                                              @RequestBody GenericNotifierRequest notifierRequestObject) {
+        try {
+            guildService.addYouTubeNotifier(sessionIdentifier, guildId, notifierRequestObject);
+            return new GenericResponse(true, "Youtube Notifier added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
+    //region Instagram Notifier
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/instagram", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<NotifierContainer>> retrieveInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                                     @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getInstagramNotifier(sessionIdentifier, guildId), "Instagram Notifiers retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/instagram/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                   @PathVariable(name = "guildId") String guildId,
+                                                   @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removeInstagramNotifier(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "Instagram Notifier removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/instagram/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                @PathVariable(name = "guildId") String guildId,
+                                                @RequestBody GenericNotifierRequest notifierRequestObject) {
+        try {
+            guildService.addInstagramNotifier(sessionIdentifier, guildId, notifierRequestObject);
+            return new GenericResponse(true, "Instagram Notifier added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
 
     //endregion
 }
