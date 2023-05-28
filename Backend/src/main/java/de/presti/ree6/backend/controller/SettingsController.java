@@ -59,7 +59,7 @@ public class SettingsController {
     //region Settings Update
 
     @CrossOrigin
-    @GetMapping(value = "/{settingName}/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{settingName}/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<Setting> updateSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") String guildId,
                                          @PathVariable(name = "settingName") String settingName,
