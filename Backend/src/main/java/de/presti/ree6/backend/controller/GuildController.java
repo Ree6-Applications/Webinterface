@@ -8,9 +8,14 @@ import de.presti.ree6.backend.repository.ChatLevelRepository;
 import de.presti.ree6.backend.repository.VoiceLevelRepository;
 import de.presti.ree6.backend.service.GuildService;
 import de.presti.ree6.backend.service.SessionService;
-import de.presti.ree6.backend.utils.data.GenericObjectResponse;
-import de.presti.ree6.backend.utils.data.GenericResponse;
+import de.presti.ree6.backend.utils.data.container.api.*;
 import de.presti.ree6.backend.utils.data.container.*;
+import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
+import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
+import de.presti.ree6.backend.utils.data.container.role.RoleContainer;
+import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
+import de.presti.ree6.backend.utils.data.container.user.UserContainer;
+import de.presti.ree6.backend.utils.data.container.user.UserLevelContainer;
 import de.presti.ree6.sql.entities.Blacklist;
 import de.presti.ree6.sql.entities.roles.AutoRole;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,11 +119,11 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/blacklist/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                 @PathVariable(name = "guildId") String guildId,
-                                                @RequestPart String word) {
+                                                @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
 
-            Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, word);
+            Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, request.value());
             blacklistRepository.delete(blacklist);
 
             return new GenericResponse(true, "Blacklist removed!");
@@ -131,13 +136,13 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/blacklist/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                              @PathVariable(name = "guildId") String guildId,
-                                             @RequestPart String word) {
+                                             @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
 
-            Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, word);
+            Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, request.value());
             if (blacklist == null) {
-                blacklist = new Blacklist(guildId, word);
+                blacklist = new Blacklist(guildId, request.value());
                 blacklistRepository.save(blacklist);
                 return new GenericResponse(true, "Blacklist added!");
             } else {
@@ -169,10 +174,10 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/autorole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                @PathVariable(name = "guildId") String guildId,
-                                               @RequestPart String roleId) {
+                                               @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, roleId);
+            AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, request.value());
             autoRoleRepository.delete(autoRole);
             return new GenericResponse(true, "AutoRole removed!");
         } catch (Exception e) {
@@ -184,12 +189,12 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/autorole/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                             @PathVariable(name = "guildId") String guildId,
-                                            @RequestPart String roleId) {
+                                            @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, roleId);
+            AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, request.value());
             if (autoRole == null) {
-                autoRole = new AutoRole(guildId, roleId);
+                autoRole = new AutoRole(guildId, request.value());
                 autoRoleRepository.save(autoRole);
                 return new GenericResponse(true, "AutoRole added!");
             } else {
@@ -261,8 +266,9 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/chatrole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeChatAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                               @PathVariable(name = "guildId") String guildId,
-                                              @RequestPart long level) {
+                                              @RequestBody GenericValueRequest valueRequest) {
         try {
+            long level = Long.parseLong(valueRequest.value());
             guildService.removeChatAutoRole(sessionIdentifier, guildId, level);
             return new GenericResponse(true, "Chat Auto-role removed!");
         } catch (Exception e) {
@@ -274,10 +280,9 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/chatrole/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addChatAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                            @PathVariable(name = "guildId") String guildId,
-                                           @RequestPart String roleId,
-                                           @RequestPart long level) {
+                                           @RequestBody LevelAutoRoleRequest levelAutoRoleRequest) {
         try {
-            guildService.addChatAutoRole(sessionIdentifier, guildId, roleId, level);
+            guildService.addChatAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.roleId(), levelAutoRoleRequest.level());
             return new GenericResponse(true, "Chat Auto-role added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -303,8 +308,9 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/voicerole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeVoiceAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                @PathVariable(name = "guildId") String guildId,
-                                               @RequestPart long level) {
+                                               @RequestBody GenericValueRequest valueRequest) {
         try {
+            long level = Long.parseLong(valueRequest.value());
             guildService.removeVoiceAutoRole(sessionIdentifier, guildId, level);
             return new GenericResponse(true, "Voice Auto-role removed!");
         } catch (Exception e) {
@@ -316,10 +322,9 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/voicerole/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addVoiceAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                             @PathVariable(name = "guildId") String guildId,
-                                            @RequestPart String roleId,
-                                            @RequestPart long level) {
+                                            @RequestBody LevelAutoRoleRequest levelAutoRoleRequest) {
         try {
-            guildService.addVoiceAutoRole(sessionIdentifier, guildId, roleId, level);
+            guildService.addVoiceAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.roleId(), levelAutoRoleRequest.level());
             return new GenericResponse(true, "Voice Auto-role added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -372,9 +377,9 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/welcome/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                              @PathVariable(name = "guildId") String guildId,
-                                             @RequestPart String channelId) {
+                                             @RequestBody GenericValueRequest request) {
         try {
-            guildService.updateWelcomeChannel(sessionIdentifier, guildId, channelId);
+            guildService.updateWelcomeChannel(sessionIdentifier, guildId, request.value());
             return new GenericResponse(true, "Welcome channel added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -412,9 +417,9 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/log/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") String guildId,
-                                         @RequestPart String channelId) {
+                                         @RequestBody GenericValueRequest request) {
         try {
-            guildService.updateLogChannel(sessionIdentifier, guildId, channelId);
+            guildService.updateLogChannel(sessionIdentifier, guildId, request.value());
             return new GenericResponse(true, "Log channel added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -440,9 +445,9 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/reddit/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                 @PathVariable(name = "guildId") String guildId,
-                                                @RequestPart String subreddit) {
+                                                @RequestBody GenericValueRequest request) {
         try {
-            guildService.removeRedditNotifier(sessionIdentifier, guildId, subreddit);
+            guildService.removeRedditNotifier(sessionIdentifier, guildId, request.value());
             return new GenericResponse(true, "Reddit Notifier removed!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -453,11 +458,10 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/reddit/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                              @PathVariable(name = "guildId") String guildId,
-                                             @RequestPart String channelId,
-                                             @RequestPart String subreddit,
-                                             @RequestPart(required = false) String message) {
+                                             @RequestBody GenericNotifierRequest notifierRequestObject) {
         try {
-            guildService.addRedditNotifier(sessionIdentifier, guildId, subreddit, message != null ? message : "%name% got a new post check it out <%url%>!", channelId);
+            guildService.addRedditNotifier(sessionIdentifier, guildId, notifierRequestObject.name(),
+                    notifierRequestObject.message() != null ? notifierRequestObject.message() : "%name% got a new post check it out <%url%>!", notifierRequestObject.channelId());
             return new GenericResponse(true, "Reddit Notifier added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());

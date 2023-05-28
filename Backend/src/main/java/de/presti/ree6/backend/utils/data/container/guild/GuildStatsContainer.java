@@ -1,5 +1,6 @@
-package de.presti.ree6.backend.utils.data.container;
+package de.presti.ree6.backend.utils.data.container.guild;
 
+import de.presti.ree6.backend.utils.data.container.CommandStatsContainer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

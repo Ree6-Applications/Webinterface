@@ -3,6 +3,7 @@ package de.presti.ree6.backend.utils.data.container;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2User;
 import com.jagrosh.jdautilities.oauth2.session.Session;
+import de.presti.ree6.backend.utils.data.container.user.UserContainer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

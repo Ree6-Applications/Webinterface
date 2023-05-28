@@ -1,4 +1,4 @@
-package de.presti.ree6.backend.utils.data.container;
+package de.presti.ree6.backend.utils.data.container.user;
 
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2User;
 import lombok.AllArgsConstructor;

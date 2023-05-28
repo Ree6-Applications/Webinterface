@@ -2,9 +2,11 @@ package de.presti.ree6.backend.service;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.repository.GuildStatsRepository;
 import de.presti.ree6.backend.utils.data.container.*;
+import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
+import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
+import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
 import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.sql.entities.Recording;
 import de.presti.ree6.sql.entities.webhook.Webhook;

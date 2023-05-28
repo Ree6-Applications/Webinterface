@@ -1,4 +1,4 @@
-package de.presti.ree6.backend.utils.data.container;
+package de.presti.ree6.backend.utils.data.container.role;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import de.presti.ree6.backend.bot.BotWorker;

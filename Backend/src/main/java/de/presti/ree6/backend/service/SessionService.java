@@ -7,7 +7,7 @@ import com.jagrosh.jdautilities.oauth2.session.Session;
 import de.presti.ree6.backend.Server;
 import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.utils.RandomUtils;
-import de.presti.ree6.backend.utils.data.container.GuildContainer;
+import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
 import de.presti.ree6.backend.utils.data.container.SessionContainer;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;

@@ -2,9 +2,10 @@ package de.presti.ree6.backend.controller;
 
 import de.presti.ree6.backend.repository.SettingRepository;
 import de.presti.ree6.backend.service.SessionService;
-import de.presti.ree6.backend.utils.data.GenericObjectResponse;
-import de.presti.ree6.backend.utils.data.GenericResponse;
-import de.presti.ree6.backend.utils.data.container.GuildContainer;
+import de.presti.ree6.backend.utils.data.container.api.GenericObjectResponse;
+import de.presti.ree6.backend.utils.data.container.api.GenericResponse;
+import de.presti.ree6.backend.utils.data.container.api.GenericValueRequest;
+import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
 import de.presti.ree6.sql.entities.Setting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -63,11 +64,11 @@ public class SettingsController {
     public GenericObjectResponse<Setting> updateSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") String guildId,
                                          @PathVariable(name = "settingName") String settingName,
-                                         @RequestBody String value) {
+                                         @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
             Setting setting = settingRepository.getSettingByGuildIdAndName(guildId, settingName);
-            setting.setValue(value);
+            setting.setValue(request.value());
             settingRepository.save(setting);
             return new GenericObjectResponse<>(true, setting, "Setting updated!");
         } catch (Exception e) {
