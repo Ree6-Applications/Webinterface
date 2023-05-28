@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/settings/{guildId}")
 public class SettingsController {
