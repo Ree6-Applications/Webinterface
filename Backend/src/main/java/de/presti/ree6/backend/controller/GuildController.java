@@ -2,22 +2,20 @@ package de.presti.ree6.backend.controller;
 
 
 import de.presti.ree6.backend.bot.BotWorker;
-import de.presti.ree6.backend.repository.AutoRoleRepository;
-import de.presti.ree6.backend.repository.BlacklistRepository;
-import de.presti.ree6.backend.repository.ChatLevelRepository;
-import de.presti.ree6.backend.repository.VoiceLevelRepository;
 import de.presti.ree6.backend.service.GuildService;
 import de.presti.ree6.backend.service.SessionService;
+import de.presti.ree6.backend.utils.data.container.ChannelContainer;
+import de.presti.ree6.backend.utils.data.container.LeaderboardContainer;
+import de.presti.ree6.backend.utils.data.container.NotifierContainer;
+import de.presti.ree6.backend.utils.data.container.RecordContainer;
 import de.presti.ree6.backend.utils.data.container.api.*;
-import de.presti.ree6.backend.utils.data.container.*;
 import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
 import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
 import de.presti.ree6.backend.utils.data.container.role.RoleContainer;
 import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
 import de.presti.ree6.backend.utils.data.container.user.UserContainer;
 import de.presti.ree6.backend.utils.data.container.user.UserLevelContainer;
-import de.presti.ree6.sql.entities.Blacklist;
-import de.presti.ree6.sql.entities.roles.AutoRole;
+import de.presti.ree6.sql.SQLSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -34,19 +32,10 @@ public class GuildController {
 
     private final GuildService guildService;
 
-    private final ChatLevelRepository chatLevelRepository;
-    private final VoiceLevelRepository voiceLevelRepository;
-    private final BlacklistRepository blacklistRepository;
-    private final AutoRoleRepository autoRoleRepository;
-
     @Autowired
-    public GuildController(SessionService sessionService, GuildService guildService, ChatLevelRepository chatLevelRepository, VoiceLevelRepository voiceLevelRepository, BlacklistRepository blacklistRepository, AutoRoleRepository autoRoleRepository) {
+    public GuildController(SessionService sessionService, GuildService guildService) {
         this.sessionService = sessionService;
         this.guildService = guildService;
-        this.chatLevelRepository = chatLevelRepository;
-        this.voiceLevelRepository = voiceLevelRepository;
-        this.blacklistRepository = blacklistRepository;
-        this.autoRoleRepository = autoRoleRepository;
     }
 
     //region Guild Retrieve
@@ -108,7 +97,7 @@ public class GuildController {
                                                                       @PathVariable(name = "guildId") String guildId) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            List<String> blacklist = blacklistRepository.getBlacklistByGuildId(guildId).stream().map(Blacklist::getWord).toList();
+            List<String> blacklist = SQLSession.getSqlConnector().getSqlWorker().getChatProtectorWords(guildId);
             return new GenericObjectResponse<>(true, blacklist, "Blacklist retrieved!");
         } catch (Exception e) {
             return new GenericObjectResponse<>(false, Collections.emptyList(), e.getMessage());
@@ -123,9 +112,7 @@ public class GuildController {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
 
-            Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, request.value());
-            blacklistRepository.delete(blacklist);
-
+            SQLSession.getSqlConnector().getSqlWorker().removeChatProtectorWord(guildId, request.value());
             return new GenericResponse(true, "Blacklist removed!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -140,10 +127,8 @@ public class GuildController {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
 
-            Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, request.value());
-            if (blacklist == null) {
-                blacklist = new Blacklist(guildId, request.value());
-                blacklistRepository.save(blacklist);
+            if (!SQLSession.getSqlConnector().getSqlWorker().isChatProtectorSetup(guildId, request.value())) {
+                SQLSession.getSqlConnector().getSqlWorker().addChatProtectorWord(guildId, request.value());
                 return new GenericResponse(true, "Blacklist added!");
             } else {
                 return new GenericResponse(false, "Word already blacklisted!");
@@ -163,7 +148,7 @@ public class GuildController {
                                                                             @PathVariable(name = "guildId") String guildId) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            List<RoleContainer> autoRoles = autoRoleRepository.getAutoRoleByGuildId(guildId).stream().map(c -> guildContainer.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList();
+            List<RoleContainer> autoRoles = SQLSession.getSqlConnector().getSqlWorker().getAutoRoles(guildId).stream().map(c -> guildContainer.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList();
             return new GenericObjectResponse<>(true, autoRoles, "AutoRole retrieved!");
         } catch (Exception e) {
             return new GenericObjectResponse<>(false, Collections.emptyList(), e.getMessage());
@@ -177,8 +162,7 @@ public class GuildController {
                                                @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, request.value());
-            autoRoleRepository.delete(autoRole);
+            SQLSession.getSqlConnector().getSqlWorker().removeAutoRole(guildId, request.value());
             return new GenericResponse(true, "AutoRole removed!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -192,10 +176,9 @@ public class GuildController {
                                             @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, request.value());
-            if (autoRole == null) {
-                autoRole = new AutoRole(guildId, request.value());
-                autoRoleRepository.save(autoRole);
+
+            if (!SQLSession.getSqlConnector().getSqlWorker().isAutoRoleSetup(guildId, request.value())) {
+                SQLSession.getSqlConnector().getSqlWorker().addAutoRole(guildId, request.value());
                 return new GenericResponse(true, "AutoRole added!");
             } else {
                 return new GenericResponse(false, "Role is already in AutoRole!");
@@ -218,10 +201,10 @@ public class GuildController {
 
             LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
 
-            leaderboardContainer.setChatLeaderboard(chatLevelRepository.getFirst5getChatUserLevelsByGuildIdOrderByExperienceDesc(guildId).stream()
+            leaderboardContainer.setChatLeaderboard(SQLSession.getSqlConnector().getSqlWorker().getTopChat(guildId, 5).stream()
                     .map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
 
-            leaderboardContainer.setVoiceLeaderboard(voiceLevelRepository.getFirst5VoiceLevelsByGuildIdOrderByExperienceDesc(guildId).stream()
+            leaderboardContainer.setVoiceLeaderboard(SQLSession.getSqlConnector().getSqlWorker().getTopVoice(guildId, 5).stream()
                     .map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
 
             leaderboardContainer.setGuildId(guildContainer.getId());
