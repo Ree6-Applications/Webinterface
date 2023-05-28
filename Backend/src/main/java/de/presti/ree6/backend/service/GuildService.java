@@ -2,7 +2,6 @@ package de.presti.ree6.backend.service;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import de.presti.ree6.backend.repository.GuildStatsRepository;
 import de.presti.ree6.backend.utils.data.container.*;
 import de.presti.ree6.backend.utils.data.container.api.GenericNotifierRequest;
 import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
@@ -24,12 +23,10 @@ public class GuildService {
 
     private final SessionService sessionService;
 
-    private final GuildStatsRepository guildStatsRepository;
 
     @Autowired
-    public GuildService(SessionService sessionService, GuildStatsRepository guildStatsRepository) {
+    public GuildService(SessionService sessionService) {
         this.sessionService = sessionService;
-        this.guildStatsRepository = guildStatsRepository;
     }
 
     //region Stats
@@ -37,12 +34,12 @@ public class GuildService {
     public GuildStatsContainer getStats(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
         return new GuildStatsContainer(SQLSession.getSqlConnector().getSqlWorker().getInvites(guildId).size(),
-                guildStatsRepository.getGuildCommandStatsByGuildId(guildId).stream().map(CommandStatsContainer::new).toList());
+                SQLSession.getSqlConnector().getSqlWorker().getStats(guildId).stream().map(CommandStatsContainer::new).toList());
     }
 
     public List<CommandStatsContainer> getCommandStats(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-        return guildStatsRepository.getGuildCommandStatsByGuildId(guildId).stream().map(CommandStatsContainer::new).toList();
+        return SQLSession.getSqlConnector().getSqlWorker().getStats(guildId).stream().map(CommandStatsContainer::new).toList();
     }
 
     public int getInviteCount(String sessionIdentifier, String guildId) throws IllegalAccessException {
@@ -151,9 +148,8 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-RedditNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, notifierRequest.name(),
-                notifierRequest.message() != null ? notifierRequest.message() : "%name% got a new post check it out <%url%>!",
-                newWebhook.getId(), newWebhook.getToken()));
+        SQLSession.getSqlConnector().getSqlWorker().addRedditWebhook(guildId, newWebhook.getId(), newWebhook.getToken(),
+                notifierRequest.name(), notifierRequest.message());
     }
 
     // TODO:: make a universal delete method for webhooks, safe code.
@@ -181,9 +177,8 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-TwitchNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, notifierRequest.name(),
-                notifierRequest.message() != null ? notifierRequest.message() : "%name% is now Live on Twitch! Come and join the stream <%url%>!",
-                newWebhook.getId(), newWebhook.getToken()));
+        SQLSession.getSqlConnector().getSqlWorker().addTwitchWebhook(guildId, newWebhook.getId(), newWebhook.getToken(),
+                notifierRequest.name(), notifierRequest.message());
     }
 
     public void removeTwitchNotifier(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
@@ -210,9 +205,8 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-YoutubeNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, notifierRequest.name(),
-                notifierRequest.message() != null ? notifierRequest.message() : "%name% just uploaded a new Video! Check it out <%url%>!",
-                newWebhook.getId(), newWebhook.getToken()));
+        SQLSession.getSqlConnector().getSqlWorker().addYouTubeWebhook(guildId, newWebhook.getId(), newWebhook.getToken(),
+                notifierRequest.name(), notifierRequest.message());
     }
 
     public void removeYouTubeNotifier(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
@@ -239,9 +233,8 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-TwitterNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, notifierRequest.name(),
-                notifierRequest.message() != null ? notifierRequest.message() : "%name% tweeted something! Check it out <%url%>!",
-                newWebhook.getId(), newWebhook.getToken()));
+        SQLSession.getSqlConnector().getSqlWorker().addTwitterWebhook(guildId, newWebhook.getId(), newWebhook.getToken(),
+                notifierRequest.name(), notifierRequest.message());
     }
 
     public void removeTwitterNotifier(String sessionIdentifier, String guildId, String name) throws IllegalAccessException {
@@ -268,9 +261,8 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-InstagramNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookReddit(guildId, notifierRequest.name(),
-                notifierRequest.message() != null ? notifierRequest.message() : "%name% posted something on their Instagram!",
-                newWebhook.getId(), newWebhook.getToken()));
+        SQLSession.getSqlConnector().getSqlWorker().addInstagramWebhook(guildId, newWebhook.getId(), newWebhook.getToken(),
+                notifierRequest.name(), notifierRequest.message());
     }
 
     public void removeInstagramNotifier(String sessionIdentifier, String guildId, String name) throws IllegalAccessException {
