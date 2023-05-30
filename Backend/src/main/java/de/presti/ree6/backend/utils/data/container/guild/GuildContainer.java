@@ -1,9 +1,11 @@
-package de.presti.ree6.backend.utils.data.container;
+package de.presti.ree6.backend.utils.data.container.guild;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jagrosh.jdautilities.oauth2.entities.OAuth2Guild;
 import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.utils.data.Data;
+import de.presti.ree6.backend.utils.data.container.ChannelContainer;
+import de.presti.ree6.backend.utils.data.container.role.RoleContainer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package de.presti.ree6.backend.utils.data.container;
+package de.presti.ree6.backend.utils.data.container.role;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

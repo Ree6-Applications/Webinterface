@@ -13,4 +13,5 @@ public class NotifierContainer {
 
     String name;
     String message;
+    ChannelContainer channel;
 }

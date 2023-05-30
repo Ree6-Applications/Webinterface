@@ -1,11 +1,13 @@
 package de.presti.ree6.backend.controller;
 
-import de.presti.ree6.backend.repository.SettingRepository;
 import de.presti.ree6.backend.service.SessionService;
-import de.presti.ree6.backend.utils.data.GenericObjectResponse;
-import de.presti.ree6.backend.utils.data.GenericResponse;
-import de.presti.ree6.backend.utils.data.container.GuildContainer;
+import de.presti.ree6.backend.utils.data.container.api.GenericObjectResponse;
+import de.presti.ree6.backend.utils.data.container.api.GenericResponse;
+import de.presti.ree6.backend.utils.data.container.api.GenericValueRequest;
+import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
+import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.sql.entities.Setting;
+import de.presti.ree6.sql.util.SettingsManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -13,17 +15,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/settings/{guildId}")
 public class SettingsController {
 
     private final SessionService sessionService;
-    private final SettingRepository settingRepository;
 
     @Autowired
-    public SettingsController(SessionService sessionService, SettingRepository settingRepository) {
+    public SettingsController(SessionService sessionService) {
         this.sessionService = sessionService;
-        this.settingRepository = settingRepository;
     }
 
     //region Settings Retrieve
@@ -34,7 +35,7 @@ public class SettingsController {
                                                   @PathVariable(name = "guildId") String guildId) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            return new GenericObjectResponse<>(true, settingRepository.getSettingsByGuildId(guildId), "Setting retrieved!");
+            return new GenericObjectResponse<>(true, SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guildId), "Setting retrieved!");
         } catch (Exception e) {
             return new GenericObjectResponse<>(false, Collections.emptyList(), e.getMessage());
         }
@@ -47,7 +48,7 @@ public class SettingsController {
                                            @PathVariable(name = "settingName") String settingName) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            return new GenericObjectResponse<>(true, settingRepository.getSettingByGuildIdAndName(guildId, settingName), "Setting retrieved!");
+            return new GenericObjectResponse<>(true, SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, settingName), "Setting retrieved!");
         } catch (Exception e) {
             return new GenericObjectResponse<>(false, null, e.getMessage());
         }
@@ -58,17 +59,16 @@ public class SettingsController {
     //region Settings Update
 
     @CrossOrigin
-    @GetMapping(value = "/{settingName}/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{settingName}/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<Setting> updateSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") String guildId,
                                          @PathVariable(name = "settingName") String settingName,
-                                         @RequestBody String value) {
+                                         @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            Setting setting = settingRepository.getSettingByGuildIdAndName(guildId, settingName);
-            setting.setValue(value);
-            settingRepository.save(setting);
-            return new GenericObjectResponse<>(true, setting, "Setting updated!");
+            Setting setting = SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, settingName);
+            setting.setValue(request.value());
+            return new GenericObjectResponse<>(true, SQLSession.getSqlConnector().getSqlWorker().updateEntity(setting), "Setting updated!");
         } catch (Exception e) {
             return new GenericObjectResponse<>(false, null, e.getMessage());
         }
@@ -85,8 +85,10 @@ public class SettingsController {
                                          @PathVariable(name = "settingName") String settingName) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            Setting setting = settingRepository.getSettingByGuildIdAndName(guildId, settingName);
-            settingRepository.delete(setting);
+            Setting setting = SettingsManager.getDefault(settingName);
+            setting.setGuildId(guildId);
+
+            SQLSession.getSqlConnector().getSqlWorker().setSetting(setting);
             return new GenericResponse(true,"Setting deleted!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());

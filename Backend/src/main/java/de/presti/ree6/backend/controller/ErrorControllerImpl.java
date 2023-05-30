@@ -1,15 +1,16 @@
 package de.presti.ree6.backend.controller;
 
-import de.presti.ree6.backend.utils.data.GenericResponse;
+import de.presti.ree6.backend.utils.data.container.api.GenericResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
+@CrossOrigin
 @RestController
 public class ErrorControllerImpl implements ErrorController {
     /**
@@ -26,6 +27,7 @@ public class ErrorControllerImpl implements ErrorController {
         this.errorAttributes = errorAttributes;
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/error", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse handleError(HttpServletRequest request) {
         HttpStatus httpStatus = getStatus(request);

@@ -2,17 +2,20 @@ package de.presti.ree6.backend.controller;
 
 
 import de.presti.ree6.backend.bot.BotWorker;
-import de.presti.ree6.backend.repository.AutoRoleRepository;
-import de.presti.ree6.backend.repository.BlacklistRepository;
-import de.presti.ree6.backend.repository.ChatLevelRepository;
-import de.presti.ree6.backend.repository.VoiceLevelRepository;
 import de.presti.ree6.backend.service.GuildService;
 import de.presti.ree6.backend.service.SessionService;
-import de.presti.ree6.backend.utils.data.GenericObjectResponse;
-import de.presti.ree6.backend.utils.data.GenericResponse;
-import de.presti.ree6.backend.utils.data.container.*;
-import de.presti.ree6.sql.entities.Blacklist;
-import de.presti.ree6.sql.entities.roles.AutoRole;
+import de.presti.ree6.backend.utils.data.container.ChannelContainer;
+import de.presti.ree6.backend.utils.data.container.LeaderboardContainer;
+import de.presti.ree6.backend.utils.data.container.NotifierContainer;
+import de.presti.ree6.backend.utils.data.container.RecordContainer;
+import de.presti.ree6.backend.utils.data.container.api.*;
+import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
+import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
+import de.presti.ree6.backend.utils.data.container.role.RoleContainer;
+import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
+import de.presti.ree6.backend.utils.data.container.user.UserContainer;
+import de.presti.ree6.backend.utils.data.container.user.UserLevelContainer;
+import de.presti.ree6.sql.SQLSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/guilds")
 public class GuildController {
@@ -28,19 +32,10 @@ public class GuildController {
 
     private final GuildService guildService;
 
-    private final ChatLevelRepository chatLevelRepository;
-    private final VoiceLevelRepository voiceLevelRepository;
-    private final BlacklistRepository blacklistRepository;
-    private final AutoRoleRepository autoRoleRepository;
-
     @Autowired
-    public GuildController(SessionService sessionService, GuildService guildService, ChatLevelRepository chatLevelRepository, VoiceLevelRepository voiceLevelRepository, BlacklistRepository blacklistRepository, AutoRoleRepository autoRoleRepository) {
+    public GuildController(SessionService sessionService, GuildService guildService) {
         this.sessionService = sessionService;
         this.guildService = guildService;
-        this.chatLevelRepository = chatLevelRepository;
-        this.voiceLevelRepository = voiceLevelRepository;
-        this.blacklistRepository = blacklistRepository;
-        this.autoRoleRepository = autoRoleRepository;
     }
 
     //region Guild Retrieve
@@ -102,7 +97,7 @@ public class GuildController {
                                                                       @PathVariable(name = "guildId") String guildId) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            List<String> blacklist = blacklistRepository.getBlacklistByGuildId(guildId).stream().map(Blacklist::getWord).toList();
+            List<String> blacklist = SQLSession.getSqlConnector().getSqlWorker().getChatProtectorWords(guildId);
             return new GenericObjectResponse<>(true, blacklist, "Blacklist retrieved!");
         } catch (Exception e) {
             return new GenericObjectResponse<>(false, Collections.emptyList(), e.getMessage());
@@ -110,16 +105,14 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/blacklist/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/blacklist/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                 @PathVariable(name = "guildId") String guildId,
-                                                @RequestBody String word) {
+                                                @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
 
-            Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, word);
-            blacklistRepository.delete(blacklist);
-
+            SQLSession.getSqlConnector().getSqlWorker().removeChatProtectorWord(guildId, request.value());
             return new GenericResponse(true, "Blacklist removed!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -127,17 +120,15 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/blacklist/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/blacklist/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                              @PathVariable(name = "guildId") String guildId,
-                                             @RequestBody String word) {
+                                             @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
 
-            Blacklist blacklist = blacklistRepository.getBlacklistByGuildIdAndWord(guildId, word);
-            if (blacklist == null) {
-                blacklist = new Blacklist(guildId, word);
-                blacklistRepository.save(blacklist);
+            if (!SQLSession.getSqlConnector().getSqlWorker().isChatProtectorSetup(guildId, request.value())) {
+                SQLSession.getSqlConnector().getSqlWorker().addChatProtectorWord(guildId, request.value());
                 return new GenericResponse(true, "Blacklist added!");
             } else {
                 return new GenericResponse(false, "Word already blacklisted!");
@@ -157,7 +148,7 @@ public class GuildController {
                                                                             @PathVariable(name = "guildId") String guildId) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            List<RoleContainer> autoRoles = autoRoleRepository.getAutoRoleByGuildId(guildId).stream().map(c -> guildContainer.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList();
+            List<RoleContainer> autoRoles = SQLSession.getSqlConnector().getSqlWorker().getAutoRoles(guildId).stream().map(c -> guildContainer.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList();
             return new GenericObjectResponse<>(true, autoRoles, "AutoRole retrieved!");
         } catch (Exception e) {
             return new GenericObjectResponse<>(false, Collections.emptyList(), e.getMessage());
@@ -165,14 +156,13 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/autorole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/autorole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                @PathVariable(name = "guildId") String guildId,
-                                               @RequestBody String roleId) {
+                                               @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, roleId);
-            autoRoleRepository.delete(autoRole);
+            SQLSession.getSqlConnector().getSqlWorker().removeAutoRole(guildId, request.value());
             return new GenericResponse(true, "AutoRole removed!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -180,16 +170,15 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/autorole/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/autorole/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                             @PathVariable(name = "guildId") String guildId,
-                                            @RequestBody String roleId) {
+                                            @RequestBody GenericValueRequest request) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            AutoRole autoRole = autoRoleRepository.getAutoRoleByGuildIdAndRoleId(guildId, roleId);
-            if (autoRole == null) {
-                autoRole = new AutoRole(guildId, roleId);
-                autoRoleRepository.save(autoRole);
+
+            if (!SQLSession.getSqlConnector().getSqlWorker().isAutoRoleSetup(guildId, request.value())) {
+                SQLSession.getSqlConnector().getSqlWorker().addAutoRole(guildId, request.value());
                 return new GenericResponse(true, "AutoRole added!");
             } else {
                 return new GenericResponse(false, "Role is already in AutoRole!");
@@ -212,10 +201,10 @@ public class GuildController {
 
             LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
 
-            leaderboardContainer.setChatLeaderboard(chatLevelRepository.getFirst5getChatUserLevelsByGuildIdOrderByExperienceDesc(guildId).stream()
+            leaderboardContainer.setChatLeaderboard(SQLSession.getSqlConnector().getSqlWorker().getTopChat(guildId, 5).stream()
                     .map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
 
-            leaderboardContainer.setVoiceLeaderboard(voiceLevelRepository.getFirst5VoiceLevelsByGuildIdOrderByExperienceDesc(guildId).stream()
+            leaderboardContainer.setVoiceLeaderboard(SQLSession.getSqlConnector().getSqlWorker().getTopVoice(guildId, 5).stream()
                     .map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
 
             leaderboardContainer.setGuildId(guildContainer.getId());
@@ -257,11 +246,12 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/chatrole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/chatrole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeChatAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                               @PathVariable(name = "guildId") String guildId,
-                                              @RequestBody long level) {
+                                              @RequestBody GenericValueRequest valueRequest) {
         try {
+            long level = Long.parseLong(valueRequest.value());
             guildService.removeChatAutoRole(sessionIdentifier, guildId, level);
             return new GenericResponse(true, "Chat Auto-role removed!");
         } catch (Exception e) {
@@ -270,13 +260,12 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/chatrole/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/chatrole/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addChatAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                            @PathVariable(name = "guildId") String guildId,
-                                           @RequestBody String roleId,
-                                           @RequestBody long level) {
+                                           @RequestBody LevelAutoRoleRequest levelAutoRoleRequest) {
         try {
-            guildService.addChatAutoRole(sessionIdentifier, guildId, roleId, level);
+            guildService.addChatAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.roleId(), levelAutoRoleRequest.level());
             return new GenericResponse(true, "Chat Auto-role added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -299,11 +288,12 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/voicerole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/voicerole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeVoiceAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                @PathVariable(name = "guildId") String guildId,
-                                               @RequestBody long level) {
+                                               @RequestBody GenericValueRequest valueRequest) {
         try {
+            long level = Long.parseLong(valueRequest.value());
             guildService.removeVoiceAutoRole(sessionIdentifier, guildId, level);
             return new GenericResponse(true, "Voice Auto-role removed!");
         } catch (Exception e) {
@@ -312,13 +302,12 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/voicerole/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/voicerole/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addVoiceAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                             @PathVariable(name = "guildId") String guildId,
-                                            @RequestBody String roleId,
-                                            @RequestBody long level) {
+                                            @RequestBody LevelAutoRoleRequest levelAutoRoleRequest) {
         try {
-            guildService.addVoiceAutoRole(sessionIdentifier, guildId, roleId, level);
+            guildService.addVoiceAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.roleId(), levelAutoRoleRequest.level());
             return new GenericResponse(true, "Voice Auto-role added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -347,7 +336,7 @@ public class GuildController {
     @CrossOrigin
     @GetMapping(value = "/{guildId}/welcome", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<ChannelContainer> retrieveWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                                              @PathVariable(name = "guildId") String guildId) {
+                                                                          @PathVariable(name = "guildId") String guildId) {
         try {
             return new GenericObjectResponse<>(true, guildService.getWelcomeChannel(sessionIdentifier, guildId), "Welcome channel retrieved!");
         } catch (Exception e) {
@@ -356,9 +345,9 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/welcome/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/welcome/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                               @PathVariable(name = "guildId") String guildId) {
+                                                @PathVariable(name = "guildId") String guildId) {
         try {
             guildService.removeWelcomeChannel(sessionIdentifier, guildId);
             return new GenericResponse(true, "Welcome channel removed!");
@@ -368,12 +357,12 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/welcome/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/welcome/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                            @PathVariable(name = "guildId") String guildId,
-                                            @RequestBody String channelId) {
+                                             @PathVariable(name = "guildId") String guildId,
+                                             @RequestBody GenericValueRequest request) {
         try {
-            guildService.updateWelcomeChannel(sessionIdentifier, guildId, channelId);
+            guildService.updateWelcomeChannel(sessionIdentifier, guildId, request.value());
             return new GenericResponse(true, "Welcome channel added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -387,7 +376,7 @@ public class GuildController {
     @CrossOrigin
     @GetMapping(value = "/{guildId}/log", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<ChannelContainer> retrieveLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                                          @PathVariable(name = "guildId") String guildId) {
+                                                                      @PathVariable(name = "guildId") String guildId) {
         try {
             return new GenericObjectResponse<>(true, guildService.getLogChannel(sessionIdentifier, guildId), "Log channel retrieved!");
         } catch (Exception e) {
@@ -396,9 +385,9 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/log/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/log/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                @PathVariable(name = "guildId") String guildId) {
+                                            @PathVariable(name = "guildId") String guildId) {
         try {
             guildService.removeLogChannel(sessionIdentifier, guildId);
             return new GenericResponse(true, "Log channel removed!");
@@ -408,17 +397,227 @@ public class GuildController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/{guildId}/log/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/log/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                             @PathVariable(name = "guildId") String guildId,
-                                             @RequestBody String channelId) {
+                                         @PathVariable(name = "guildId") String guildId,
+                                         @RequestBody GenericValueRequest request) {
         try {
-            guildService.updateLogChannel(sessionIdentifier, guildId, channelId);
+            guildService.updateLogChannel(sessionIdentifier, guildId, request.value());
             return new GenericResponse(true, "Log channel added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
         }
     }
+
+    //endregion
+
+    //region Notifier
+
+    //region Reddit Notifier
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/reddit", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<NotifierContainer>> retrieveRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                          @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getRedditNotifier(sessionIdentifier, guildId), "Reddit Notifiers retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/reddit/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                @PathVariable(name = "guildId") String guildId,
+                                                @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removeRedditNotifier(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "Reddit Notifier removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/reddit/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                             @PathVariable(name = "guildId") String guildId,
+                                             @RequestBody GenericNotifierRequest notifierRequestObject) {
+        try {
+            guildService.addRedditNotifier(sessionIdentifier, guildId, notifierRequestObject);
+            return new GenericResponse(true, "Reddit Notifier added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
+    //region Twitch Notifier
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/twitch", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<NotifierContainer>> retrieveTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                                 @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getTwitchNotifier(sessionIdentifier, guildId), "Twitch Notifiers retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/twitch/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                @PathVariable(name = "guildId") String guildId,
+                                                @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removeTwitchNotifier(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "Twitch Notifier removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/twitch/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                             @PathVariable(name = "guildId") String guildId,
+                                             @RequestBody GenericNotifierRequest notifierRequestObject) {
+        try {
+            guildService.addTwitchNotifier(sessionIdentifier, guildId, notifierRequestObject);
+            return new GenericResponse(true, "Twitch Notifier added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+
+    //endregion
+
+    //region Twitter Notifier
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/twitter", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<NotifierContainer>> retrieveTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                                  @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getTwitterNotifier(sessionIdentifier, guildId), "Twitter Notifiers retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/twitter/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                 @PathVariable(name = "guildId") String guildId,
+                                                 @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removeTwitterNotifier(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "Twitter Notifier removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/twitter/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                              @PathVariable(name = "guildId") String guildId,
+                                              @RequestBody GenericNotifierRequest notifierRequestObject) {
+        try {
+            guildService.addTwitterNotifier(sessionIdentifier, guildId, notifierRequestObject);
+            return new GenericResponse(true, "Twitter Notifier added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
+    //region YouTube Notifier
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/youtube", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<NotifierContainer>> retrieveYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                                  @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getYouTubeNotifier(sessionIdentifier, guildId), "Youtube Notifiers retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/youtube/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                 @PathVariable(name = "guildId") String guildId,
+                                                 @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removeYouTubeNotifier(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "Youtube Notifier removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/youtube/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                              @PathVariable(name = "guildId") String guildId,
+                                              @RequestBody GenericNotifierRequest notifierRequestObject) {
+        try {
+            guildService.addYouTubeNotifier(sessionIdentifier, guildId, notifierRequestObject);
+            return new GenericResponse(true, "Youtube Notifier added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
+    //region Instagram Notifier
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/instagram", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<NotifierContainer>> retrieveInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                                     @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getInstagramNotifier(sessionIdentifier, guildId), "Instagram Notifiers retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/instagram/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                   @PathVariable(name = "guildId") String guildId,
+                                                   @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removeInstagramNotifier(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "Instagram Notifier removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/instagram/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                @PathVariable(name = "guildId") String guildId,
+                                                @RequestBody GenericNotifierRequest notifierRequestObject) {
+        try {
+            guildService.addInstagramNotifier(sessionIdentifier, guildId, notifierRequestObject);
+            return new GenericResponse(true, "Instagram Notifier added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
 
     //endregion
 }

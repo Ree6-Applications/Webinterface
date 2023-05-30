@@ -1,4 +1,4 @@
-package de.presti.ree6.backend.utils.data;
+package de.presti.ree6.backend.utils.data.container.api;
 
 /**
  * A generic response object.
