@@ -1,22 +1,27 @@
 package de.presti.ree6.backend.bot.version;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * Class with every Version.
  */
+@Getter
+@AllArgsConstructor
 public enum BotVersion {
 
     /**
      * Version for Development tests.
      */
-    DEVELOPMENT_BUILD("discord.bot.tokens.dev", 1, true),
+    DEVELOPMENT_BUILD("discord.bot.tokens.dev", true),
     /**
      * Version for a not yet fully stable release.
      */
-    BETA_BUILD("discord.bot.tokens.beta", 5, false),
+    BETA_BUILD("discord.bot.tokens.beta", false),
     /**
      * Version for a stable release.
      */
-    RELEASE("discord.bot.tokens.release", 10, false);
+    RELEASE("discord.bot.tokens.release", false);
 
     /**
      * The Token-Path in the config file.
@@ -24,53 +29,8 @@ public enum BotVersion {
     final String tokenPath;
 
     /**
-     * The Shard-Count.
-     */
-    final int shards;
-
-    /**
      * If the Bot version should activate the debug mode.
      */
     final boolean debug;
-
-    /**
-     * Constructor.
-     *
-     * @param tokenPath the Token-Path in the config file.
-     * @param shards    the Shard-Count.
-     * @param debug     if the Bot version should activate the debug mode.
-     */
-    BotVersion(String tokenPath, int shards, boolean debug) {
-        this.tokenPath = tokenPath;
-        this.shards = shards;
-        this.debug = debug;
-    }
-
-    /**
-     * Get the Token-Path in the config file.
-     *
-     * @return {@link String} as Token-Path.
-     */
-    public String getTokenPath() {
-        return tokenPath;
-    }
-
-    /**
-     * Get the Shard-Count.
-     *
-     * @return {@link Integer} as Shard-Count.
-     */
-    public int getShards() {
-        return shards;
-    }
-
-    /**
-     * If the Bot version should activate the debug mode.
-     *
-     * @return {@link Boolean} as debug mode.
-     */
-    public boolean isDebug() {
-        return debug;
-    }
 
 }
