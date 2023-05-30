@@ -3,19 +3,18 @@ package de.presti.ree6.backend.bot;
 import de.presti.ree6.backend.Server;
 import de.presti.ree6.backend.bot.version.BotState;
 import de.presti.ree6.backend.bot.version.BotVersion;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
-
-import java.awt.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Class to store information about the bot.
  */
+@Getter
+@Setter
 public class BotWorker {
 
     /**
@@ -60,8 +59,8 @@ public class BotWorker {
     /**
      * Create a new {@link net.dv8tion.jda.api.sharding.ShardManager} instance and set the rest information for later use.
      *
-     * @param version1 the current Bot Version "typ".
-     * @param build1   the current Bot Version.
+     * @param version1    the current Bot Version "typ".
+     * @param build1      the current Bot Version.
      * @param shardAmount the amount of shards to use.
      */
     public static void createBot(BotVersion version1, String build1, int shardAmount) {
@@ -73,11 +72,8 @@ public class BotWorker {
         shardManager = DefaultShardManagerBuilder
                 .createDefault(token)
                 .setShardsTotal(shardAmount)
-                .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_INVITES, GatewayIntent.DIRECT_MESSAGES,
-                        GatewayIntent.GUILD_INVITES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT,
-                        GatewayIntent.GUILD_WEBHOOKS, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_BANS)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
-                .disableCache(CacheFlag.EMOJI, CacheFlag.ACTIVITY)
                 .build();
     }
 
@@ -90,47 +86,6 @@ public class BotWorker {
         if (shardManager != null) {
             shardManager.shutdown();
         }
-    }
-
-    /**
-     * Called to add a ListenerAdapter to the EventListener.
-     *
-     * @param listenerAdapters the Listener Adapter(s) that should be added.
-     */
-    public static void addEvent(ListenerAdapter... listenerAdapters) {
-        for (ListenerAdapter listenerAdapter : listenerAdapters) {
-            shardManager.addEventListener(listenerAdapter);
-        }
-    }
-
-    /**
-     * Called to get a random Embed supported Color.
-     *
-     * @return a {@link Color}.
-     */
-    public static Color randomEmbedColor() {
-        String zeros = "000000";
-        String s = Integer.toString(ThreadLocalRandom.current().nextInt(0X1000000), 16);
-        s = zeros.substring(s.length()) + s;
-        return Color.decode("#" + s);
-    }
-
-    /**
-     * Change the current Bot State.
-     *
-     * @param botState the new {@link BotState}
-     */
-    public static void setState(BotState botState) {
-        state = botState;
-    }
-
-    /**
-     * Get the current Bot State.
-     *
-     * @return the {@link BotState}.
-     */
-    public static BotState getState() {
-        return state;
     }
 
     /**
@@ -150,41 +105,5 @@ public class BotWorker {
      */
     public static ShardManager getShardManager() {
         return shardManager;
-    }
-
-    /**
-     * Get the build / the actual version in the x.y.z format.
-     *
-     * @return the Build.
-     */
-    public static String getBuild() {
-        return build;
-    }
-
-    /**
-     * Set the start Time of the Bot.
-     *
-     * @param startTime1 the new start Time.
-     */
-    public static void setStartTime(long startTime1) {
-        startTime = startTime1;
-    }
-
-    /**
-     * Get the start Time of the Bot.
-     *
-     * @return the start Time.
-     */
-    public static long getStartTime() {
-        return startTime;
-    }
-
-    /**
-     * Get the current Bot Token.
-     *
-     * @return the Bot Token.
-     */
-    public static String getToken() {
-        return token;
     }
 }
