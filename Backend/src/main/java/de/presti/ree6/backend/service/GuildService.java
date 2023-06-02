@@ -74,7 +74,7 @@ public class GuildService {
     }
 
     public void removeLogChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
-        deleteWelcomeChannel(sessionService.retrieveGuild(sessionIdentifier, guildId).getGuild());
+        deleteLogChannel(sessionService.retrieveGuild(sessionIdentifier, guildId).getGuild());
     }
 
     private void deleteLogChannel(Guild guild) {
