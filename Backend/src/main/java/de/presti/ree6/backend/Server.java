@@ -95,15 +95,17 @@ public class Server {
         try {
             List<String> argList = Arrays.stream(args).map(String::toLowerCase).toList();
 
+            int shards = instance.config.getConfiguration().getInt("bot.misc.shards", 1);
+
+            BotVersion version = BotVersion.RELEASE;
+
             if (argList.contains("--dev")) {
-                BotWorker.createBot(BotVersion.DEVELOPMENT_BUILD, "2.1.3");
-            } else if (argList.contains("--prod")) {
-                BotWorker.createBot(BotVersion.RELEASE, "2.1.3");
+                version = BotVersion.DEVELOPMENT_BUILD;
             } else if (argList.contains("--beta")) {
-                BotWorker.createBot(BotVersion.BETA_BUILD, "2.1.3");
-            } else {
-                BotWorker.createBot(BotVersion.RELEASE, "2.1.3");
+                version = BotVersion.BETA_BUILD;
             }
+
+            BotWorker.createBot(version, "3.0.0", shards);
 
             log.info("Service (JDA) has been started. Creation was successful.");
         } catch (Exception exception) {
@@ -117,6 +119,12 @@ public class Server {
         switch (getInstance().getConfig().getConfiguration().getString("hikari.misc.storage").toLowerCase()) {
             case "mariadb" -> databaseTyp = DatabaseTyp.MariaDB;
 
+            case "h2" -> databaseTyp = DatabaseTyp.H2;
+
+            case "h2-server", "h2_server" -> databaseTyp = DatabaseTyp.H2_Server;
+
+            case "postgresql", "postgres" -> databaseTyp = DatabaseTyp.PostgreSQL;
+
             default -> databaseTyp = DatabaseTyp.SQLite;
         }
 
@@ -124,7 +132,8 @@ public class Server {
                 getConfig().getConfiguration().getString("hikari.sql.db"), getConfig().getConfiguration().getString("hikari.sql.pw"),
                 getConfig().getConfiguration().getString("hikari.sql.host"), getConfig().getConfiguration().getInt("hikari.sql.port"),
                 getConfig().getConfiguration().getString("hikari.misc.storageFile"), databaseTyp,
-                getConfig().getConfiguration().getInt("hikari.misc.poolSize"));
+                getConfig().getConfiguration().getInt("hikari.misc.poolSize"),
+                getConfig().getConfiguration().getBoolean("hikari.misc.createEmbeddedServer"));
 
         credentialManager = CredentialManagerBuilder.builder()
                 .withStorageBackend(new DatabaseStorageBackend())

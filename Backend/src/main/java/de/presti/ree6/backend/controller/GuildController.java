@@ -175,7 +175,10 @@ public class GuildController {
                                             @PathVariable(name = "guildId") String guildId,
                                             @RequestBody GenericValueRequest request) {
         try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
+
+            if (guildContainer.getRoleById(request.value()) == null)
+                throw new IllegalAccessException("Role not found!");
 
             if (!SQLSession.getSqlConnector().getSqlWorker().isAutoRoleSetup(guildId, request.value())) {
                 SQLSession.getSqlConnector().getSqlWorker().addAutoRole(guildId, request.value());
@@ -618,6 +621,72 @@ public class GuildController {
     }
 
     //endregion
+
+    //endregion
+
+    //region Temporal Voice Channels
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/temporalvoice", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<ChannelContainer> retrieveTemporalVoice(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                      @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getTemporalVoice(sessionIdentifier, guildId), "TemporalVoice channel retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/temporalvoice/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeTemporalVoiceChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                            @PathVariable(name = "guildId") String guildId) {
+        try {
+            guildService.removeTemporalVoice(sessionIdentifier, guildId);
+            return new GenericResponse(true, "TemporalVoice channel removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/temporalvoice/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addTemporalVoiceChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                         @PathVariable(name = "guildId") String guildId,
+                                         @RequestBody GenericValueRequest request) {
+        try {
+            guildService.updateTemporalVoice(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "TemporalVoice channel added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
+    //region Opt-Out
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/opt-out/check", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse checkOptOut(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                       @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericResponse(true, guildService.checkOptOut(sessionIdentifier, guildId));
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/opt-out", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse optOut(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                       @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericResponse(true, guildService.optOut(sessionIdentifier, guildId));
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
 
     //endregion
 }

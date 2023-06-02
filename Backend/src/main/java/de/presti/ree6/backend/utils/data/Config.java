@@ -62,8 +62,9 @@ public class Config {
                     .parent().path("host").addDefault("localhost")
                     .parent().path("port").addDefault(3306)
                     .parent().parent().path("misc").comment("Misc Configuration").blankLine()
-                    .path("storage").addDefault("sqlite").commentSide("Either use sqlite or mariadb.")
+                    .path("storage").addDefault("sqlite").commentSide("Possible entries: sqlite, mariadb, postgresql, h2, h2-server")
                     .parent().path("storageFile").addDefault("storage/Ree6.db")
+                    .parent().path("createEmbeddedServer").addDefault(false).commentSide("Should an instance of an embedded Server be created? Only used for H2-Server.")
                     .parent().path("poolSize").addDefault(10);
 
             yamlFile.path("twitch")
@@ -79,7 +80,8 @@ public class Config {
                     .parent().parent().parent()
                     .path("client").comment("OAuth Configuration").blankLine()
                     .path("id").addDefault(0).commentSide("Client ID of the Discord Application.")
-                    .parent().path("secret").addDefault("yourDiscordClientSecrethere").commentSide("Client Secret of the Discord Application.");
+                    .parent().path("secret").addDefault("yourDiscordClientSecrethere").commentSide("Client Secret of the Discord Application.")
+                    .parent().path("shards").addDefault(1).commentSide("The shard amount of the Bot. Check out https://anidiots.guide/understanding/sharding/#sharding for more information.");
 
             yamlFile.path("webinterface").comment("Basic Configurations for the Webinterface").blankLine()
                     .path("hostname").addDefault("cp.ree6.de").commentSide("Hostname of the Webinterface.")

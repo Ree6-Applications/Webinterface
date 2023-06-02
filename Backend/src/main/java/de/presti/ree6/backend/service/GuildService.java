@@ -9,6 +9,7 @@ import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
 import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
 import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.sql.entities.Recording;
+import de.presti.ree6.sql.entities.TemporalVoicechannel;
 import de.presti.ree6.sql.entities.webhook.*;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
@@ -285,6 +286,10 @@ public class GuildService {
 
     public void addChatAutoRole(String sessionIdentifier, String guildId, String roleId, long level) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        if (guildContainer.getRoleById(roleId) == null)
+            throw new IllegalAccessException("Role not found");
+
         SQLSession.getSqlConnector().getSqlWorker().addChatLevelReward(guildId, roleId, level);
     }
 
@@ -303,7 +308,11 @@ public class GuildService {
     }
 
     public void addVoiceAutoRole(String sessionIdentifier, String guildId, String roleId, long level) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
+
+        if (guildContainer.getRoleById(roleId) == null)
+            throw new IllegalAccessException("Role not found");
+
         SQLSession.getSqlConnector().getSqlWorker().addVoiceLevelReward(guildId, roleId, level);
     }
 
@@ -345,5 +354,66 @@ public class GuildService {
             throw new IllegalAccessException("You were not part of the Guild this recording was made in!");
         }
     }
+
+    //region Temporal Voice
+
+    public ChannelContainer getTemporalVoice(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
+        TemporalVoicechannel temporalVoicechannel = SQLSession.getSqlConnector().getSqlWorker()
+                .getEntity(new TemporalVoicechannel(), "SELECT * FROM TemporalVoicechannel WHERE GID=:gid", Map.of("gid", guildId));
+
+        return guildContainer.getChannelById(temporalVoicechannel.getVoiceChannelId());
+    }
+
+    public void updateTemporalVoice(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
+
+        if (guildContainer.getChannelById(channelId) == null)
+            throw new IllegalAccessException("Channel not found");
+
+        TemporalVoicechannel temporalVoicechannel = SQLSession.getSqlConnector().getSqlWorker()
+                .getEntity(new TemporalVoicechannel(), "SELECT * FROM TemporalVoicechannel WHERE GID=:gid", Map.of("gid", guildId));
+
+        if (temporalVoicechannel != null) {
+            temporalVoicechannel.setVoiceChannelId(channelId);
+        } else {
+            temporalVoicechannel = new TemporalVoicechannel(guildId, channelId);
+        }
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(temporalVoicechannel);
+    }
+
+    public void removeTemporalVoice(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        TemporalVoicechannel temporalVoicechannel = SQLSession.getSqlConnector().getSqlWorker()
+                .getEntity(new TemporalVoicechannel(), "SELECT * FROM TemporalVoicechannel WHERE GID=:gid", Map.of("gid", guildId));
+
+        if (temporalVoicechannel != null) {
+            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(temporalVoicechannel);
+        }
+    }
+
+    //endregion
+
+    //region OptOut
+
+    public String checkOptOut(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
+        return SQLSession.getSqlConnector().getSqlWorker().isOptOut(guildId, sessionContainer.getUser().getId()) ? "optedOut" : "optedIn";
+    }
+
+    public String optOut(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
+        if (SQLSession.getSqlConnector().getSqlWorker().isOptOut(guildId, sessionContainer.getUser().getId())) {
+            SQLSession.getSqlConnector().getSqlWorker().optOut(guildId, sessionContainer.getUser().getId());
+            return "Opted out!";
+        } else {
+            SQLSession.getSqlConnector().getSqlWorker().optIn(guildId, sessionContainer.getUser().getId());
+            return "Opted in!";
+        }
+    }
+
+    //endregion
 
 }
