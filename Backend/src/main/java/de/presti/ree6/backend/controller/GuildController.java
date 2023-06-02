@@ -147,7 +147,7 @@ public class GuildController {
     public GenericObjectResponse<List<RoleContainer>> retrieveGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                                             @PathVariable(name = "guildId") String guildId) {
         try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
             List<RoleContainer> autoRoles = SQLSession.getSqlConnector().getSqlWorker().getAutoRoles(guildId).stream().map(c -> guildContainer.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList();
             return new GenericObjectResponse<>(true, autoRoles, "AutoRole retrieved!");
         } catch (Exception e) {
