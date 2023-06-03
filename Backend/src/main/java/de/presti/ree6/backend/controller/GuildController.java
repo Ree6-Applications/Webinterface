@@ -4,10 +4,7 @@ package de.presti.ree6.backend.controller;
 import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.service.GuildService;
 import de.presti.ree6.backend.service.SessionService;
-import de.presti.ree6.backend.utils.data.container.ChannelContainer;
-import de.presti.ree6.backend.utils.data.container.LeaderboardContainer;
-import de.presti.ree6.backend.utils.data.container.NotifierContainer;
-import de.presti.ree6.backend.utils.data.container.RecordContainer;
+import de.presti.ree6.backend.utils.data.container.*;
 import de.presti.ree6.backend.utils.data.container.api.*;
 import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
 import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
@@ -16,6 +13,7 @@ import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
 import de.presti.ree6.backend.utils.data.container.user.UserContainer;
 import de.presti.ree6.backend.utils.data.container.user.UserLevelContainer;
 import de.presti.ree6.sql.SQLSession;
+import de.presti.ree6.sql.entities.Tickets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -683,6 +681,86 @@ public class GuildController {
                                        @PathVariable(name = "guildId") String guildId) {
         try {
             return new GenericResponse(true, guildService.optOut(sessionIdentifier, guildId));
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
+    //region Tickets
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/tickets", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<TicketContainer> retrieveTicket(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                 @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getTicket(sessionIdentifier, guildId), "Tickets retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/tickets/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeTicket(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                      @PathVariable(name = "guildId") String guildId) {
+        try {
+            guildService.removeTicket(sessionIdentifier, guildId);
+            return new GenericResponse(true, "Tickets removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/tickets/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addTicket(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                   @PathVariable(name = "guildId") String guildId,
+                                                   @RequestBody TicketsRequest request) {
+        try {
+            guildService.updateTicket(sessionIdentifier, guildId, request.channelId(), request.logChannelId(), request.ticketMessageOpen(), request.ticketMessageMenu());
+            return new GenericResponse(true, "Tickets added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
+    //region Suggestion
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<SuggestionContainer> retrieveSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                 @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getSuggestion(sessionIdentifier, guildId), "Suggestions retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/suggestions/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                        @PathVariable(name = "guildId") String guildId) {
+        try {
+            guildService.removeSuggestion(sessionIdentifier, guildId);
+            return new GenericResponse(true, "Suggestions removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/{guildId}/suggestions/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                     @PathVariable(name = "guildId") String guildId,
+                                     @RequestBody SuggestionRequest request) {
+        try {
+            guildService.updateSuggestion(sessionIdentifier, guildId, request.channelId(), request.suggestionMessageMenu());
+            return new GenericResponse(true, "Suggestions added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
         }

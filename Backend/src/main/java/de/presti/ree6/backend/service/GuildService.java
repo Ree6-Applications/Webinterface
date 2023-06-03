@@ -8,8 +8,7 @@ import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
 import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
 import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
 import de.presti.ree6.sql.SQLSession;
-import de.presti.ree6.sql.entities.Recording;
-import de.presti.ree6.sql.entities.TemporalVoicechannel;
+import de.presti.ree6.sql.entities.*;
 import de.presti.ree6.sql.entities.webhook.*;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
@@ -416,4 +415,156 @@ public class GuildService {
 
     //endregion
 
+    //region Ticket
+
+    public TicketContainer getTicket(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
+        Tickets tickets = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Tickets(), "SELECT * FROM Tickets WHERE GUILDID=:gid", Map.of("gid", guildId));
+
+        TicketContainer ticketContainer = new TicketContainer();
+        ticketContainer.setTicketCount(tickets.getTicketCount());
+        ticketContainer.setChannel(guildContainer.getChannelById(String.valueOf(tickets.getChannelId())));
+        ticketContainer.setCategory(guildContainer.getCategoryById(String.valueOf(tickets.getTicketCategory())));
+
+        StandardGuildMessageChannel logChannel = guildContainer.getGuild().getChannelById(StandardGuildMessageChannel.class, tickets.getLogChannelId());
+        ticketContainer.setLogChannel(new ChannelContainer(logChannel));
+        ticketContainer.setTicketOpenMessage(SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, "message_ticket_open").getStringValue());
+        ticketContainer.setTicketMenuMessage(SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, "message_ticket_menu").getStringValue());
+
+        return ticketContainer;
+    }
+
+    public void updateTicket(String sessionIdentifier, String guildId, String channelId, String logChannelId, String ticketOpenMessage, String ticketMenuMessage) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
+
+        Guild guild = guildContainer.getGuild();
+
+        Tickets tickets = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Tickets(),
+                "SELECT * FROM Tickets WHERE GUILDID=:gid", Map.of("gid", guildId));
+
+        boolean requireChannel = false;
+
+        if (tickets == null) {
+            tickets = new Tickets();
+            tickets.setGuildId(Long.valueOf(guildId));
+            requireChannel = true;
+        }
+
+        if (channelId != null) {
+            if (guildContainer.getChannelById(channelId) == null)
+                throw new IllegalAccessException("Channel not found");
+
+            tickets.setChannelId(Long.parseLong(channelId));
+        } else if (requireChannel) {
+            throw new IllegalAccessException("Channel not found");
+        }
+
+        if (logChannelId != null) {
+            StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
+
+            Tickets finalTickets = tickets;
+            guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
+                    .filter(entry -> entry.getIdLong() == finalTickets.getLogChannelId() && entry.getToken().equalsIgnoreCase(finalTickets.getLogChannelWebhookToken()))
+                    .forEach(entry -> entry.delete().queue()));
+
+            net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ticket-Log").complete();
+            tickets.setLogChannelWebhookToken(newWebhook.getToken());
+            tickets.setLogChannelId(newWebhook.getIdLong());
+        }
+
+        if (ticketOpenMessage != null) {
+            SQLSession.getSqlConnector().getSqlWorker().setSetting(new Setting(guildId, "message_ticket_open",
+                    "Message that should display when a Ticket is opened.", ticketOpenMessage));
+        }
+
+        if (ticketMenuMessage != null) {
+            SQLSession.getSqlConnector().getSqlWorker().setSetting(new Setting(guildId, "message_ticket_menu",
+                    "Message that should display in the Ticket Menu.", ticketMenuMessage));
+        }
+
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(tickets);
+    }
+
+    public void removeTicket(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        Tickets tickets = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Tickets(),
+                "SELECT * FROM Tickets WHERE GUILDID=:gid", Map.of("gid", guildId));
+
+        if (tickets != null) {
+            guildContainer.getGuild().retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
+                    .filter(entry -> entry.getIdLong() == tickets.getLogChannelId() && entry.getToken().equalsIgnoreCase(tickets.getLogChannelWebhookToken()))
+                    .forEach(entry -> entry.delete().queue()));
+
+            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(tickets);
+        }
+    }
+
+    //endregion
+
+    //region Suggestion
+
+    public SuggestionContainer getSuggestion(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
+        Suggestions suggestions = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Suggestions(),
+                "SELECT * FROM Suggestions WHERE guildId = :id", Map.of("id", guildId));
+
+        SuggestionContainer suggestionContainer = new SuggestionContainer();
+        suggestionContainer.setChannel(guildContainer.getChannelById(String.valueOf(suggestions.getChannelId())));
+        suggestionContainer.setSuggestionMessageMenu(SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, "message_suggestion_menu").getStringValue());
+
+        return suggestionContainer;
+    }
+
+    public void updateSuggestion(String sessionIdentifier, String guildId, String channelId, String suggestionMenuMessage) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
+
+        Guild guild = guildContainer.getGuild();
+
+        Suggestions suggestions = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Suggestions(),
+                "SELECT * FROM Suggestions WHERE guildId = :id", Map.of("id", guildId));
+
+        boolean requireChannel = false;
+
+        if (suggestions == null) {
+            suggestions = new Suggestions();
+            suggestions.setGuildId(Long.parseLong(guildId));
+            requireChannel = true;
+        }
+
+        if (channelId != null) {
+            if (guildContainer.getChannelById(channelId) == null)
+                throw new IllegalAccessException("Channel not found");
+
+            suggestions.setChannelId(Long.parseLong(channelId));
+        } else if (requireChannel) {
+            throw new IllegalAccessException("Channel not found");
+        }
+
+
+        if (suggestionMenuMessage != null) {
+            SQLSession.getSqlConnector().getSqlWorker().setSetting(new Setting(guildId, "message_suggestion_menu",
+                    "Message that should display in the Suggestion Menu.", suggestionMenuMessage));
+        }
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(suggestions);
+    }
+
+    public void removeSuggestion(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        Tickets tickets = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Tickets(),
+                "SELECT * FROM Tickets WHERE GUILDID=:gid", Map.of("gid", guildId));
+
+        if (tickets != null) {
+            guildContainer.getGuild().retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
+                    .filter(entry -> entry.getIdLong() == tickets.getLogChannelId() && entry.getToken().equalsIgnoreCase(tickets.getLogChannelWebhookToken()))
+                    .forEach(entry -> entry.delete().queue()));
+
+            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(tickets);
+        }
+    }
+
+    //endregion
 }

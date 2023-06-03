@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 
 import java.util.Collections;
@@ -98,6 +99,10 @@ public class GuildContainer {
 
     public GuildChannel getGuildChannelById(String id) {
         return getGuildChannels().stream().filter(channel -> channel.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    public ChannelContainer getCategoryById(String id) {
+        return getChannels().stream().filter(channel -> channel.getId().equals(id) && channel.getType() == ChannelType.CATEGORY).findFirst().orElse(null);
     }
 
     public Guild getGuild() {

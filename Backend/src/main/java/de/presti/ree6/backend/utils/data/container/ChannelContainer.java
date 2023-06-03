@@ -7,6 +7,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.attribute.IWebhookContainer;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 
 @Getter
@@ -33,5 +34,12 @@ public class ChannelContainer {
         this.guildId = webhook.getSourceGuild().getId();
         this.name = webhookContainer.getName();
         this.type = webhookContainer.getType();
+    }
+
+    public ChannelContainer(Category category) {
+        this.id = category.getId();
+        this.guildId = category.getGuild().getId();
+        this.name = category.getName();
+        this.type = category.getType();
     }
 }
