@@ -1,6 +1,8 @@
 package de.presti.ree6.backend.service;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import de.presti.ree6.backend.utils.data.container.*;
 import de.presti.ree6.backend.utils.data.container.api.GenericNotifierRequest;
@@ -9,22 +11,20 @@ import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
 import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
 import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.sql.entities.*;
+import de.presti.ree6.sql.entities.custom.CustomCommand;
 import de.presti.ree6.sql.entities.webhook.*;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class GuildService {
 
     private final SessionService sessionService;
-
 
     @Autowired
     public GuildService(SessionService sessionService) {
@@ -755,6 +755,63 @@ public class GuildService {
     }
 
     //endregion
+
+    //endregion
+
+    //region Custom Command
+
+    public List<CustomCommandContainer> getCustomCommand(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
+
+        return SQLSession.getSqlConnector().getSqlWorker().getEntityList(new CustomCommand(),
+                "SELECT * FROM CustomCommand WHERE guild = :gid",
+                Map.of("gid", guildId)).stream().map(command -> new CustomCommandContainer(command, guildContainer)).toList();
+    }
+
+    public void removeCustomCommand(String sessionIdentifier, String guildId, String commandId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        CustomCommand command = SQLSession.getSqlConnector().getSqlWorker().getEntity(new CustomCommand(),
+                "SELECT * FROM CustomCommand WHERE guild = :gid AND id = :id",
+                Map.of("gid", guildId, "id", commandId));
+
+        if (command == null)
+            throw new IllegalAccessException("Command not found");
+
+        SQLSession.getSqlConnector().getSqlWorker().deleteEntity(command);
+    }
+
+    public CustomCommandContainer addCustomCommand(String sessionIdentifier, String guildId, String commandName, String channelId, String response, String embedJson) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
+
+        CustomCommand command = SQLSession.getSqlConnector().getSqlWorker().getEntity(new CustomCommand(),
+                "SELECT * FROM CustomCommand WHERE guild = :gid AND command = :name",
+                Map.of("gid", guildId, "name", commandName));
+
+        if (command == null) {
+            command = new CustomCommand();
+            command.setGuildId(Long.parseLong(guildId));
+            command.setName(commandName);
+        }
+
+        if (response != null) {
+            command.setMessageResponse(response);
+        }
+
+        if (embedJson != null) {
+            command.setEmbedResponse(JsonParser.parseString(embedJson));
+        }
+
+        try {
+            long channelIdNumber = Long.parseLong(channelId);
+            command.setChannelId(channelIdNumber);
+        } catch (NumberFormatException e) {
+            throw new IllegalAccessException("Invalid channel id");
+        }
+
+        return new CustomCommandContainer(SQLSession.getSqlConnector().getSqlWorker().updateEntity(command), guildContainer);
+    }
+
 
     //endregion
 }

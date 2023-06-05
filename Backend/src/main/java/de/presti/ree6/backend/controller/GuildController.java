@@ -873,4 +873,44 @@ public class GuildController {
 
     //endregion
 
+    //region Custom commands
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/commands", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<CustomCommandContainer>> retrieveCustomCommands(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                                @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getCustomCommand(sessionIdentifier, guildId), "CustomCommand retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/commands/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<CustomCommandContainer> addCustomCommand(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                     @PathVariable(name = "guildId") String guildId,
+                                                                     @RequestBody CustomCommandRequest request) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.addCustomCommand(sessionIdentifier, guildId, request.name(), request.channelId(), request.message(), request.embedJson()), "CustomCommand added!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/commands/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeCustomCommand(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                             @PathVariable(name = "guildId") String guildId,
+                                             @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removeCustomCommand(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "CustomCommand removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
 }
