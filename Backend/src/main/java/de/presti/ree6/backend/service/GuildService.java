@@ -15,8 +15,10 @@ import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChanne
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class GuildService {
@@ -595,6 +597,94 @@ public class GuildService {
 
             SQLSession.getSqlConnector().getSqlWorker().deleteEntity(tickets);
         }
+    }
+
+    //endregion
+
+    //region Warnings
+
+    public List<WarningContainer> getWarnings(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        return SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Warning(),
+                "SELECT * FROM Warning WHERE guildId = :gid",
+                Map.of("gid", guildId)).stream().map(WarningContainer::new).toList();
+    }
+
+    public WarningContainer addWarnings(String sessionIdentifier, String guildId, String userId, String warnings) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        Warning warning = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Warning(),
+                "SELECT * FROM Warning WHERE guildId = :gid AND userId = :uid",
+                Map.of("gid", guildId, "uid", userId));
+
+        if (warning == null) {
+            warning = new Warning();
+            warning.setGuildId(Long.parseLong(guildId));
+            warning.setWarnings(0);
+        }
+
+        int additionWarnings = 1;
+
+        try {
+            additionWarnings = Integer.parseInt(warnings);
+        } catch (NumberFormatException ignored) {
+        }
+
+        warning.setWarnings(warning.getWarnings() + additionWarnings);
+
+        warning = SQLSession.getSqlConnector().getSqlWorker().updateEntity(warning);
+
+        return new WarningContainer(warning);
+    }
+
+    public WarningContainer removeWarnings(String sessionIdentifier, String guildId, String userId, String warnings) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        Warning warning = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Warning(),
+                "SELECT * FROM Warning WHERE guildId = :gid AND userId = :uid",
+                Map.of("gid", guildId, "uid", userId));
+
+        if (warning == null) {
+            warning = new Warning();
+            warning.setGuildId(Long.parseLong(guildId));
+            warning.setWarnings(0);
+            warning.setUserId(Long.parseLong(userId));
+        }
+
+        int additionWarnings = 1;
+
+        try {
+            additionWarnings = Integer.parseInt(warnings);
+        } catch (NumberFormatException ignored) {
+        }
+
+        warning.setWarnings(warning.getWarnings() - additionWarnings);
+
+        if (warning.getWarnings() < 0)
+            warning.setWarnings(0);
+
+        warning = SQLSession.getSqlConnector().getSqlWorker().updateEntity(warning);
+
+        return new WarningContainer(warning);
+    }
+
+    public void clearWarnings(String sessionIdentifier, String guildId, String userId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        Warning warning = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Warning(),
+                "SELECT * FROM Warning WHERE guildId = :gid AND userId = :uid",
+                Map.of("gid", guildId, "uid", userId));
+
+        if (warning == null) {
+            warning = new Warning();
+            warning.setGuildId(Long.parseLong(guildId));
+            warning.setUserId(Long.parseLong(userId));
+        }
+
+        warning.setWarnings(0);
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(warning);
     }
 
     //endregion
