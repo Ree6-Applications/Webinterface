@@ -687,5 +687,74 @@ public class GuildService {
         SQLSession.getSqlConnector().getSqlWorker().updateEntity(warning);
     }
 
+    //region Punishments
+
+    public List<PunishmentContainer> getPunishments(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        return SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Punishments(),
+                "SELECT * FROM Punishments WHERE guildId = :gid",
+                Map.of("gid", guildId)).stream().map(c -> new PunishmentContainer(c, guildContainer)).toList();
+    }
+
+    public void clearPunishments(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Punishments(),
+                "SELECT * FROM Punishments WHERE guildId = :gid",
+                Map.of("gid", guildId)).forEach(c -> SQLSession.getSqlConnector().getSqlWorker().deleteEntity(c));
+    }
+
+    public void removePunishments(String sessionIdentifier, String guildId, String punishmentId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        Punishments punishments = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Punishments(),
+                "SELECT * FROM Punishments WHERE guildId = :gid AND id = :id",
+                Map.of("gid", guildId, "id", punishmentId));
+
+        if (punishments == null)
+            throw new IllegalAccessException("Punishment not found");
+
+        if (punishments.getGuildId() != guildContainer.getGuild().getIdLong())
+            throw new IllegalAccessException("Punishment not found");
+
+        SQLSession.getSqlConnector().getSqlWorker().deleteEntity(punishments);
+    }
+
+    public PunishmentContainer addPunishments(String sessionIdentifier, String guildId, String neededWarnings, String action, String timeoutTime, String roleId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
+
+        if (guildContainer.getGuild().getRoleById(roleId) == null)
+            throw new IllegalAccessException("Role not found");
+
+        Punishments punishments = new Punishments();
+        punishments.setGuildId(Long.parseLong(guildId));
+
+        try {
+            int warnings = Integer.parseInt(neededWarnings);
+            if (warnings < 0)
+                throw new IllegalAccessException("Invalid warnings");
+
+            int actionInt = Integer.parseInt(action);
+
+            if (actionInt < 0 || actionInt > 5)
+                throw new IllegalAccessException("Invalid action");
+
+            long timeout = Long.parseLong(timeoutTime);
+            long role = Long.parseLong(roleId);
+
+            punishments.setWarnings(warnings);
+            punishments.setAction(actionInt);
+            punishments.setTimeoutTime(timeout);
+            punishments.setRoleId(role);
+        } catch (NumberFormatException e) {
+            throw new IllegalAccessException("Invalid number format");
+        }
+
+        return  new PunishmentContainer(SQLSession.getSqlConnector().getSqlWorker().updateEntity(punishments));
+    }
+
+    //endregion
+
     //endregion
 }

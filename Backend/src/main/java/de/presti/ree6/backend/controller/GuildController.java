@@ -818,5 +818,59 @@ public class GuildController {
         }
     }
 
+    //region Punishments
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/warnings/punishments", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<PunishmentContainer>> retrievePunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                                @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.getPunishments(sessionIdentifier, guildId), "Punishments retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/warnings/punishments/clear", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse clearPunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                            @PathVariable(name = "guildId") String guildId) {
+        try {
+            guildService.clearPunishments(sessionIdentifier, guildId);
+            return new GenericResponse(true, "Punishments cleared!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/warnings/punishments/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<PunishmentContainer> addPunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                     @PathVariable(name = "guildId") String guildId,
+                                                                     @RequestBody PunishmentsRequest request) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.addPunishments(sessionIdentifier, guildId, request.neededWarnings(), request.action(), request.timeoutTime(), request.roleId()), "Punishments added!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/{guildId}/warnings/punishments/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removePunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                             @PathVariable(name = "guildId") String guildId,
+                                             @RequestBody GenericValueRequest request) {
+        try {
+            guildService.removePunishments(sessionIdentifier, guildId, request.value());
+            return new GenericResponse(true, "Punishments removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+
     //endregion
+
+    //endregion
+
 }
