@@ -53,11 +53,25 @@ public class GuildService {
 
     public ChannelContainer getLogChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
-        Webhook webhook = SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guildId);
+        WebhookLog webhook = SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guildId);
         if (webhook == null) {
             return new ChannelContainer();
         }
-        return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getChannelId()));
+
+        if (webhook.getChannelId() != 0) {
+            return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getWebhookId()));
+        } else {
+            net.dv8tion.jda.api.entities.Webhook webhook1 = guildContainer.getGuild().retrieveWebhooks().complete().stream()
+                    .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getWebhookId()) && entry.getToken().equalsIgnoreCase(webhook.getToken())).findFirst().orElse(null);
+
+            if (webhook1 != null) {
+                webhook.setChannelId(webhook1.getSourceChannel().getIdLong());
+                SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
+                return new ChannelContainer(webhook1);
+            }
+        }
+
+        return new ChannelContainer();
     }
 
     public void updateLogChannel(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
@@ -74,7 +88,8 @@ public class GuildService {
             webhookLog.setGuildId(guildId);
         }
 
-        webhookLog.setChannelId(newWebhook.getId());
+        webhookLog.setChannelId(channel.getIdLong());
+        webhookLog.setWebhookId(newWebhook.getId());
         webhookLog.setToken(newWebhook.getToken());
 
         SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhookLog);
@@ -89,7 +104,7 @@ public class GuildService {
 
         if (webhook != null) {
             guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
-                    .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getChannelId()) && entry.getToken().equalsIgnoreCase(webhook.getToken()))
+                    .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getWebhookId()) && entry.getToken().equalsIgnoreCase(webhook.getToken()))
                     .forEach(entry -> entry.delete().queue()));
         }
 
@@ -102,11 +117,25 @@ public class GuildService {
 
     public ChannelContainer getWelcomeChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
-        Webhook webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId);
+        WebhookWelcome webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId);
         if (webhook == null) {
             return new ChannelContainer();
         }
-        return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getChannelId()));
+
+        if (webhook.getChannelId() != 0) {
+            return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getWebhookId()));
+        } else {
+            net.dv8tion.jda.api.entities.Webhook webhook1 = guildContainer.getGuild().retrieveWebhooks().complete().stream()
+                    .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getWebhookId()) && entry.getToken().equalsIgnoreCase(webhook.getToken())).findFirst().orElse(null);
+
+            if (webhook1 != null) {
+                webhook.setChannelId(webhook1.getSourceChannel().getIdLong());
+                SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
+                return new ChannelContainer(webhook1);
+            }
+        }
+
+        return new ChannelContainer();
     }
 
     public void updateWelcomeChannel(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
@@ -124,7 +153,8 @@ public class GuildService {
             welcome.setGuildId(guildId);
         }
 
-        welcome.setChannelId(newWebhook.getId());
+        welcome.setChannelId(channel.getIdLong());
+        welcome.setWebhookId(newWebhook.getId());
         welcome.setToken(newWebhook.getToken());
 
         SQLSession.getSqlConnector().getSqlWorker().updateEntity(welcome);
@@ -139,7 +169,7 @@ public class GuildService {
 
         if (webhook != null) {
             guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
-                    .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getChannelId()) && entry.getToken().equalsIgnoreCase(webhook.getToken()))
+                    .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getWebhookId()) && entry.getToken().equalsIgnoreCase(webhook.getToken()))
                     .forEach(entry -> entry.delete().queue()));
         }
 
@@ -167,7 +197,7 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-RedditNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().addRedditWebhook(guildId, newWebhook.getId(), newWebhook.getToken(),
+        SQLSession.getSqlConnector().getSqlWorker().addRedditWebhook(guildId, channel.getIdLong(), newWebhook.getId(), newWebhook.getToken(),
                 notifierRequest.name(), notifierRequest.message());
     }
 
@@ -196,7 +226,7 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-TwitchNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().addTwitchWebhook(guildId, newWebhook.getId(), newWebhook.getToken(),
+        SQLSession.getSqlConnector().getSqlWorker().addTwitchWebhook(guildId, channel.getIdLong(), newWebhook.getId(), newWebhook.getToken(),
                 notifierRequest.name(), notifierRequest.message());
     }
 
@@ -224,7 +254,7 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-YoutubeNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().addYouTubeWebhook(guildId, newWebhook.getId(), newWebhook.getToken(),
+        SQLSession.getSqlConnector().getSqlWorker().addYouTubeWebhook(guildId, channel.getIdLong(), newWebhook.getId(), newWebhook.getToken(),
                 notifierRequest.name(), notifierRequest.message());
     }
 
@@ -252,7 +282,7 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-TwitterNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().addTwitterWebhook(guildId, newWebhook.getId(), newWebhook.getToken(),
+        SQLSession.getSqlConnector().getSqlWorker().addTwitterWebhook(guildId, channel.getIdLong(), newWebhook.getId(), newWebhook.getToken(),
                 notifierRequest.name(), notifierRequest.message());
     }
 
@@ -280,7 +310,7 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-InstagramNotifier-" + notifierRequest.name()).complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().addInstagramWebhook(guildId, newWebhook.getId(), newWebhook.getToken(),
+        SQLSession.getSqlConnector().getSqlWorker().addInstagramWebhook(guildId, channel.getIdLong(), newWebhook.getId(), newWebhook.getToken(),
                 notifierRequest.name(), notifierRequest.message());
     }
 
