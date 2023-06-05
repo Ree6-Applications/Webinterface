@@ -341,7 +341,6 @@ public class GuildController {
         try {
             return new GenericObjectResponse<>(true, guildService.getWelcomeChannel(sessionIdentifier, guildId), "Welcome channel retrieved!");
         } catch (Exception e) {
-            e.printStackTrace();
             return new GenericObjectResponse<>(false, null, e.getMessage());
         }
     }
@@ -354,7 +353,6 @@ public class GuildController {
             SQLSession.getSqlConnector().getSqlWorker().deleteEntity(guildService.removeWelcomeChannel(sessionIdentifier, guildId));
             return new GenericResponse(true, "Welcome channel removed!");
         } catch (Exception e) {
-            e.printStackTrace();
             return new GenericResponse(false, e.getMessage());
         }
     }
@@ -368,7 +366,6 @@ public class GuildController {
             guildService.updateWelcomeChannel(sessionIdentifier, guildId, request.value());
             return new GenericResponse(true, "Welcome channel added!");
         } catch (Exception e) {
-            e.printStackTrace();
             return new GenericResponse(false, e.getMessage());
         }
     }

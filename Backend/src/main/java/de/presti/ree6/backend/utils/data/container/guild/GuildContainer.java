@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,16 +38,16 @@ public class GuildContainer {
     List<RoleContainer> roles;
 
     @JsonIgnore
-    List<Role> guildRoles;
+    ArrayList<Role> guildRoles = new ArrayList<>();
 
     @JsonIgnore
-    List<GuildChannel> guildChannels;
+    ArrayList<GuildChannel> guildChannels = new ArrayList<>();
 
     @JsonIgnore
     Guild guild;
 
     public GuildContainer(String id, String name, String iconUrl, boolean hasBot) {
-        this(id, name, iconUrl, hasBot, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), null);
+        this(id, name, iconUrl, hasBot, Collections.emptyList(), Collections.emptyList(), new ArrayList<>(), new ArrayList<>(), null);
     }
 
     public GuildContainer(OAuth2Guild oAuth2Guild) {
@@ -71,14 +72,17 @@ public class GuildContainer {
         setHasBot(BotWorker.getShardManager().getGuildById(guild.getId()) != null);
 
         if (retrieveChannels) {
-            setGuildChannels(guild.getChannels());
+            getGuildChannels().clear();
+            getGuildChannels().addAll(guild.getChannels());
             setChannels(getGuildChannels().stream().map(ChannelContainer::new).toList());
         } else {
             setChannels(Collections.emptyList());
         }
 
         if (retrieveRoles) {
-            setGuildRoles(guild.getRoles());
+            getGuildRoles().clear();
+            getGuildRoles().addAll(guild.getRoles());
+            getGuildRoles().remove(getGuildRoles().size() - 1);
             setRoles(getGuildRoles().stream().map(RoleContainer::new).toList());
         } else {
             setRoles(Collections.emptyList());
