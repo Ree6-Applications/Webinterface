@@ -39,6 +39,7 @@
     {#if !$serversLoading}
     <div in:fade class="content">
         <slot />
+        <div class="spacer"></div>
     </div>
     {/if}
 </div>
@@ -55,7 +56,12 @@
 
     .content {
         width: 100%;
-        height: calc(100% - 4rem);
+        height: 100%;
+        overflow-y: scroll;
         padding: 0rem 2rem;
+
+        .spacer {
+            margin-bottom: 2rem;
+        }
     }
 </style>

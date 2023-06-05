@@ -43,7 +43,7 @@
         <div class="button-bar">
 
             {#if !editing}
-            <div class="text">
+            <div class="text paragraph">
                 {#each $store.split("\n") as line}
                 <p>{line}</p>
                 {/each}

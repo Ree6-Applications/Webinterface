@@ -29,15 +29,15 @@
             link: "/moderation",
         },
         {
-            icon: "movie",
-            name: "Social media",
-            link: "/media",
+            icon: "touch_app",
+            name: "Interactions",
+            link: "/interactions",
         },
         {
             icon: "leaderboard",
             name: "Leaderboards",
             link: "/leaderboards",
-        },
+        }
     ];
 
     function selectServer(server: Server) {
