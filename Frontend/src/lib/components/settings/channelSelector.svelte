@@ -76,8 +76,6 @@
             "value": channel.id?.toString()
         }));
 
-        return;
-
         // Set channel
         await post_js(endpoint + "/add", JSON.stringify({
             "value": channel.id?.toString()
