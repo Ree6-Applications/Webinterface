@@ -67,24 +67,33 @@ public class GuildService {
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-Log").complete();
 
-        deleteLogChannel(guild);
+        WebhookLog webhookLog = deleteLogChannel(guild);
 
-        WebhookLog webhook = new WebhookLog(guildId, newWebhook.getId(), newWebhook.getToken());
-        SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
+        if (webhookLog == null) {
+            webhookLog = new WebhookLog();
+            webhookLog.setGuildId(guildId);
+        }
+
+        webhookLog.setChannelId(newWebhook.getId());
+        webhookLog.setToken(newWebhook.getToken());
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhookLog);
     }
 
-    public void removeLogChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
-        deleteLogChannel(sessionService.retrieveGuild(sessionIdentifier, guildId).getGuild());
+    public WebhookLog removeLogChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        return deleteLogChannel(sessionService.retrieveGuild(sessionIdentifier, guildId).getGuild());
     }
 
-    private void deleteLogChannel(Guild guild) {
-        Webhook webhook = SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guild.getId());
+    private WebhookLog deleteLogChannel(Guild guild) {
+        WebhookLog webhook = SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guild.getId());
 
         if (webhook != null) {
             guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
                     .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getChannelId()) && entry.getToken().equalsIgnoreCase(webhook.getToken()))
                     .forEach(entry -> entry.delete().queue()));
         }
+
+        return webhook;
     }
 
     //endregion
@@ -106,18 +115,26 @@ public class GuildService {
 
         StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
 
-        deleteWelcomeChannel(guild);
+        WebhookWelcome welcome = deleteWelcomeChannel(guild);
 
         net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-Welcome").complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().updateEntity(new WebhookWelcome(guildId, newWebhook.getId(), newWebhook.getToken()));
+        if (welcome == null) {
+            welcome = new WebhookWelcome();
+            welcome.setGuildId(guildId);
+        }
+
+        welcome.setChannelId(newWebhook.getId());
+        welcome.setToken(newWebhook.getToken());
+
+        SQLSession.getSqlConnector().getSqlWorker().updateEntity(welcome);
     }
 
-    public void removeWelcomeChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
-        deleteWelcomeChannel(sessionService.retrieveGuild(sessionIdentifier, guildId).getGuild());
+    public WebhookWelcome removeWelcomeChannel(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        return deleteWelcomeChannel(sessionService.retrieveGuild(sessionIdentifier, guildId).getGuild());
     }
 
-    private void deleteWelcomeChannel(Guild guild) {
+    private WebhookWelcome deleteWelcomeChannel(Guild guild) {
         WebhookWelcome webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guild.getId());
 
         if (webhook != null) {
@@ -125,6 +142,8 @@ public class GuildService {
                     .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getChannelId()) && entry.getToken().equalsIgnoreCase(webhook.getToken()))
                     .forEach(entry -> entry.delete().queue()));
         }
+
+        return webhook;
     }
 
     //endregion

@@ -350,7 +350,7 @@ public class GuildController {
     public GenericResponse removeWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                 @PathVariable(name = "guildId") String guildId) {
         try {
-            guildService.removeWelcomeChannel(sessionIdentifier, guildId);
+            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(guildService.removeWelcomeChannel(sessionIdentifier, guildId));
             return new GenericResponse(true, "Welcome channel removed!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -390,7 +390,7 @@ public class GuildController {
     public GenericResponse removeLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                             @PathVariable(name = "guildId") String guildId) {
         try {
-            guildService.removeLogChannel(sessionIdentifier, guildId);
+            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(guildService.removeLogChannel(sessionIdentifier, guildId));
             return new GenericResponse(true, "Log channel removed!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
