@@ -65,7 +65,7 @@ public class GuildService {
                     .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getWebhookId()) && entry.getToken().equalsIgnoreCase(webhook.getToken())).findFirst().orElse(null);
 
             if (webhook1 != null) {
-                webhook.setChannelId(webhook1.getSourceChannel().getIdLong());
+                webhook.setChannelId(webhook1.getChannel().getIdLong());
                 SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
                 return new ChannelContainer(webhook1);
             }
@@ -129,7 +129,7 @@ public class GuildService {
                     .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getWebhookId()) && entry.getToken().equalsIgnoreCase(webhook.getToken())).findFirst().orElse(null);
 
             if (webhook1 != null) {
-                webhook.setChannelId(webhook1.getSourceChannel().getIdLong());
+                webhook.setChannelId(webhook1.getChannel().getIdLong());
                 SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
                 return new ChannelContainer(webhook1);
             }
