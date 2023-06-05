@@ -31,7 +31,7 @@ public class ChannelContainer {
     public ChannelContainer(Webhook webhook) {
         IWebhookContainer webhookContainer = webhook.getChannel();
         this.id = webhookContainer.getId();
-        this.guildId = webhook.getSourceGuild().getId();
+        this.guildId = webhook.getGuild().getId();
         this.name = webhookContainer.getName();
         this.type = webhookContainer.getType();
     }

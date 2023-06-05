@@ -59,7 +59,7 @@ public class GuildService {
         }
 
         if (webhook.getChannelId() != 0) {
-            return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getWebhookId()));
+            return new ChannelContainer(guildContainer.getGuildChannelById(String.valueOf(webhook.getChannelId())));
         } else {
             net.dv8tion.jda.api.entities.Webhook webhook1 = guildContainer.getGuild().retrieveWebhooks().complete().stream()
                     .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getWebhookId()) && entry.getToken().equalsIgnoreCase(webhook.getToken())).findFirst().orElse(null);
@@ -123,7 +123,7 @@ public class GuildService {
         }
 
         if (webhook.getChannelId() != 0) {
-            return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getWebhookId()));
+            return new ChannelContainer(guildContainer.getGuildChannelById(String.valueOf(webhook.getChannelId())));
         } else {
             net.dv8tion.jda.api.entities.Webhook webhook1 = guildContainer.getGuild().retrieveWebhooks().complete().stream()
                     .filter(entry -> entry.getId().equalsIgnoreCase(webhook.getWebhookId()) && entry.getToken().equalsIgnoreCase(webhook.getToken())).findFirst().orElse(null);
