@@ -719,7 +719,7 @@ public class GuildController {
                                      @PathVariable(name = "guildId") String guildId,
                                      @RequestBody TicketsRequest request) {
         try {
-            guildService.updateTicket(sessionIdentifier, guildId, request.channelId(), request.logChannelId(), request.ticketMessageOpen(), request.ticketMessageMenu());
+            guildService.updateTicket(sessionIdentifier, guildId, request.channelId(), request.logChannelId());
             return new GenericResponse(true, "Tickets added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -756,10 +756,10 @@ public class GuildController {
     @CrossOrigin
     @PostMapping(value = "/{guildId}/suggestions/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                         @PathVariable(name = "guildId") String guildId,
-                                         @RequestBody SuggestionRequest request) {
+                                     @PathVariable(name = "guildId") String guildId,
+                                     @RequestBody GenericValueRequest request) {
         try {
-            guildService.updateSuggestion(sessionIdentifier, guildId, request.channelId(), request.suggestionMessageMenu());
+            guildService.updateSuggestion(sessionIdentifier, guildId, request.value());
             return new GenericResponse(true, "Suggestions added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());

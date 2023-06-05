@@ -467,7 +467,7 @@ public class GuildService {
         return ticketContainer;
     }
 
-    public void updateTicket(String sessionIdentifier, String guildId, String channelId, String logChannelId, String ticketOpenMessage, String ticketMenuMessage) throws IllegalAccessException {
+    public void updateTicket(String sessionIdentifier, String guildId, String channelId, String logChannelId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
 
         Guild guild = guildContainer.getGuild();
@@ -505,17 +505,6 @@ public class GuildService {
             tickets.setLogChannelId(newWebhook.getIdLong());
         }
 
-        if (ticketOpenMessage != null) {
-            SQLSession.getSqlConnector().getSqlWorker().setSetting(new Setting(guildId, "message_ticket_open",
-                    "Message that should display when a Ticket is opened.", ticketOpenMessage));
-        }
-
-        if (ticketMenuMessage != null) {
-            SQLSession.getSqlConnector().getSqlWorker().setSetting(new Setting(guildId, "message_ticket_menu",
-                    "Message that should display in the Ticket Menu.", ticketMenuMessage));
-        }
-
-
         SQLSession.getSqlConnector().getSqlWorker().updateEntity(tickets);
     }
 
@@ -550,7 +539,7 @@ public class GuildService {
         return suggestionContainer;
     }
 
-    public void updateSuggestion(String sessionIdentifier, String guildId, String channelId, String suggestionMenuMessage) throws IllegalAccessException {
+    public void updateSuggestion(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
 
         Guild guild = guildContainer.getGuild();
@@ -573,12 +562,6 @@ public class GuildService {
             suggestions.setChannelId(Long.parseLong(channelId));
         } else if (requireChannel) {
             throw new IllegalAccessException("Channel not found");
-        }
-
-
-        if (suggestionMenuMessage != null) {
-            SQLSession.getSqlConnector().getSqlWorker().setSetting(new Setting(guildId, "message_suggestion_menu",
-                    "Message that should display in the Suggestion Menu.", suggestionMenuMessage));
         }
 
         SQLSession.getSqlConnector().getSqlWorker().updateEntity(suggestions);
