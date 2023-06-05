@@ -493,7 +493,7 @@ public class GuildService {
         }
 
         if (logChannelId != null) {
-            StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
+            StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, logChannelId);
 
             Tickets finalTickets = tickets;
             guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
