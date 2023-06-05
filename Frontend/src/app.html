@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="stylesheet" href="%sveltekit.assets%/material-icons.css" />
+		%sveltekit.head%
+	</head>
+
+	<body class="dark" data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+
+	<style>
+		.dark {
+			--primary: #00ccff;
+			--seasalt: #f8f9faff;
+			--antiflash-white: #e9ecefff;
+			--platinum: #dee2e6ff;
+			--french-gray: #ced4daff;
+			--french-gray-2: #adb5bdff;
+			--slate-gray: #6c757dff;
+			--outer-space: #495057ff;
+			--onyx: #343a40ff;
+			--eerie-black: #212529ff;
+			--button-gap: 0.3rem;
+			--button-padding: 0.4rem 0.78rem;
+			--input-padding: 0.6rem 0.9rem;
+			--icon-padding: 0.4rem;
+			--button-radius: 1rem;
+			color: white;
+			font-family: Arial, Helvetica, sans-serif;
+		}
+		
+		.clickable {
+			cursor: pointer;
+			user-select: none;
+		}
+
+		.icon-primary {
+			user-select: none;
+			color: var(--primary);
+		}
+
+		.hover-primary {
+			user-select: none;
+			transition: color 0.2s ease-in-out;
+		}
+
+		.hover-primary:hover {
+			color: var(--primary);
+		}
+
+		.icon-large {
+			user-select: none;
+			font-size: 2.5rem;
+		}
+
+		.icon-medium {
+			user-select: none;
+			font-size: 2rem;
+		}
+
+		.icon-small {
+			user-select: none;
+			font-size: 1.8rem;
+		}
+
+		.headline {
+			font-size: 2rem;
+		}
+
+		.text-large {
+			font-size: 1.5rem;
+		}
+
+		.text-medium {
+			font-size: 1.2rem;
+		}
+
+		.text-small {
+			font-size: 1rem;
+		}
+
+		.text-bg {
+			color: var(--french-gray);
+		}
+
+		* {
+			padding: 0;
+			margin: 0;
+		}
+	</style>
+</html>

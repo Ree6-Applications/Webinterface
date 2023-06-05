@@ -1,0 +1,21 @@
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--button-gap) * 1.5);
+
+    .chip {
+        display: flex;
+        align-items: center;
+        gap: var(--button-gap);
+        padding: var(--button-padding);
+        border-radius: 10rem;
+        border: 2px solid var(--onyx);
+        background-color: var(--onyx);
+        transition: 250ms ease;
+    }
+
+    .chip-enabled {
+        border-color: var(--slate-gray);
+        background-color: var(--onyx);
+    }
+}
