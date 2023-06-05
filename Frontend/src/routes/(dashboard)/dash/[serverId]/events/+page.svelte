@@ -4,8 +4,13 @@
     import MassBoolean from "$lib/components/settings/massBoolean.svelte";
     import MassRoleSelector from "$lib/components/settings/massRoleSelector.svelte";
     import MessageSelector from "$lib/components/settings/messageSelector.svelte";
+    import { currentServer } from "$lib/scripts/servers";
 
 </script>
+
+<svelte:head>
+    <title>Events - { $currentServer.name }</title>
+</svelte:head>
 
 <h1 class="headline">Logging</h1>
 

@@ -3,9 +3,6 @@
     import MassBoolean from "$lib/components/settings/massBoolean.svelte";
     import MassStringSelector from "$lib/components/settings/massStringSelector.svelte";
     import StringSelector from "$lib/components/settings/stringSelector.svelte";
-    import { get } from "$lib/scripts/constants";
-    import { onMount } from "svelte";
-    import Warnings from "./warnings.svelte";
 
     
     let blacklist = ["Glatze", "Bastard"]
@@ -39,12 +36,10 @@
 
 <MassBoolean icon="keyboard_command_key" title="Enabled commands" description="Configure all commands that can be executed using the discord bot." prefix="command_" />
 
-<h1 class="headline">Warnings & punishments</h1>
-
-<Warnings />
-
 <style lang="scss">
     @import '$lib/default.scss';
+    @import '$lib/styles/box.scss';
+    @import '$lib/styles/chips.scss';
 
     .chip-button {
         margin-left: 0.1rem;
