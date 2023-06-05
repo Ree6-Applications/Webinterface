@@ -35,6 +35,10 @@
 
 </script>
 
+<svelte:head>
+    <title>Statistics - { $currentServer.name }</title>
+</svelte:head>
+
 <div class="middle">
     <div class="server-profile">
         <img class="profile-img" src={$currentServer.icon ?? "hi"} alt="hi" />

@@ -1,4 +1,13 @@
+<script>
+
+    import { currentServer } from "$lib/scripts/servers";
+
+</script>
 <h1 class="headline">Social media</h1>
+
+<svelte:head>
+    <title>Social media - { $currentServer.name }</title>
+</svelte:head>
 
 <div class="box">
     <div class="box-title">

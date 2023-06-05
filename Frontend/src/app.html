@@ -5,6 +5,7 @@
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="stylesheet" href="%sveltekit.assets%/material-icons.css" />
+		<title>...</title>
 		%sveltekit.head%
 	</head>
 
@@ -13,6 +14,11 @@
 	</body>
 
 	<style>
+
+		body {
+			overflow: hidden;
+		}
+
 		.dark {
 			--primary: #00ccff;
 			--seasalt: #f8f9faff;
@@ -32,9 +38,17 @@
 			color: white;
 			font-family: Arial, Helvetica, sans-serif;
 		}
+
+		body {
+			overflow-y: hidden;
+		}
 		
 		.clickable {
 			cursor: pointer;
+			user-select: none;
+		}
+
+		.ns {
 			user-select: none;
 		}
 
