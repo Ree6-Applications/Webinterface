@@ -4,6 +4,8 @@
 
     export let current: Role | null;
     export let message: string;
+    export let zIndex: number = 100;
+    export let nullable: boolean = false;
     export let callback: (role: Role | null) => void;
 
     function close() {
@@ -12,7 +14,7 @@
 
 </script>
 
-<div out:fade={{duration: 250}} in:fade={{duration: 250}} class="dialog-outer">
+<div out:fade={{duration: 250}} in:fade={{duration: 250}} class="dialog-outer" style="z-index: {zIndex};">
     <div out:scale={{start: 0.8, duration: 250}} in:scale={{start: 0.8, duration: 250}} class="dialog">
 
         <div class="header">
@@ -29,6 +31,13 @@
                     <div class="name">{role.name}</div>
                 </div>
                 {/each}
+                {#if nullable}
+                <div on:click={() => callback(null)} on:keydown 
+                    class="channel clickable {current == null ? 'selected' : ''}">
+                    <span class="material-icons icon-small icon-primary">close</span>
+                    <div class="name">Nothing</div>
+                </div>
+                {/if}
             </div>
         </div>
     </div>

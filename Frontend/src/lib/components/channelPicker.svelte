@@ -15,6 +15,7 @@
 
     export let current: Channel;
     export let message: string;
+    export let zIndex: number = 100;
     export let callback: (id: Channel) => void;
 
     function close() {
@@ -23,7 +24,7 @@
 
 </script>
 
-<div out:fade={{duration: 250}} in:fade={{duration: 250}} class="dialog-outer">
+<div out:fade={{duration: 250}} in:fade={{duration: 250}} class="dialog-outer" style="z-index: {zIndex};">
     <div out:scale={{start: 0.8, duration: 250}} in:scale={{start: 0.8, duration: 250}} class="dialog">
 
         <div class="header">

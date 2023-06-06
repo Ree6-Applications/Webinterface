@@ -1,0 +1,61 @@
+.button {
+    display: flex;
+    align-items: center;
+    gap: var(--button-gap);
+    padding: var(--button-padding);
+    background-color: var(--onyx);
+    border-radius: 1rem;
+    transition: 250ms all ease;
+    cursor: pointer;
+}
+
+.text {
+    display: flex;
+    align-items: center;
+    gap: var(--button-gap);
+    padding: var(--button-padding);
+    background-color: var(--onyx);
+    border-radius: 1rem;
+    transition: 250ms all ease;
+    outline: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+}
+
+.paragraph {
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+}
+
+.icon-button {
+    padding: var(--icon-padding);
+}
+
+.button:hover {
+    background-color: var(--eerie-black);
+}
+
+input {
+    padding: var(--input-padding);
+    background-color: var(--onyx);
+    border-radius: 1rem;
+    transition: 250ms all ease;
+    outline: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+}
+
+textarea {
+    padding: var(--input-padding);
+    background-color: var(--onyx);
+    border-radius: 1rem;
+    transition: 250ms all ease;
+    outline: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    width: 30vw;
+}

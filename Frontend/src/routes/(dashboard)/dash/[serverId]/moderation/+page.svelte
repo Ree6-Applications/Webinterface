@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from "$app/stores";
+    import DataPopup from "$lib/components/data_popup/dataPopup.svelte";
     import MassBoolean from "$lib/components/settings/massBoolean.svelte";
     import MassStringSelector from "$lib/components/settings/massStringSelector.svelte";
     import StringSelector from "$lib/components/settings/stringSelector.svelte";
@@ -29,7 +30,7 @@
 
 <div class="default-margin"></div>
 
-<MassStringSelector icon="block" title="Blacklisted roles" description="Any message containing a word from the list of blacklisted words will be deleted and logged." endpoint={"/guilds/" + $page.params.serverId + "/blacklist"} />
+<MassStringSelector icon="block" title="Blacklisted words" description="Any message containing a word from the list of blacklisted words will be deleted and logged." endpoint={"/guilds/" + $page.params.serverId + "/blacklist"} />
 
 <h1 class="headline">Command settings</h1>
 
@@ -42,6 +43,40 @@
 <div class="default-margin"></div>
 
 <Warnings />
+
+<DataPopup title="Create something" builder={() => {
+
+    return [
+        {
+            type: "channel",
+            name: "Some channel",
+            value: {
+                id: null,
+                name: null,
+                type: "TEXT"
+            },
+            visible: true
+        },
+        {
+            type: "role",
+            name: "Some role",
+            value: null,
+            visible: true
+        },
+        {
+            type: "string",
+            name: "Some string",
+            value: null,
+            visible: true
+        },
+        {
+            type: "int",
+            name: "Some int",
+            value: null,
+            visible: true
+        }
+    ]
+}} action1="Create" action2="Cancel" action1Handler={(content) => console.log(content)} />
 
 <style lang="scss">
     @import '$lib/default.scss';
