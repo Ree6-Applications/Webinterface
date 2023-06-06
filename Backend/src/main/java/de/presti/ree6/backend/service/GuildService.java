@@ -527,16 +527,13 @@ public class GuildService {
 
     //region Suggestion
 
-    public SuggestionContainer getSuggestion(String sessionIdentifier, String guildId) throws IllegalAccessException {
+    public ChannelContainer getSuggestion(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
+
         Suggestions suggestions = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Suggestions(),
                 "SELECT * FROM Suggestions WHERE guildId = :id", Map.of("id", guildId));
 
-        SuggestionContainer suggestionContainer = new SuggestionContainer();
-        suggestionContainer.setChannel(guildContainer.getChannelById(String.valueOf(suggestions.getChannelId())));
-        suggestionContainer.setSuggestionMessageMenu(SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, "message_suggestion_menu").getStringValue());
-
-        return suggestionContainer;
+        return guildContainer.getChannelById(String.valueOf(suggestions.getChannelId()));
     }
 
     public void updateSuggestion(String sessionIdentifier, String guildId, String channelId) throws IllegalAccessException {

@@ -29,7 +29,7 @@ public class SettingsController {
 
     //region Settings Retrieve
 
-    @CrossOrigin
+
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<List<Setting>> retrieveSettings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                   @PathVariable(name = "guildId") String guildId) {
@@ -41,7 +41,7 @@ public class SettingsController {
         }
     }
 
-    @CrossOrigin
+
     @GetMapping(value = "/{settingName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<Setting> retrieveSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                            @PathVariable(name = "guildId") String guildId,
@@ -58,7 +58,7 @@ public class SettingsController {
 
     //region Settings Update
 
-    @CrossOrigin
+
     @PostMapping(value = "/{settingName}/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<Setting> updateSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") String guildId,
@@ -78,7 +78,7 @@ public class SettingsController {
 
     //region Setting Delete
 
-    @CrossOrigin
+
     @GetMapping(value = "/{settingName}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse deleteSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") String guildId,

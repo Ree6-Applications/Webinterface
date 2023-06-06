@@ -20,11 +20,6 @@ public class Data {
         return Server.getInstance().getConfig().getConfiguration().getString("webinterface.hostname", "cp.ree6.de");
     }
 
-    public static String getHostUrl() {
-        boolean useSSL = Server.getInstance().getConfig().getConfiguration().getBoolean("webinterface.usingSSL", true);
-        return (useSSL ? "https://" : "http://") + getHostname();
-    }
-
     public static String getDiscordRedirectUrl() {
         return Server.getInstance().getConfig().getConfiguration().getString("webinterface.discordRedirect", "https://cp.ree6.de/auth/discord/callback");
     }
@@ -41,11 +36,9 @@ public class Data {
         return Server.getInstance().getConfig().getConfiguration().getString("webinterface.loginRedirect", "https://cp.ree6.de/login");
     }
 
-    // Current Domain of the Website.
-    public static final String WEBSITE = "https://ree6.de";
-
-    // Advertisement, because of Sponsors.
-    public static final String ADVERTISEMENT = "powered by Tube-Hosting";
+    public static String getAllowedDomains() {
+        return Server.getInstance().getConfig().getConfiguration().getString("webinterface.allowedDomains", "https://*.ree6.de,http://localhost:[5173,8888]");
+    }
 
     public static final String defaultIconUrl = "https://i0.wp.com/www.alphr.com/wp-content/uploads/2019/02/Discord-Spoiler-Tag-Featured.jpg?resize=1200%2C1080&ssl=1";
 }
