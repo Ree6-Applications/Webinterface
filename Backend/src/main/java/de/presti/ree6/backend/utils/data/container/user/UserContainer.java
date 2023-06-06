@@ -32,7 +32,13 @@ public class UserContainer {
     }
 
     public UserContainer(Member user) {
-        this(user.getUser());
+        if (user == null) return;
+
+        User user1 = user.getUser();
+        this.id = user1.getId();
+        this.name = user1.getName();
+        this.discriminator = user1.getDiscriminator();
+        this.avatarUrl = user1.getEffectiveAvatarUrl();
     }
 
 }
