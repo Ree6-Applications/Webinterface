@@ -16,10 +16,6 @@ public class Data {
         throw new IllegalStateException("Utility class");
     }
 
-    public static String getHostname() {
-        return Server.getInstance().getConfig().getConfiguration().getString("webinterface.hostname", "cp.ree6.de");
-    }
-
     public static String getDiscordRedirectUrl() {
         return Server.getInstance().getConfig().getConfiguration().getString("webinterface.discordRedirect", "https://cp.ree6.de/auth/discord/callback");
     }
