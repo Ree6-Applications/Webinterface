@@ -79,7 +79,7 @@ public final class RandomUtils {
      * @return A random number with the given amount of digits.
      */
     public static String randomNumber(int length) {
-        return RandomUtils.random(length, "123456789");
+        return RandomUtils.randomString(length, "123456789");
     }
 
     /**
@@ -88,7 +88,7 @@ public final class RandomUtils {
      * @return A string with the given amount of characters.
      */
     public static String randomString(int length) {
-        return RandomUtils.random(length, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@/+§!$()=?]}{[");
+        return RandomUtils.randomString(length, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@/+§!$()=?]}{[");
     }
 
     /**
@@ -97,8 +97,8 @@ public final class RandomUtils {
      * @param chars The characters to use.
      * @return A string with the given amount of characters.
      */
-    public static String random(int length, String chars) {
-        return RandomUtils.random(length, chars.toCharArray());
+    public static String randomString(int length, String chars) {
+        return RandomUtils.randomString(length, chars.toCharArray());
     }
 
     /**
@@ -107,7 +107,7 @@ public final class RandomUtils {
      * @param chars The characters to use.
      * @return A string with the given amount of characters.
      */
-    public static String random(int length, char[] chars) {
+    public static String randomString(int length, char[] chars) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < length; ++i) {
             stringBuilder.append(chars[RandomUtils.random.nextInt(chars.length)]);
