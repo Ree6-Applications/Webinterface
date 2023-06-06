@@ -34,11 +34,13 @@ public class Server {
     /**
      * Class Instance.
      */
+    @Getter
     private static Server instance;
 
     /**
      * Discord OAuth2 Client instance.
      */
+    @Getter
     OAuth2Client oAuth2Client;
 
     /**
@@ -195,29 +197,16 @@ public class Server {
     }
 
     /**
-     * Retrieve an Instance of the Server.
-     *
-     * @return instance of Server.
-     */
-    public static Server getInstance() {
-        return instance;
-    }
-
-    /**
-     * Retrieve an Instance of the OAuthClient-
-     *
-     * @return {@link OAuth2Client} Instance of OAuthClient.
-     */
-    public OAuth2Client getOAuth2Client() {
-        return oAuth2Client;
-    }
-
-    /**
      * Retrieve the Instance of the Config.
      *
      * @return {@link Config} Instance of the Config.
      */
     public Config getConfig() {
+        if (config == null) {
+            config = new Config();
+            config.init();
+        }
+
         return config;
     }
 }
