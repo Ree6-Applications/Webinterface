@@ -2,13 +2,18 @@
     import { page } from "$app/stores";
     import ConfirmPopup from "$lib/components/confirmPopup.svelte";
     import LoadingIndicator from "$lib/components/loadingIndicator.svelte";
-    import { get_js } from "$lib/scripts/constants";
+    import { get_js, post_js } from "$lib/scripts/constants";
     import { onMount } from "svelte";
+    import { slide } from "svelte/transition";
 
     let loading = true
     let error = false
 
-    let clearAll = false
+    let confirm = false
+    let confirmMessage = "", confirmTitle = ""
+    let currentAction = ""
+    let currentTarget = ""
+    let warnings: any[] = []
 
     onMount(async () => {
         const json = await get_js("/guilds/" + $page.params.serverId + "/warnings")
@@ -18,15 +23,113 @@
             return
         }
         
+        warnings = json.object
+
         console.log(json)
         loading = false;
     })
 
+    function addWarning(id: string) {
+        confirm = true;
+        confirmTitle = "Add warning"
+        confirmMessage = "Do you really want to add a warning to this user?"
+        currentAction = "add"
+        currentTarget = id + ":1"
+    }
+
+    function removeWarning(id: string) {
+        confirm = true;
+        confirmTitle = "Remove warning"
+        confirmMessage = "Do you really want to remove a warning to this user?"
+        currentAction = "add"
+        currentTarget = id + ":-1"
+    }
+
+    function clearWarningsOfUser(id: string) {
+        confirm = true;
+        confirmTitle = "Clear warnings"
+        confirmMessage = "Do you really want to clear ALL warnings of this user? This action cannot be undone."
+        currentAction = "remove"
+        currentTarget = id
+    }
+
+    function clearWarnings() {
+        confirm = true;
+        confirmTitle = "Clear warnings"
+        confirmMessage = "Do you really want to clear all warnings? This action cannot be undone."
+        currentAction = "clear"
+    }
+
 </script>
 
-{#if clearAll}
-<ConfirmPopup title="Confirm deletion." content="Do you really want to delete all warnings? This can not be undone." close={(b) => {
-    clearAll = false;
+{#if confirm}
+<ConfirmPopup title={confirmTitle} content={confirmMessage} close={async (b) => {
+    confirm = false;
+
+    if(b) {
+
+        let json;
+        switch(currentAction) {
+
+            case "add":
+
+                loading = true;
+                const args = currentTarget.split(":")
+                json = await post_js("/guilds/" + $page.params.serverId + "/warnings/add", JSON.stringify({
+                    "userId": args[0],
+                    "warnings": args[1]
+                }))
+
+                console.log(json)
+
+                if(!json.success) {
+                    setTimeout(() => {
+                        error = true
+                        loading = false;
+                    }, 2000);
+                } else {
+                    loading = false;
+                }
+
+                break;
+
+            case "remove":
+
+                loading = true;
+                json = await post_js("/guilds/" + $page.params.serverId + "/warnings/remove", JSON.stringify({
+                    "value": currentTarget,
+                }))
+
+                console.log(json)
+
+                if(!json.success) {
+                    setTimeout(() => {
+                        error = true
+                        loading = false;
+                    }, 2000);
+                } else {
+                    loading = false;
+                }
+
+                break;
+
+            case "clear":
+
+                loading = true;
+                json = await post_js("/guilds/" + $page.params.serverId + "/warnings/clear", "{}")
+
+                if(!json.success) {
+                    setTimeout(() => {
+                        error = true
+                        loading = false;
+                    }, 2000);
+                } else {
+                    loading = false;
+                }
+                break;
+        }
+    }
+
 }} />
 {/if}
 
@@ -42,12 +145,8 @@
 
         {#if !loading}
         <div class="button-bar ns">
-            <div class="button" on:keydown={() => {}}>
-                <span class="material-icons icon-small icon-primary">add</span>
-                <p class="text-small">Warn someone</p>
-            </div>
 
-            <div class="button" on:click={() => clearAll = true} on:keydown={() => {}}>
+            <div class="button" on:click={() => clearWarnings()} on:keydown={() => {}}>
                 <span class="material-icons icon-small icon-primary">delete</span>
                 <p class="text-small">Delete all</p>
             </div>
@@ -58,10 +157,39 @@
 
     </div>
 
+    {#if !loading}
+    <div in:slide class="chips default-margin">
+        {#each warnings as warning}
+
+        <div class="chip">
+            <img src={warning.user.avatarUrl} alt="User avatar" />
+            <p class="text-small">{warning.user.name}</p>
+
+            <div class="hr-v"></div>
+
+            <span class="material-icons icon-small icon-primary clickable" on:click={() => addWarning(warning.user.id)} on:keydown>add</span>
+            <p class="text-small">{warning.warnings}</p>
+            <span class="material-icons icon-small icon-primary clickable" on:click={() => removeWarning(warning.user.id)} on:keydown>remove</span>
+
+            <div class="hr-v"></div>
+
+            <span class="material-icons icon-small icon-primary clickable" on:click={() => clearWarningsOfUser(warning.user.id)} on:keydown>delete</span>
+        </div>
+
+        {/each}
+    </div>
+    {/if}
 
 </div>
 
 <style lang="scss">
     @import '$lib/styles/box.scss';
+    @import '$lib/default.scss';
+    @import '$lib/styles/chips.scss';
+
+    img {
+        height: 1.9rem;
+        border-radius: 10rem;
+    }
 
 </style>

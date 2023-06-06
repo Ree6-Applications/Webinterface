@@ -142,7 +142,7 @@
     {#if !$settingsLoading && loaded}
     <div in:slide class="chips default-margin">
         {#each Array.from(features.values()) as feature}
-        <div class="chip clickable {feature.value == "true" ? 'chip-enabled' : ''}"
+        <div class="chip clickable chip-hover {feature.value == "true" ? 'chip-enabled' : ''}"
             on:click={() => toggle(feature.id, true)} on:keydown={() => {}}
         >
             {#if loadingFeature == feature.id}

@@ -14,6 +14,11 @@
         transition: 250ms ease;
     }
 
+    .chip-hover:hover {
+        border-color: var(--slate-gray);
+        background-color: var(--slate-gray);
+    }
+
     .chip-enabled {
         border-color: var(--slate-gray);
         background-color: var(--onyx);
