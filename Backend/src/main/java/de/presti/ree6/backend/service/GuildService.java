@@ -9,11 +9,13 @@ import de.presti.ree6.backend.utils.data.container.api.GenericNotifierRequest;
 import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
 import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
 import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
+import de.presti.ree6.backend.utils.data.container.user.UserContainer;
 import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.sql.entities.*;
 import de.presti.ree6.sql.entities.custom.CustomCommand;
 import de.presti.ree6.sql.entities.webhook.*;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -594,6 +596,12 @@ public class GuildService {
     public WarningContainer addWarnings(String sessionIdentifier, String guildId, String userId, String warnings) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
 
+        Member member = guildContainer.getGuild().getMemberById(userId);
+
+        if (member == null) {
+            throw new IllegalAccessException("Member not found");
+        }
+
         Warning warning = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Warning(),
                 "SELECT * FROM Warning WHERE guildId = :gid AND userId = :uid",
                 Map.of("gid", guildId, "uid", userId));
@@ -615,11 +623,17 @@ public class GuildService {
 
         warning = SQLSession.getSqlConnector().getSqlWorker().updateEntity(warning);
 
-        return new WarningContainer(warning);
+        return new WarningContainer(warning, new UserContainer(member));
     }
 
     public WarningContainer removeWarnings(String sessionIdentifier, String guildId, String userId, String warnings) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+
+        Member member = guildContainer.getGuild().getMemberById(userId);
+
+        if (member == null) {
+            throw new IllegalAccessException("Member not found");
+        }
 
         Warning warning = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Warning(),
                 "SELECT * FROM Warning WHERE guildId = :gid AND userId = :uid",
@@ -646,25 +660,15 @@ public class GuildService {
 
         warning = SQLSession.getSqlConnector().getSqlWorker().updateEntity(warning);
 
-        return new WarningContainer(warning);
+        return new WarningContainer(warning, new UserContainer(member));
     }
 
-    public void clearWarnings(String sessionIdentifier, String guildId, String userId) throws IllegalAccessException {
+    public void clearWarnings(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
 
-        Warning warning = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Warning(),
-                "SELECT * FROM Warning WHERE guildId = :gid AND userId = :uid",
-                Map.of("gid", guildId, "uid", userId));
-
-        if (warning == null) {
-            warning = new Warning();
-            warning.setGuildId(Long.parseLong(guildId));
-            warning.setUserId(Long.parseLong(userId));
-        }
-
-        warning.setWarnings(0);
-
-        SQLSession.getSqlConnector().getSqlWorker().updateEntity(warning);
+        SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Warning(),
+                "SELECT * FROM Warning WHERE guildId = :gid",
+                Map.of("gid", guildId)).forEach(SQLSession.getSqlConnector().getSqlWorker()::deleteEntity);
     }
 
     //region Punishments

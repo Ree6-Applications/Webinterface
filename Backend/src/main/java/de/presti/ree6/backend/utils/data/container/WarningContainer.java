@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.utils.data.container;
 
+import de.presti.ree6.backend.utils.data.container.user.UserContainer;
 import de.presti.ree6.sql.entities.Warning;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,13 +13,17 @@ import lombok.Setter;
 @AllArgsConstructor
 public class WarningContainer {
 
-    String userId;
+    UserContainer user;
     String guildId;
     String warnings;
 
     public WarningContainer(Warning warning) {
-        userId = String.valueOf(warning.getUserId());
         guildId = String.valueOf(warning.getGuildId());
         warnings = String.valueOf(warning.getWarnings());
+    }
+
+    public WarningContainer(Warning warning, UserContainer userContainer) {
+        this(warning);
+        user = userContainer;
     }
 }

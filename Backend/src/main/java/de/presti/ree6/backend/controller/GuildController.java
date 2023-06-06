@@ -691,9 +691,9 @@ public class GuildController {
     }
 
     @PostMapping(value = "/{guildId}/warnings/clear", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse clearWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId, @RequestBody GenericValueRequest request) {
+    public GenericResponse clearWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId) {
         try {
-            guildService.clearWarnings(sessionIdentifier, guildId, request.value());
+            guildService.clearWarnings(sessionIdentifier, guildId);
             return new GenericResponse(true, "Warnings cleared!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());

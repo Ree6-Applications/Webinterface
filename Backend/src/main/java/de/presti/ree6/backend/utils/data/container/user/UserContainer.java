@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 
 @Getter
@@ -28,6 +29,10 @@ public class UserContainer {
 
     public UserContainer(User user) {
         this(user.getId(), user.getName(), user.getDiscriminator(), user.getEffectiveAvatarUrl());
+    }
+
+    public UserContainer(Member user) {
+        this(user.getUser());
     }
 
 }
