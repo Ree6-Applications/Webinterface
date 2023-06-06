@@ -7,10 +7,10 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin
 @RestController
 public class ErrorControllerImpl implements ErrorController {
     /**
@@ -26,7 +26,6 @@ public class ErrorControllerImpl implements ErrorController {
     public ErrorControllerImpl(ErrorAttributes errorAttributes) {
         this.errorAttributes = errorAttributes;
     }
-
 
     @RequestMapping(value = "/error", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse handleError(HttpServletRequest request) {

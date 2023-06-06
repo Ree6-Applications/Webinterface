@@ -18,7 +18,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/auth")
 public class SessionController {
