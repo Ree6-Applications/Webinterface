@@ -722,7 +722,7 @@ public class GuildController {
     }
 
 
-    @GetMapping(value = "/{guildId}/warnings/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/warnings/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<WarningContainer> addWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId, @RequestBody WarningsRequest request) {
         try {
             return new GenericObjectResponse<>(true, guildService.addWarnings(sessionIdentifier, guildId, request.userId(), request.warnings()), "Warnings added!");
@@ -732,7 +732,7 @@ public class GuildController {
     }
 
 
-    @GetMapping(value = "/{guildId}/warnings/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/warnings/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<WarningContainer> removeWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId, @RequestBody WarningsRequest request) {
         try {
             return new GenericObjectResponse<>(true, guildService.removeWarnings(sessionIdentifier, guildId, request.userId(), request.warnings()), "Warnings removed!");
@@ -742,7 +742,7 @@ public class GuildController {
     }
 
 
-    @GetMapping(value = "/{guildId}/warnings/clear", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/warnings/clear", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse clearWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId, @RequestBody GenericValueRequest request) {
         try {
             guildService.clearWarnings(sessionIdentifier, guildId, request.value());
@@ -814,7 +814,7 @@ public class GuildController {
     }
 
 
-    @GetMapping(value = "/{guildId}/commands/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/commands/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<CustomCommandContainer> addCustomCommand(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId, @RequestBody CustomCommandRequest request) {
         try {
             return new GenericObjectResponse<>(true, guildService.addCustomCommand(sessionIdentifier, guildId, request.name(), request.channelId(), request.message(), request.embedJson()), "CustomCommand added!");
@@ -824,7 +824,7 @@ public class GuildController {
     }
 
 
-    @GetMapping(value = "/{guildId}/commands/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{guildId}/commands/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeCustomCommand(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId, @RequestBody GenericValueRequest request) {
         try {
             guildService.removeCustomCommand(sessionIdentifier, guildId, request.value());
