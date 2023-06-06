@@ -590,13 +590,13 @@ public class GuildService {
 
         return SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Warning(),
                 "SELECT * FROM Warning WHERE guildId = :gid",
-                Map.of("gid", guildId)).stream().map(c -> new WarningContainer(c, new UserContainer(guildContainer.getGuild().getMemberById(c.getUserId())))).toList();
+                Map.of("gid", guildId)).stream().map(c -> new WarningContainer(c, new UserContainer(guildContainer.getGuild().retrieveMemberById(c.getUserId()).complete()))).toList();
     }
 
     public WarningContainer addWarnings(String sessionIdentifier, String guildId, String userId, String warnings) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
 
-        Member member = guildContainer.getGuild().getMemberById(userId);
+        Member member = guildContainer.getGuild().retrieveMemberById(userId).complete();
 
         if (member == null) {
             throw new IllegalAccessException("Member not found");
@@ -629,7 +629,7 @@ public class GuildService {
     public WarningContainer removeWarnings(String sessionIdentifier, String guildId, String userId, String warnings) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
 
-        Member member = guildContainer.getGuild().getMemberById(userId);
+        Member member = guildContainer.getGuild().retrieveMemberById(userId).complete();
 
         if (member == null) {
             throw new IllegalAccessException("Member not found");
