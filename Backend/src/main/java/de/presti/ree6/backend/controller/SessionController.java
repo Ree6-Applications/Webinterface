@@ -32,7 +32,7 @@ public class SessionController {
 
     //region Session Auth
 
-    @CrossOrigin
+
     @GetMapping(value = "/check", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<SessionContainer> checkSession(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
         try {
@@ -46,7 +46,7 @@ public class SessionController {
 
     //region Discord Auth
 
-    @CrossOrigin
+
     @GetMapping(value = "/discord", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<SessionContainer> completeSession(@RequestParam(name = "code") String code, @RequestParam(name = "state") String state) {
         try {
@@ -56,7 +56,7 @@ public class SessionController {
         }
     }
 
-    @CrossOrigin
+
     @GetMapping(value = "/discord/request")
     public RedirectView createSession() {
         return new RedirectView(Server.getInstance().getOAuth2Client().generateAuthorizationURL(
@@ -71,7 +71,7 @@ public class SessionController {
 
     //region Twitch Auth
 
-    @CrossOrigin
+
     @GetMapping(value = "/twitch/request")
     public RedirectView createTwitch(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
         try {
@@ -87,7 +87,7 @@ public class SessionController {
         }
     }
 
-    @CrossOrigin
+
     @GetMapping(value = "/twitch", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse authenticateTwitch(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "code") String code) {
         try {

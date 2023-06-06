@@ -84,12 +84,14 @@ public class Config {
                     .parent().path("shards").addDefault(1).commentSide("The shard amount of the Bot. Check out https://anidiots.guide/understanding/sharding/#sharding for more information.");
 
             yamlFile.path("webinterface").comment("Basic Configurations for the Webinterface").blankLine()
-                    .path("hostname").addDefault("cp.ree6.de").commentSide("Hostname of the Webinterface.")
-                    .parent().path("usingSSL").addDefault(true).commentSide("Whether you are using SSL or not.")
-                    .parent().path("discordRedirect").addDefault("https://cp.ree6.de/auth/discord/callback").commentSide("Redirect URL for Discord OAuth.")
+                    .path("discordRedirect").addDefault("https://cp.ree6.de/auth/discord/callback").commentSide("Redirect URL for Discord OAuth.")
                     .parent().path("twitchRedirect").addDefault("https://cp.ree6.de/auth/twitch/callback").commentSide("Redirect URL for Twitch OAuth.")
                     .parent().path("errorRedirect").addDefault("https://cp.ree6.de/error").commentSide("Redirect URL for errors.")
-                    .parent().path("loginRedirect").addDefault("https://cp.ree6.de/login").commentSide("Redirect URL if the user is not logged-in.");
+                    .parent().path("loginRedirect").addDefault("https://cp.ree6.de/login").commentSide("Redirect URL if the user is not logged-in.")
+                    .parent().path("allowedDomains").addDefault("https://*.ree6.de,http://localhost:[5173,8888]").commentSide("""
+                            Domains that are allowed to request the backend.
+                            We recommend doing *.HOST.TLD, and then putting the backend behind something like API.HOST.TLD!
+                            """);
 
             try {
                 yamlFile.save(getFile());
@@ -196,6 +198,7 @@ public class Config {
 
     /**
      * Create a new Configuration.
+     *
      * @return The Configuration as {@link YamlFile}.
      */
     public YamlFile createConfiguration() {
@@ -208,6 +211,7 @@ public class Config {
 
     /**
      * Get the Configuration.
+     *
      * @return The Configuration as {@link YamlFile}.
      */
     public YamlFile getConfiguration() {
@@ -220,6 +224,7 @@ public class Config {
 
     /**
      * Get the Configuration File.
+     *
      * @return The Configuration File as {@link File}.
      */
     public File getFile() {

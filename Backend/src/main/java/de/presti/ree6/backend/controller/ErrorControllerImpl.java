@@ -27,7 +27,7 @@ public class ErrorControllerImpl implements ErrorController {
         this.errorAttributes = errorAttributes;
     }
 
-    @CrossOrigin
+
     @RequestMapping(value = "/error", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse handleError(HttpServletRequest request) {
         HttpStatus httpStatus = getStatus(request);
