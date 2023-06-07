@@ -1,4 +1,4 @@
-export const BASE_PATH = "https://147.135.69.14:8013"
+export const BASE_PATH = "https://node.goldengamersunited.com"
 
 export function get(path: string) {
 
