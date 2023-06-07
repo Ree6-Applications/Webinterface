@@ -741,7 +741,7 @@ public class GuildService {
             throw new IllegalAccessException("Invalid number format");
         }
 
-        return  new PunishmentContainer(SQLSession.getSqlConnector().getSqlWorker().updateEntity(punishments));
+        return  new PunishmentContainer(SQLSession.getSqlConnector().getSqlWorker().updateEntity(punishments), guildContainer);
     }
 
     //endregion
