@@ -714,9 +714,6 @@ public class GuildService {
     public PunishmentContainer addPunishments(String sessionIdentifier, String guildId, String neededWarnings, String action, String timeoutTime, String roleId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
 
-        if (guildContainer.getGuild().getRoleById(roleId) == null)
-            throw new IllegalAccessException("Role not found");
-
         Punishments punishments = new Punishments();
         punishments.setGuildId(Long.parseLong(guildId));
 
@@ -730,6 +727,11 @@ public class GuildService {
             if (actionInt < 0 || actionInt > 5)
                 throw new IllegalAccessException("Invalid action");
 
+            if (actionInt == 2 || actionInt == 3) {
+                if (guildContainer.getGuild().getRoleById(roleId) == null)
+                    throw new IllegalAccessException("Role not found");
+            }
+
             long timeout = Long.parseLong(timeoutTime);
             long role = Long.parseLong(roleId);
 
@@ -741,7 +743,7 @@ public class GuildService {
             throw new IllegalAccessException("Invalid number format");
         }
 
-        return  new PunishmentContainer(SQLSession.getSqlConnector().getSqlWorker().updateEntity(punishments), guildContainer);
+        return new PunishmentContainer(SQLSession.getSqlConnector().getSqlWorker().updateEntity(punishments), guildContainer);
     }
 
     //endregion
@@ -810,7 +812,7 @@ public class GuildService {
     public List<MessageReactionRoleContainer> retrieveReactionRoles(String sessionIdentifier, String guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, true);
 
-        List<ReactionRole> roles =  SQLSession.getSqlConnector().getSqlWorker().getEntityList(new ReactionRole(),
+        List<ReactionRole> roles = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new ReactionRole(),
                 "SELECT * FROM ReactionRole WHERE guild = :gid",
                 Map.of("gid", guildId));
 
