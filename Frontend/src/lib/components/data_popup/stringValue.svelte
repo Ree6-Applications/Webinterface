@@ -2,6 +2,7 @@
 
     export let current: string | null = null;
     export let callback: (value: string | null) => void;
+    export let unit = "";
     export let picking = false;
 
 </script>
@@ -25,7 +26,7 @@
     <span class="material-icons icon-primary">close</span>
     <p class="text-small">Nothing</p>
     {:else}
-    <p class="text-small">{current}</p>
+    <p class="text-small">{current} {unit}</p>
     {/if}
 </div>
 {/if}

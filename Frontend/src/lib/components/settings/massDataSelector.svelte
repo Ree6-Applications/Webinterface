@@ -1,7 +1,7 @@
 <script lang="ts">
     import { post_js } from "$lib/scripts/constants";
     import DataPopup from "../data_popup/dataPopup.svelte";
-    import type { Model } from "../data_popup/popup";
+    import { model2JSON, type Model } from "../data_popup/popup";
     import LoadingIndicator from "../loadingIndicator.svelte";
 
     export let icon: string;
@@ -40,8 +40,12 @@
 {#if picking}
 <DataPopup title="Create {models[currentModel].name.toLowerCase()}" builder={() => {
     return models[currentModel].model;
-}} action1="Create" action2="Cancel" action1Handler={(content) => {
+}} action1="Create" action2="Cancel" action1Handler={async (content) => {
     picking = false;
+    
+    const body = model2JSON(content);
+    const json = await post_js(endpoint + "/add", body);
+
 }} action2Handler={() => picking = false} close={() => picking = false}/>
 {/if}
 
@@ -62,7 +66,7 @@
                 currentModel = models.indexOf(model);
                 picking = true;
             }} on:keydown={() => {}}>
-                <span class="material-icons icon-small icon-primary">{model.primaryIcon}</span>
+                <span class="material-icons icon-small icon-primary">add</span>
                 <p class="text-small">{model.name}</p>
             </div>
             {/each}

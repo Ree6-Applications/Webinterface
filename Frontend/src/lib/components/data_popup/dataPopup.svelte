@@ -41,9 +41,9 @@
                 <p class="text-medium">{item.name}</p>
 
                 {#if item.type == "string"}
-                <StringValue current={item.value} callback={(string) => item.value = string} />
+                <StringValue current={item.value} callback={(string) => item.value = string} unit={item.unit} />
                 {:else if item.type == "int"}
-                <IntValue current={item.value} callback={(int) => item.value = int} />
+                <IntValue current={item.value} callback={(int) => item.value = int} unit={item.unit} />
                 {:else if item.type == "channel"}
                 <ChannelValue current={item.value} callback={(channel) => item.value = channel} />
                 {:else if item.type == "role"}
