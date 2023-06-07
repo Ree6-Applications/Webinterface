@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { currentRoles, type Role } from "$lib/scripts/servers";
     import { fade, scale } from "svelte/transition";
 
-    export let current: Role | null;
+    export let current: string;
     export let message: string;
-    export let zIndex: number = 100;
+    export let strings: string[] = []
     export let nullable: boolean = false;
-    export let callback: (role: Role | null) => void;
+    export let zIndex: number = 100;
+    export let callback: (selected: string | null) => void;
 
     function close() {
         callback(current);
@@ -24,18 +24,18 @@
 
         <div class="content">
             <div class="channels">
-                {#each $currentRoles as role}
-                <div on:click={() => callback(role)} on:keydown 
-                    class="channel clickable {current == role ? 'selected' : ''}">
-                    <span class="material-icons icon-small" style={"color: #" + role.color.toString(16) + ";"}>military_tech</span>
-                    <div class="name">{role.name}</div>
+                {#each strings as string}
+                <div on:click={() => callback(string)} on:keydown 
+                    class="channel clickable {current == string ? 'selected' : ''}">
+                    <span class="material-icons icon-primary icon-small">tag</span>
+                    <div class="name">{string}</div>
                 </div>
                 {/each}
                 {#if nullable}
                 <div on:click={() => callback(null)} on:keydown 
                     class="channel clickable {current == null ? 'selected' : ''}">
-                    <span class="material-icons icon-small icon-primary">close</span>
-                    <div class="name">Nothing</div>
+                    <span class="material-icons icon-primary icon-small">close</span>
+                    <div class="name">None</div>
                 </div>
                 {/if}
             </div>

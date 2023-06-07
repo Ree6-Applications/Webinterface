@@ -14,6 +14,7 @@
     let currentAction = ""
     let currentTarget = ""
     let warnings: any[] = []
+    let setCallback: Function = () => {}
 
     onMount(async () => {
         const json = await get_js("/guilds/" + $page.params.serverId + "/warnings")
@@ -29,24 +30,27 @@
         loading = false;
     })
 
-    function addWarning(id: string) {
+    function addWarning(id: string, callback: Function) {
         confirm = true;
+        setCallback = callback
         confirmTitle = "Add warning"
         confirmMessage = "Do you really want to add a warning to this user?"
         currentAction = "add"
         currentTarget = id + ":1"
     }
 
-    function removeWarning(id: string) {
+    function removeWarning(id: string, callback: Function) {
         confirm = true;
+        setCallback = callback
         confirmTitle = "Remove warning"
         confirmMessage = "Do you really want to remove a warning to this user?"
         currentAction = "add"
         currentTarget = id + ":-1"
     }
 
-    function clearWarningsOfUser(id: string) {
+    function clearWarningsOfUser(id: string, callback: Function) {
         confirm = true;
+        setCallback = callback
         confirmTitle = "Clear warnings"
         confirmMessage = "Do you really want to clear ALL warnings of this user? This action cannot be undone."
         currentAction = "remove"
@@ -89,6 +93,7 @@
                     }, 2000);
                 } else {
                     loading = false;
+                    setCallback()
                 }
 
                 break;
@@ -109,6 +114,7 @@
                     }, 2000);
                 } else {
                     loading = false;
+                    setCallback()
                 }
 
                 break;
@@ -124,12 +130,15 @@
                         loading = false;
                     }, 2000);
                 } else {
+                    warnings = []
                     loading = false;
                 }
+
                 break;
         }
     }
 
+    currentTarget = ""
 }} />
 {/if}
 
@@ -146,10 +155,14 @@
         {#if !loading}
         <div class="button-bar ns">
 
+            {#if warnings.length > 0}
             <div class="button" on:click={() => clearWarnings()} on:keydown={() => {}}>
                 <span class="material-icons icon-small icon-primary">delete</span>
                 <p class="text-small">Delete all</p>
             </div>
+            {:else}
+            <p class="text">No warnings found!</p>
+            {/if}
         </div>
         {:else}
         <LoadingIndicator error={error} size="43" />
@@ -157,7 +170,7 @@
 
     </div>
 
-    {#if !loading}
+    {#if (!loading || currentTarget != "") && warnings.length > 0}
     <div in:slide class="chips default-margin">
         {#each warnings as warning}
 
@@ -167,13 +180,21 @@
 
             <div class="hr-v"></div>
 
-            <span class="material-icons icon-small icon-primary clickable" on:click={() => addWarning(warning.user.id)} on:keydown>add</span>
+            {#if !currentTarget.includes(warning.user.id)}
+            <span class="material-icons icon-small icon-primary clickable" on:click={() => addWarning(warning.user.id, () => {
+                warning.warnings = (parseInt(warning.warnings) + 1).toString()
+            })} on:keydown>add</span>
             <p class="text-small">{warning.warnings}</p>
-            <span class="material-icons icon-small icon-primary clickable" on:click={() => removeWarning(warning.user.id)} on:keydown>remove</span>
-
+            <span class="material-icons icon-small icon-primary clickable" on:click={() => removeWarning(warning.user.id, () => {
+                warning.warnings = (parseInt(warning.warnings) - 1).toString()
+            })} on:keydown>remove</span>
             <div class="hr-v"></div>
-
-            <span class="material-icons icon-small icon-primary clickable" on:click={() => clearWarningsOfUser(warning.user.id)} on:keydown>delete</span>
+            <span class="material-icons icon-small icon-primary clickable" on:click={() => clearWarningsOfUser(warning.user.id, () => {
+                warnings = warnings.filter((w) => w.user.id != warning.user.id)
+            })} on:keydown>delete</span>
+            {:else}
+            <LoadingIndicator size="25" />
+            {/if}
         </div>
 
         {/each}
