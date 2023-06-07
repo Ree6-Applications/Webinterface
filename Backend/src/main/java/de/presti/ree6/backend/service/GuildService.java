@@ -388,7 +388,8 @@ public class GuildService {
             }
 
             if (found) {
-                SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
+                // TODO:: unmark
+                //SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
                 return new RecordContainer(recording);
             } else {
                 throw new IllegalAccessException("You were not part of this recording.");

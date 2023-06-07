@@ -15,9 +15,8 @@ import org.apache.tomcat.util.codec.binary.Base64;
 public class RecordContainer {
 
     String data;
-    JsonArray participants;
 
     public RecordContainer(Recording recording) {
-        this(Base64.encodeBase64String(recording.getRecording()), recording.getJsonArray());
+        this(Base64.encodeBase64String(recording.getRecording()));
     }
 }
