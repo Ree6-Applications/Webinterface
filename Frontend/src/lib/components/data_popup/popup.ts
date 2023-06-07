@@ -8,19 +8,18 @@ export interface DataType<T> {
 }
 
 export interface Model {
-    primaryIndex: number;
     primaryIcon: string;
     name: string;
-    jsonName: string;
-    jsonInserter: string;
     model: DataType<any>[];
+    isModel: (json: any) => boolean;
+    renderFormat: (json: any) => string;
 }
 
 export function model2JSON(model: DataType<any>[]): string {
     let json: string = '{';
     model.forEach((data: DataType<any>) => {
 
-        if(data.type == "string" || data.type == "int") {
+        if(data.type == "string" || data.type == "int" || data.type == "selector") {
             json += `"${data.jsonName}": "${data.value}",`;
         } else {
             json += `"${data.jsonName}": ${data.value == null ? null : '"' + data.value.id + '"'},`;

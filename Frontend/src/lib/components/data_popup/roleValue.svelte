@@ -9,7 +9,7 @@
 </script>
 
 {#if picking}
-<RolePicker nullable={true} current={current} zIndex={200} message="Select a channel." callback={(role) => {
+<RolePicker nullable={true} current={current} zIndex={200} message="Select a role." callback={(role) => {
     picking = false;
     current = role;
     callback(role);
