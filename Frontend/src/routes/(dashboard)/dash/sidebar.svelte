@@ -29,6 +29,11 @@
             link: "/moderation",
         },
         {
+        icon: "touch_app",
+            name: "Interactions",
+            link: "/interactions",
+        },
+        {
             icon: "leaderboard",
             name: "Leaderboards",
             link: "/leaderboards",
