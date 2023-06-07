@@ -26,6 +26,10 @@
 
 </script>
 
+<svelte:head>
+    <title>Moderation - {$currentServer.name}</title>
+</svelte:head>
+
 <h1 class="headline">Moderation settings</h1>
 
 <StringSelector icon="layers" title="Command prefix" description="Select the prefix for all commands." settingName="chatprefix" />
@@ -53,9 +57,8 @@
         {
             name: "Timeout",
             primaryIcon: "timelapse",
-            primaryIndex: 0,
-            jsonName: "type",
-            jsonInserter: "timeout",
+            isModel: (json) => json.action == "1",
+            renderFormat: (json) => "More than " + json.neededWarnings + " warnings result in a timeout for " + json.timeoutTime + " seconds.",
             model: [
                 {
                     name: "Needed warnings",
@@ -69,7 +72,7 @@
                     name: "action",
                     jsonName: "action",
                     type: "string",
-                    value: "timeout",
+                    value: "1",
                     visible: false,
                     unit: ""
                 },
@@ -93,10 +96,9 @@
         },
         {
             name: "Role",
-            primaryIcon: "timelapse",
-            primaryIndex: 0,
-            jsonName: "type",
-            jsonInserter: "timeout",
+            primaryIcon: "military_tech",
+            isModel: (json) => json.action == "2" || json.action == "3",
+            renderFormat: (json) => "More than " + json.neededWarnings + " warnings result in " + (json.action == "2" ? "adding the '" + json.role.name + "' role to" : "removing the '" + json.role.name + "' role from") + " the user.",
             model: [
                 {
                     name: "Needed warnings",
@@ -107,12 +109,12 @@
                     unit: "warnings",
                 },
                 {
-                    name: "action",
+                    name: "Role action",
                     jsonName: "action",
-                    type: "string",
-                    value: "role",
-                    visible: false,
-                    unit: ""
+                    type: "selector",
+                    value: "2",
+                    visible: true,
+                    unit: "2:Add role,3:Remove role"
                 },
                 {
                     name: "Timeout length",
@@ -128,6 +130,46 @@
                     type: "role",
                     value: null,
                     visible: true,
+                    unit: ""
+                },
+            ]
+        },
+        {
+            name: "Punishment",
+            primaryIcon: "gavel",
+            isModel: (json) => json.action == "4" || json.action == "5",
+            renderFormat: (json) => "More than " + json.neededWarnings + " warnings result in a " + (json.action == "4" ? "kick" : "ban") + ".",
+            model: [
+                {
+                    name: "Needed warnings",
+                    jsonName: "neededWarnings",
+                    type: "int",
+                    value: 1,
+                    visible: true,
+                    unit: "warnings",
+                },
+                {
+                    name: "Punishment type",
+                    jsonName: "action",
+                    type: "selector",
+                    value: "4",
+                    visible: true,
+                    unit: "4:Kick,5:Ban"
+                },
+                {
+                    name: "Timeout length",
+                    jsonName: "timeoutTime",
+                    type: "int",
+                    value: 0,
+                    visible: false,
+                    unit: "seconds"
+                },
+                {
+                    name: "Role",
+                    jsonName: "roleId",
+                    type: "role",
+                    value: null,
+                    visible: false,
                     unit: ""
                 },
             ]

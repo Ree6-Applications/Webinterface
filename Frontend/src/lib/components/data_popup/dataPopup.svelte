@@ -6,6 +6,7 @@
     import RoleValue from "./roleValue.svelte";
     import StringValue from "./stringValue.svelte";
     import IntValue from "./intValue.svelte";
+    import SelectorValue from "./selectorValue.svelte";
 
     export let title: string;
     
@@ -42,6 +43,8 @@
 
                 {#if item.type == "string"}
                 <StringValue current={item.value} callback={(string) => item.value = string} unit={item.unit} />
+                {:else if item.type == "selector"}
+                <SelectorValue current={item.value} strings={item.unit.split(",")} callback={(string) => item.value = string} />
                 {:else if item.type == "int"}
                 <IntValue current={item.value} callback={(int) => item.value = int} unit={item.unit} />
                 {:else if item.type == "channel"}
@@ -49,6 +52,7 @@
                 {:else if item.type == "role"}
                 <RoleValue current={item.value} callback={(role) => item.value = role}/>
                 {/if}
+
             </div>
             {/if}
             {/each}
