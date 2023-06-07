@@ -779,8 +779,7 @@ public class GuildController {
 
     //region Reaction Roles
 
-    @GetMapping
-    @RequestMapping(value = "/{guildId}/reactionroles", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{guildId}/reactionroles", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<List<MessageReactionRoleContainer>> retrieveReactionRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId) {
         try {
             return new GenericObjectResponse<>(true, guildService.retrieveReactionRoles(sessionIdentifier, guildId), "ReactionRoles retrieved!");
