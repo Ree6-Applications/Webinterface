@@ -1,6 +1,5 @@
 package de.presti.ree6.backend.service;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
@@ -8,6 +7,7 @@ import de.presti.ree6.backend.utils.data.container.*;
 import de.presti.ree6.backend.utils.data.container.api.GenericNotifierRequest;
 import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
 import de.presti.ree6.backend.utils.data.container.guild.GuildStatsContainer;
+import de.presti.ree6.backend.utils.data.container.role.RoleContainer;
 import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
 import de.presti.ree6.backend.utils.data.container.user.UserContainer;
 import de.presti.ree6.sql.SQLSession;
@@ -16,12 +16,18 @@ import de.presti.ree6.sql.entities.custom.CustomCommand;
 import de.presti.ree6.sql.entities.webhook.*;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Service
 public class GuildService {
@@ -796,6 +802,109 @@ public class GuildService {
         return new CustomCommandContainer(SQLSession.getSqlConnector().getSqlWorker().updateEntity(command), guildContainer);
     }
 
+
+    //endregion
+
+    //region Reaction role
+
+    public List<MessageReactionRoleContainer> retrieveReactionRoles(String sessionIdentifier, String guildId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, true);
+
+        List<ReactionRole> roles =  SQLSession.getSqlConnector().getSqlWorker().getEntityList(new ReactionRole(),
+                "SELECT * FROM ReactionRole WHERE guild = :gid",
+                Map.of("gid", guildId));
+
+        Map<Long, List<ReactionRole>> map = roles.stream().collect(Collectors.groupingBy(ReactionRole::getMessageId));
+
+        List<MessageReactionRoleContainer> messageReactionRoleContainers = new ArrayList<>();
+
+        Guild guild = guildContainer.getGuild();
+
+        map.forEach((key, value) -> {
+            if (value.size() == 0) return;
+
+            StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, value.get(0).getChannelId());
+
+            if (channel == null) return;
+
+            Message message = channel.retrieveMessageById(key).complete();
+
+            MessageReactionRoleContainer messageReactionRoleContainer = new MessageReactionRoleContainer();
+            messageReactionRoleContainer.setRoleReactions(value.stream()
+                    .map(role -> new ReactionRoleContainer(role, guildContainer))
+                    .toList());
+            messageReactionRoleContainer.setMessage(new MessageContainer(message));
+            messageReactionRoleContainers.add(messageReactionRoleContainer);
+        });
+
+        return messageReactionRoleContainers;
+    }
+
+    public void addReactionRole(String sessionIdentifier, String guildId, String emojiId, String formattedEmoji, String channelId, String messageId, String roleId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, true);
+
+        Guild guild = guildContainer.getGuild();
+
+        RoleContainer role = guildContainer.getRoleById(roleId);
+
+        if (role == null)
+            throw new IllegalAccessException("Role not found");
+
+        try {
+            long channelIdNumber = Long.parseLong(channelId);
+            long messageIdNumber = Long.parseLong(messageId);
+            long emojiIdNumber = Long.parseLong(emojiId);
+
+            if (formattedEmoji == null || formattedEmoji.isBlank()) {
+                throw new IllegalAccessException("Invalid emoji");
+            }
+
+            Message message = guild.getTextChannelById(channelIdNumber).retrieveMessageById(messageIdNumber).complete();
+
+            if (message == null)
+                throw new IllegalAccessException("Message not found");
+
+            //message.addReaction(Emoji.fromFormatted(emojiIdNumber)).queue();
+
+            ReactionRole reactionRole = new ReactionRole();
+            reactionRole.setChannelId(channelIdNumber);
+            reactionRole.setEmoteId(emojiIdNumber);
+            reactionRole.setFormattedEmote(formattedEmoji);
+            reactionRole.setGuildId(guild.getIdLong());
+            reactionRole.setMessageId(messageIdNumber);
+            reactionRole.setRoleId(Long.parseLong(role.getId()));
+
+            SQLSession.getSqlConnector().getSqlWorker().updateEntity(reactionRole);
+        } catch (NumberFormatException e) {
+            throw new IllegalAccessException("Invalid number format");
+        }
+
+    }
+
+    public void removeReactionRole(String sessionIdentifier, String guildId, String emojiId, String messageId) throws IllegalAccessException {
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, true);
+
+        Guild guild = guildContainer.getGuild();
+
+
+        try {
+            long messageIdNumber = Long.parseLong(messageId);
+            long emojiIdNumber = Long.parseLong(emojiId);
+
+            //message.removeReaction(Emoji.fromFormatted(emojiIdNumber)).queue();
+
+            ReactionRole reactionRole = SQLSession.getSqlConnector().getSqlWorker().getEntity(new ReactionRole(),
+                    "SELECT * FROM ReactionRole WHERE guild = :gid AND message = :mid AND emote = :eid",
+                    Map.of("gid", guildId, "mid", messageId, "eid", emojiId));
+
+            if (reactionRole == null)
+                throw new IllegalAccessException("Reaction role not found");
+
+            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(reactionRole);
+        } catch (NumberFormatException e) {
+            throw new IllegalAccessException("Invalid number format");
+        }
+    }
 
     //endregion
 }

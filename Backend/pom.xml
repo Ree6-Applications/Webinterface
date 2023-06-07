@@ -61,7 +61,7 @@
         <dependency>
             <groupId>de.ree6</groupId>
             <artifactId>Ree6-SQL</artifactId>
-            <version>2cd7d40f00</version>
+            <version>8390cbbdab</version>
         </dependency>
 
         <!-- Discord -->

@@ -72,7 +72,7 @@ public class BotWorker {
         shardManager = DefaultShardManagerBuilder
                 .createDefault(token)
                 .setShardsTotal(shardAmount)
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .build();
     }

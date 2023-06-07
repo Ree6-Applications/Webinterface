@@ -777,4 +777,38 @@ public class GuildController {
 
     //endregion
 
+    //region Reaction Roles
+
+    @GetMapping
+    @RequestMapping(value = "/{guildId}/reactionroles", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericObjectResponse<List<MessageReactionRoleContainer>> retrieveReactionRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId) {
+        try {
+            return new GenericObjectResponse<>(true, guildService.retrieveReactionRoles(sessionIdentifier, guildId), "ReactionRoles retrieved!");
+        } catch (Exception e) {
+            return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/{guildId}/reactionroles/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse addReactionRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId, @RequestBody ReactionRoleRequest request) {
+        try {
+            guildService.addReactionRole(sessionIdentifier, guildId, request.emojiId(), request.formattedEmoji(), request.channelId(), request.messageId(), request.roleId());
+            return new GenericResponse(true,"ReactionRole added!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/{guildId}/reactionroles/remove", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GenericResponse removeReactionRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId, @RequestBody ReactionRoleDeleteRequest request) {
+        try {
+            guildService.removeReactionRole(sessionIdentifier, guildId, request.emojiId(), request.messageId());
+            return new GenericResponse(true,"ReactionRole removed!");
+        } catch (Exception e) {
+            return new GenericResponse(false, e.getMessage());
+        }
+    }
+
+    //endregion
+
 }
