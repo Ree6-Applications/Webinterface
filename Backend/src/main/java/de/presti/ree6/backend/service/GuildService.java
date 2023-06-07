@@ -732,13 +732,17 @@ public class GuildService {
                     throw new IllegalAccessException("Role not found");
             }
 
-            long timeout = Long.parseLong(timeoutTime);
-            long role = Long.parseLong(roleId);
+            long timeout = timeoutTime != null ? Long.parseLong(timeoutTime) : 0;
+            long role = roleId != null ? Long.parseLong(roleId) : 0;
 
             punishments.setWarnings(warnings);
             punishments.setAction(actionInt);
-            punishments.setTimeoutTime(timeout);
-            punishments.setRoleId(role);
+
+            if (timeoutTime != null)
+                punishments.setTimeoutTime(timeout);
+
+            if (roleId != null)
+                punishments.setRoleId(role);
         } catch (NumberFormatException e) {
             throw new IllegalAccessException("Invalid number format");
         }
