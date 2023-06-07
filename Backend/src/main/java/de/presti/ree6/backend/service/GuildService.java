@@ -371,6 +371,9 @@ public class GuildService {
 
         Recording recording = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Recording(), "SELECT * FROM Recording WHERE ID=:id", Map.of("id", recordId));
 
+        if (recording == null)
+            throw new IllegalAccessException("Recording not found!");
+
         if (guilds.stream().anyMatch(g -> g.getId().equalsIgnoreCase(recording.getGuildId()))) {
             boolean found = false;
 
