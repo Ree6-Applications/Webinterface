@@ -680,7 +680,7 @@ public class GuildService {
     //region Punishments
 
     public List<PunishmentContainer> getPunishments(String sessionIdentifier, String guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
 
         return SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Punishments(),
                 "SELECT * FROM Punishments WHERE guildId = :gid",
