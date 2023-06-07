@@ -728,7 +728,7 @@ public class GuildService {
                 throw new IllegalAccessException("Invalid action");
 
             if (actionInt == 2 || actionInt == 3) {
-                if (guildContainer.getGuild().getRoleById(roleId) == null)
+                if (roleId == null || guildContainer.getGuild().getRoleById(roleId) == null)
                     throw new IllegalAccessException("Role not found");
             }
 
