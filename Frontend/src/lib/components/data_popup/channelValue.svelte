@@ -25,7 +25,7 @@
     } else {
         current = channel;
     }
-    callback(channel);
+    callback(current);
 }} />
 {/if}
 

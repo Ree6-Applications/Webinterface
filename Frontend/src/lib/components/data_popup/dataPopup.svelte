@@ -17,6 +17,8 @@
     export let action2: string | undefined = undefined;
     export let action2Handler: ((data: DataType<any>[]) => void) | undefined = undefined;
 
+    export let close: () => void;
+
     onMount(() => {
         content = builder();
     })

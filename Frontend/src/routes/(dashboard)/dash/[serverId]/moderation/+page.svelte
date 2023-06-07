@@ -2,6 +2,7 @@
     import { page } from "$app/stores";
     import DataPopup from "$lib/components/data_popup/dataPopup.svelte";
     import MassBoolean from "$lib/components/settings/massBoolean.svelte";
+    import MassDataSelector from "$lib/components/settings/massDataSelector.svelte";
     import MassStringSelector from "$lib/components/settings/massStringSelector.svelte";
     import StringSelector from "$lib/components/settings/stringSelector.svelte";
     import Warnings from "./warnings.svelte";
@@ -44,39 +45,40 @@
 
 <Warnings />
 
-<DataPopup title="Create something" builder={() => {
+<div class="default-margin"></div>
 
-    return [
+<MassDataSelector icon="auto_awesome" title="Automatic punishments" description="Automatically do certain things when a user has more than a certain amount of warnings."
+    models={[
         {
-            type: "channel",
-            name: "Some channel",
-            value: {
-                id: null,
-                name: null,
-                type: "TEXT"
-            },
-            visible: true
+            name: "Timeout",
+            primaryIcon: "timelapse",
+            primaryIndex: 0,
+            model: [
+                {
+                    name: "Timeout length",
+                    jsonName: "timeout",
+                    type: "int",
+                    value: null,
+                    visible: true,
+                }
+            ]
         },
         {
-            type: "role",
-            name: "Some role",
-            value: null,
-            visible: true
-        },
-        {
-            type: "string",
-            name: "Some string",
-            value: null,
-            visible: true
-        },
-        {
-            type: "int",
-            name: "Some int",
-            value: null,
-            visible: true
+            name: "Timeout",
+            primaryIcon: "timelapse",
+            primaryIndex: 0,
+            model: [
+                {
+                    name: "Timeout length",
+                    jsonName: "timeout",
+                    type: "int",
+                    value: null,
+                    visible: true,
+                }
+            ]
         }
-    ]
-}} action1="Create" action2="Cancel" action1Handler={(content) => console.log(content)} />
+    ]}
+endpoint={"/guilds/" + $page.params.serverId + "/warnings/punishments"}/>
 
 <style lang="scss">
     @import '$lib/default.scss';
