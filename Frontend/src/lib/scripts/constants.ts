@@ -1,4 +1,4 @@
-export const BASE_PATH = "http://147.135.69.14:8013/"
+export const BASE_PATH = "http://147.135.69.14:8013"
 
 export function get(path: string) {
 
