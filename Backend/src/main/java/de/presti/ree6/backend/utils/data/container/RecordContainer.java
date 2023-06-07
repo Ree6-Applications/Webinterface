@@ -17,11 +17,16 @@ import org.apache.tomcat.util.codec.binary.Base64;
 @AllArgsConstructor
 public class RecordContainer {
 
-    String data;
+    String creationTime;
+    String guildId;
+    String voiceChannelId;
     UserContainer creator;
 
     public RecordContainer(Recording recording) {
-        this.data = Base64.encodeBase64String(recording.getRecording());
+        ///this.data = Base64.encodeBase64String(recording.getRecording());
+        this.creationTime = String.valueOf(recording.getCreation());
+        this.guildId = recording.getGuildId();
+        this.voiceChannelId = recording.getVoiceId();
         this.creator = new UserContainer(BotWorker.getShardManager().retrieveUserById(recording.getCreatorId()).complete());
     }
 }

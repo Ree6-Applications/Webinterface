@@ -365,7 +365,7 @@ public class GuildService {
 
     //endregion
 
-    public RecordContainer getRecording(String sessionIdentifier, String recordId) throws IllegalAccessException {
+    public Recording getRecording(String sessionIdentifier, String recordId) throws IllegalAccessException {
         SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
         List<GuildContainer> guilds = sessionService.retrieveGuilds(sessionIdentifier, false);
 
@@ -388,15 +388,23 @@ public class GuildService {
             }
 
             if (found) {
-                // TODO:: unmark
-                //SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
-                return new RecordContainer(recording);
+                return recording;
             } else {
                 throw new IllegalAccessException("You were not part of this recording.");
             }
         } else {
             throw new IllegalAccessException("You were not part of the Guild this recording was made in!");
         }
+    }
+
+    public RecordContainer getRecordingContainer(String sessionIdentifier, String recordId) throws IllegalAccessException {
+        return new RecordContainer(getRecording(sessionIdentifier, recordId));
+    }
+
+    public byte[] getRecordingBytes(String sessionIdentifier, String recordId) throws IllegalAccessException {
+        Recording recording = getRecording(sessionIdentifier, recordId);
+        SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
+        return recording.getRecording();
     }
 
     //region Temporal Voice

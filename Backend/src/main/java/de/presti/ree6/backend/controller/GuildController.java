@@ -13,9 +13,13 @@ import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
 import de.presti.ree6.backend.utils.data.container.user.UserContainer;
 import de.presti.ree6.backend.utils.data.container.user.UserLevelContainer;
 import de.presti.ree6.sql.SQLSession;
-import de.presti.ree6.sql.entities.Tickets;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -293,9 +297,28 @@ public class GuildController {
     @GetMapping(value = "/recording", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<RecordContainer> retrieveRecording(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "recordId") String recordId) {
         try {
-            return new GenericObjectResponse<>(true, guildService.getRecording(sessionIdentifier, recordId), "Recording retrieved!");
+            return new GenericObjectResponse<>(true, guildService.getRecordingContainer(sessionIdentifier, recordId), "Recording retrieved!");
         } catch (Exception e) {
             return new GenericObjectResponse<>(false, null, e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/recording/download", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Resource> downloadRecording(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "recordId") String recordId) {
+        try {
+
+            ByteArrayResource resource = new ByteArrayResource(guildService.getRecordingBytes(sessionIdentifier, recordId));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(resource.contentLength())
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            ContentDisposition.attachment()
+                                    .filename("recording.wav")
+                                    .build().toString())
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(null);
         }
     }
 
