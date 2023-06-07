@@ -9,8 +9,12 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for the Error Controller.
+ */
 @RestController
 public class ErrorControllerImpl implements ErrorController {
+
     /**
      * Error Attributes in the Application
      */
@@ -25,6 +29,11 @@ public class ErrorControllerImpl implements ErrorController {
         this.errorAttributes = errorAttributes;
     }
 
+    /**
+     * Handle received Error.
+     * @param request Request that was sent.
+     * @return Generic Response with the Error Message.
+     */
     @RequestMapping(value = "/error", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse handleError(HttpServletRequest request) {
         HttpStatus httpStatus = getStatus(request);
@@ -32,6 +41,11 @@ public class ErrorControllerImpl implements ErrorController {
         return new GenericResponse(false, httpStatus.getReasonPhrase());
     }
 
+    /**
+     * Return the HTTP Status.
+     * @param request Request that was sent.
+     * @return HTTP Status.
+     */
     private HttpStatus getStatus(HttpServletRequest request) {
         Integer statusCode = (Integer)request.getAttribute("jakarta.servlet.error.status_code");
         if (statusCode == null) {

@@ -18,12 +18,22 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 
+/**
+ * Controller meant to handle Sessions.
+ */
 @RestController
 @RequestMapping("/auth")
 public class SessionController {
 
+    /**
+     * Session Service to handle Sessions.
+     */
     private final SessionService sessionService;
 
+    /**
+     * Controller for the Session Controller.
+     * @param sessionService Session Service to handle Sessions.
+     */
     @Autowired
     public SessionController(SessionService sessionService) {
         this.sessionService = sessionService;
@@ -31,7 +41,11 @@ public class SessionController {
 
     //region Session Auth
 
-
+    /**
+     * Create a new Session.
+     * @param sessionIdentifier Session Identifier to identify the Session.
+     * @return Generic Object Response with the Session.
+     */
     @GetMapping(value = "/check", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<SessionContainer> checkSession(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
         try {
@@ -45,7 +59,12 @@ public class SessionController {
 
     //region Discord Auth
 
-
+    /**
+     * Create a new Session.
+     * @param code Code to create the Session.
+     * @param state State to create the Session.
+     * @return Generic Object Response with the Session.
+     */
     @GetMapping(value = "/discord", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<SessionContainer> completeSession(@RequestParam(name = "code") String code, @RequestParam(name = "state") String state) {
         try {
@@ -55,7 +74,10 @@ public class SessionController {
         }
     }
 
-
+    /**
+     * Create a new Session.
+     * @return Redirect View to the Discord OAuth2 Page.
+     */
     @GetMapping(value = "/discord/request")
     public RedirectView createSession() {
         return new RedirectView(Server.getInstance().getOAuth2Client().generateAuthorizationURL(
@@ -70,7 +92,11 @@ public class SessionController {
 
     //region Twitch Auth
 
-
+    /**
+     * Create a new Twitch Session.
+     * @param sessionIdentifier Session Identifier to identify the Session.
+     * @return Generic Object Response with the Session.
+     */
     @GetMapping(value = "/twitch/request")
     public RedirectView createTwitch(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
         try {
@@ -86,7 +112,12 @@ public class SessionController {
         }
     }
 
-
+    /**
+     * Create a new Twitch Session.
+     * @param sessionIdentifier Session Identifier to identify the Session.
+     * @param code Code to create the Session.
+     * @return Generic Object Response with the Session.
+     */
     @GetMapping(value = "/twitch", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse authenticateTwitch(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "code") String code) {
         try {

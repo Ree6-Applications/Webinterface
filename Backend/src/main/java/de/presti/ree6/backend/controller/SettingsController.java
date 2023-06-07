@@ -15,12 +15,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Controller meant to handle Settings.
+ */
 @RestController
 @RequestMapping("/settings/{guildId}")
 public class SettingsController {
 
+    /**
+     * Session Service to handle Sessions.
+     */
     private final SessionService sessionService;
 
+    /**
+     * Controller for the Settings Controller.
+     * @param sessionService Session Service to handle Sessions.
+     */
     @Autowired
     public SettingsController(SessionService sessionService) {
         this.sessionService = sessionService;
@@ -28,7 +38,12 @@ public class SettingsController {
 
     //region Settings Retrieve
 
-
+    /**
+     * Retrieve all Settings for a Guild.
+     * @param sessionIdentifier Session Identifier to identify the Session.
+     * @param guildId Guild ID to identify the Guild.
+     * @return Generic Object Response with the Settings.
+     */
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<List<Setting>> retrieveSettings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                                   @PathVariable(name = "guildId") String guildId) {
@@ -40,7 +55,13 @@ public class SettingsController {
         }
     }
 
-
+    /**
+     * Retrieve a Setting for a Guild.
+     * @param sessionIdentifier Session Identifier to identify the Session.
+     * @param guildId Guild ID to identify the Guild.
+     * @param settingName Setting Name to identify the Setting.
+     * @return Generic Object Response with the Setting.
+     */
     @GetMapping(value = "/{settingName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<Setting> retrieveSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                            @PathVariable(name = "guildId") String guildId,
@@ -57,7 +78,14 @@ public class SettingsController {
 
     //region Settings Update
 
-
+    /**
+     * Update a Setting for a Guild.
+     * @param sessionIdentifier Session Identifier to identify the Session.
+     * @param guildId Guild ID to identify the Guild.
+     * @param settingName Setting Name to identify the Setting.
+     * @param request Generic Value Request with the new Value.
+     * @return Generic Object Response with the updated Setting.
+     */
     @PostMapping(value = "/{settingName}/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<Setting> updateSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") String guildId,
@@ -77,7 +105,13 @@ public class SettingsController {
 
     //region Setting Delete
 
-
+    /**
+     * Delete a Setting for a Guild.
+     * @param sessionIdentifier Session Identifier to identify the Session.
+     * @param guildId Guild ID to identify the Guild.
+     * @param settingName Setting Name to identify the Setting.
+     * @return Generic Response with the result.
+     */
     @GetMapping(value = "/{settingName}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse deleteSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") String guildId,
