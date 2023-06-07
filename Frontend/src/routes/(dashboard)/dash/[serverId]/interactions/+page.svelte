@@ -3,6 +3,7 @@
     import ChannelSelector from "$lib/components/settings/channelSelector.svelte";
     import MassBoolean from "$lib/components/settings/massBoolean.svelte";
     import MassRoleSelector from "$lib/components/settings/massRoleSelector.svelte";
+    import MassDataSelector from "$lib/components/settings/massDataSelector.svelte";
     import MessageSelector from "$lib/components/settings/messageSelector.svelte";
     import { currentServer } from "$lib/scripts/servers";
 
@@ -14,7 +15,7 @@
 
 <h1 class="headline">Tickets</h1>
 
-<ChannelSelector icon="tag" title="Logging channel" description="Select the channel for all log messages." endpoint={"/guilds/" + $page.params.serverId + "/tickets"} />
+# TODO add.
 
 <h1 class="headline">Suggestions</h1>
 

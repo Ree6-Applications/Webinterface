@@ -94,13 +94,11 @@ public class SessionController {
 
     /**
      * Create a new Twitch Session.
-     * @param sessionIdentifier Session Identifier to identify the Session.
      * @return Generic Object Response with the Session.
      */
     @GetMapping(value = "/twitch/request")
-    public RedirectView createTwitch(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
+    public RedirectView createTwitch() {
         try {
-            SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
             return new RedirectView(Server.getInstance().getTwitchIdentityProvider()
                     .getAuthenticationUrl(List.of(TwitchScopes.CHAT_CHANNEL_MODERATE, TwitchScopes.CHAT_READ,
                                     TwitchScopes.HELIX_BITS_READ,
@@ -108,7 +106,7 @@ public class SessionController {
                                     TwitchScopes.HELIX_CHANNEL_REDEMPTIONS_READ),
                             RandomUtils.randomString(6)));
         } catch (Exception e) {
-            return new RedirectView(Data.getLoginRedirectUrl());
+            return new RedirectView(Data.getErrorRedirectUrl());
         }
     }
 
