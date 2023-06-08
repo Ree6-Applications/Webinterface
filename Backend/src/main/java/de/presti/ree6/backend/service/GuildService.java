@@ -489,7 +489,7 @@ public class GuildService {
         ChannelContainer logChannel = guildContainer.getChannelById(String.valueOf(tickets.getLogChannelId()));
 
         if (logChannel == null) {
-            throw new IllegalAccessException("Log Channel not found!");
+            logChannel = new ChannelContainer();
         }
 
         ticketContainer.setLogChannel(logChannel);
@@ -534,7 +534,8 @@ public class GuildService {
 
             net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ticket-Log").complete();
             tickets.setLogChannelWebhookToken(newWebhook.getToken());
-            tickets.setLogChannelId(newWebhook.getIdLong());
+            tickets.setLogChannelWebhookId(newWebhook.getIdLong());
+            tickets.setLogChannelId(channel.getIdLong());
         }
 
         SQLSession.getSqlConnector().getSqlWorker().updateEntity(tickets);
