@@ -486,13 +486,13 @@ public class GuildService {
         ticketContainer.setChannel(guildContainer.getChannelById(String.valueOf(tickets.getChannelId())));
         ticketContainer.setCategory(guildContainer.getCategoryById(String.valueOf(tickets.getTicketCategory())));
 
-        StandardGuildMessageChannel logChannel = guildContainer.getGuild().getChannelById(StandardGuildMessageChannel.class, tickets.getLogChannelId());
+        ChannelContainer logChannel = guildContainer.getChannelById(String.valueOf(tickets.getLogChannelId()));
 
         if (logChannel == null) {
             throw new IllegalAccessException("Log Channel not found!");
         }
 
-        ticketContainer.setLogChannel(new ChannelContainer(logChannel));
+        ticketContainer.setLogChannel(logChannel);
         ticketContainer.setTicketOpenMessage(SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, "message_ticket_open").getStringValue());
         ticketContainer.setTicketMenuMessage(SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, "message_ticket_menu").getStringValue());
 
