@@ -1,7 +1,7 @@
 <script lang="ts">
     import { fade, scale } from "svelte/transition";
 
-    export let current: string;
+    export let current: string | null;
     export let message: string;
     export let strings: string[] = []
     export let nullable: boolean = false;
@@ -27,7 +27,6 @@
                 {#each strings as string}
                 <div on:click={() => callback(string)} on:keydown 
                     class="channel clickable {current == string ? 'selected' : ''}">
-                    <span class="material-icons icon-primary icon-small">tag</span>
                     <div class="name">{string}</div>
                 </div>
                 {/each}
@@ -53,7 +52,7 @@
         gap: 0.5rem;
 
         .channel {
-            padding: 0.2rem;
+            padding: 0.5rem;
             background-color: var(--onyx);
             border-radius: 0.5rem;
             display: flex;

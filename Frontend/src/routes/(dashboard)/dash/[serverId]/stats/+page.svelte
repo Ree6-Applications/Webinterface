@@ -29,7 +29,7 @@
             icon: 'leaderboard',
             title: 'Leaderboard',
             description: 'Chat leaderboard, Voice leaderboard',
-            link: '/leaderboard'
+            link: '/leaderboards'
         }
     ]
 
@@ -57,13 +57,6 @@
             <span class="material-icons icon-primary icon-medium">military_tech</span>
             <p class="text-medium">{$currentRoles.length} roles</p>
         </div>
-    
-        {#each [1,2] as command}
-        <div class="stat">
-            <span class="material-icons icon-primary icon-medium">keyboard_command_key</span>
-            <p class="text-medium">2255 /help usages</p>
-        </div>
-        {/each}
     </div>
     {:else}
     <LoadingIndicator size="50" error={$currentError} />

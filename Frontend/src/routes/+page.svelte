@@ -1,55 +1,27 @@
-<div class="body">
+<script lang="ts">
+    import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+    import LoadingIndicator from "$lib/components/loadingIndicator.svelte";
+    import { fly, scale, slide } from "svelte/transition";
 
-    <div class="column">
-        <span class="material-icons colored hammer icon-primary" style="font-size: 80px;">hardware</span>
-        <h2 class="hammered">Coming soon..</h2>
+    onMount(async () => {
+        goto("/dash");
+    })
+</script>
+<div class="body">
+    <div out:scale class="center">
+        <LoadingIndicator size="100" />
     </div>
 </div>
 
 <style lang="scss">
 
-    .hammer {
-        animation: hammering 1s infinite;
-    }
-
-    .hammered {
-        animation: hammered 1s infinite;
-    }
-
-    @keyframes hammering {
-        0% {
-            transform: rotate(0deg) translateX(10%) scaleY(1);
-        }
-
-        20% {
-            transform: rotate(90deg) translateX(23%) scaleY(1);
-        }
-
-        25% {
-            transform: rotate(90deg) translateX(23%) scaleY(1.05);
-        }
-
-        100% {
-            transform: rotate(0deg) translateX(10%) scaleY(1);
-        }
-    }
-
-    @keyframes hammered {
-        0% {
-            transform: scale(1);
-        }
-
-        27% {
-            transform: scale(1);
-        }
-
-        40% {
-            transform: scale(0.9);
-        }
-
-        100% {
-            transform: scale(1);
-        }
+    .center {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .body {

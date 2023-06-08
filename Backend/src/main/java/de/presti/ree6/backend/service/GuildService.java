@@ -414,6 +414,9 @@ public class GuildService {
         TemporalVoicechannel temporalVoicechannel = SQLSession.getSqlConnector().getSqlWorker()
                 .getEntity(new TemporalVoicechannel(), "SELECT * FROM TemporalVoicechannel WHERE GID=:gid", Map.of("gid", guildId));
 
+        if (temporalVoicechannel == null)
+            return new ChannelContainer();
+
         return guildContainer.getChannelById(temporalVoicechannel.getVoiceChannelId());
     }
 
@@ -474,12 +477,21 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
         Tickets tickets = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Tickets(), "SELECT * FROM Tickets WHERE GUILDID=:gid", Map.of("gid", guildId));
 
+        if (tickets == null) {
+            return new TicketContainer();
+        }
+
         TicketContainer ticketContainer = new TicketContainer();
         ticketContainer.setTicketCount(tickets.getTicketCount());
         ticketContainer.setChannel(guildContainer.getChannelById(String.valueOf(tickets.getChannelId())));
         ticketContainer.setCategory(guildContainer.getCategoryById(String.valueOf(tickets.getTicketCategory())));
 
         StandardGuildMessageChannel logChannel = guildContainer.getGuild().getChannelById(StandardGuildMessageChannel.class, tickets.getLogChannelId());
+
+        if (logChannel == null) {
+            throw new IllegalAccessException("Log Channel not found!");
+        }
+
         ticketContainer.setLogChannel(new ChannelContainer(logChannel));
         ticketContainer.setTicketOpenMessage(SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, "message_ticket_open").getStringValue());
         ticketContainer.setTicketMenuMessage(SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, "message_ticket_menu").getStringValue());
@@ -552,6 +564,9 @@ public class GuildService {
 
         Suggestions suggestions = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Suggestions(),
                 "SELECT * FROM Suggestions WHERE guildId = :id", Map.of("id", guildId));
+
+        if (suggestions == null)
+            return new ChannelContainer();
 
         return guildContainer.getChannelById(String.valueOf(suggestions.getChannelId()));
     }

@@ -29,7 +29,7 @@
             link: "/moderation",
         },
         {
-            icon: "touch_app",
+        icon: "touch_app",
             name: "Interactions",
             link: "/interactions",
         },

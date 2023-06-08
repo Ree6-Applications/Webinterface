@@ -29,7 +29,13 @@
                 localStorage.setItem("id", json.object.user.id);
                 localStorage.setItem("discriminator", json.object.user.discriminator);
 
-                goto("/dash")
+                if(localStorage.getItem("redirect")) {
+                    const link = localStorage.getItem("redirect");
+                    localStorage.removeItem("redirect");
+                    goto(link ?? "/dash");
+                } else {
+                    goto("/dash");
+                }
             }
             
             message = json.message;
