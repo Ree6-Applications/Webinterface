@@ -1,9 +1,6 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import ChannelSelector from "$lib/components/settings/channelSelector.svelte";
-    import MassBoolean from "$lib/components/settings/massBoolean.svelte";
-    import MassRoleSelector from "$lib/components/settings/massRoleSelector.svelte";
-    import MassDataSelector from "$lib/components/settings/massDataSelector.svelte";
     import MessageSelector from "$lib/components/settings/messageSelector.svelte";
     import { currentServer } from "$lib/scripts/servers";
 
@@ -13,9 +10,10 @@
     <title>Interactions - { $currentServer.name }</title>
 </svelte:head>
 
+<!-- TODO add -->
 <h1 class="headline">Tickets</h1>
 
-# TODO add.
+<h2>Comming soon!</h2>
 
 <h1 class="headline">Suggestions</h1>
 
