@@ -14,6 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PunishmentContainer {
 
+    String punishmentId;
     String guildId;
     String neededWarnings;
     String action;
@@ -21,6 +22,7 @@ public class PunishmentContainer {
     RoleContainer role;
 
     public PunishmentContainer(Punishments punishments) {
+        punishmentId = String.valueOf(punishments.getId());
         guildId = String.valueOf(punishments.getGuildId());
         neededWarnings = String.valueOf(punishments.getWarnings());
         action = String.valueOf(punishments.getAction());
