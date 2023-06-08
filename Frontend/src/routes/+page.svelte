@@ -8,6 +8,11 @@
         goto("/dash");
     })
 </script>
+
+<svelte:head>
+    <title>Loading...</title>
+</svelte:head>
+
 <div class="body">
     <div out:scale class="center">
         <LoadingIndicator size="100" />
