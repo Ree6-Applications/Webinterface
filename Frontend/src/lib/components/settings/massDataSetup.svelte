@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import DataPopup from "../data_popup/dataPopup.svelte";
-    import type { DataType } from "../data_popup/popup";
+    import { jsonIntoModel, type DataType, type ConfigurableDataType } from "../data_popup/popup";
     import { model2JSON } from "../data_popup/popup";
     import LoadingIndicator from "../loadingIndicator.svelte";
     import { get_js, post_js } from "$lib/scripts/constants";
@@ -12,9 +12,8 @@
     export let description: string;
     export let primaryIcon: string;
 
-    export let deleteField: (json: any) => string; // Function used to read value for deleting object
     export let isEnabled: (json: any) => boolean;
-    export let model: DataType<any>[];
+    export let model: ConfigurableDataType<any>[];
     export let render: (json: any) => string;
 
     let loading = true;
@@ -49,8 +48,8 @@
 </script>
 
 {#if picking}
-<DataPopup title="Setup {title.toLowerCase()}." builder={() => {
-    return structuredClone(model)
+<DataPopup title="{config ? "Configure" : "Setup"} {title.toLowerCase()}." builder={() => {
+    return config ? jsonIntoModel(structuredClone(model), object) : structuredClone(model)
 }} close={() => picking = false} 
 
 action1={config ? "Save" : "Create"}
@@ -58,6 +57,7 @@ action1Handler={async (data) => {
 
     picking = false;
     loading = true;
+    console.log(model2JSON(data))
     const json = await post_js(endpoint + "/add", model2JSON(data))
 
     if(!json.success) {
@@ -72,6 +72,7 @@ action1Handler={async (data) => {
     }
 
     loading = false;
+    reload();
 }}
 
 action2="Cancel"
@@ -118,7 +119,23 @@ action2Handler={() => picking = false}
                 <p class="text-small">Settings</p>
             </div>
 
-            <div on:click={() => {
+            <div on:click={async () => {
+                
+                loading = true;
+                const json = await post_js(endpoint + "/remove", "{}")
+
+                if(!json.success) {
+                    error = true;
+                    errorMessage = json.message ?? "Something went wrong."
+                    setTimeout(() => {
+                        loading = false;
+                        error = false;
+                    }, 2000);
+                    return;
+                }
+
+                reload()
+
             }} on:keydown class="button">
                 <span class="material-icons icon-small icon-primary">close</span>
                 <p class="text-small">Disable</p>
@@ -136,13 +153,6 @@ action2Handler={() => picking = false}
             <div class="title">
                 <span class="material-icons icon-primary icon-small">{primaryIcon}</span>
                 <p class="text-small">{render(object)}</p>
-            </div>
-            <div class="button-bar">
-                <div on:click={() => {
-                    picking = true
-                }} on:keydown class="button icon-button">
-                    <span class="material-icons icon-small icon-primary">delete</span>
-                </div>
             </div>
         </div>
     </div>

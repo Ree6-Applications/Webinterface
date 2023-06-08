@@ -25,7 +25,8 @@ model={[
             name: null,
             type: "TEXT"
         },
-        visible: true
+        visible: true,
+        jsonResName: "channel"
     },
     {
         name: "Logging channel",
@@ -37,12 +38,10 @@ model={[
             name: null,
             type: "TEXT"
         },
-        visible: true
+        visible: true,
+        jsonResName: "logChannel"
     }
 ]}
-deleteField={(json) => {
-    return json.id
-}}
 
 isEnabled={(json) => {
     return json.channel != null
@@ -50,7 +49,7 @@ isEnabled={(json) => {
 
 primaryIcon="check"
 render={(json) => {
-    return json.ticketCount + " tickets"
+    return json.ticketCount + " tickets with logging in #" + json.logChannel.name + " and ticket creation in #" + json.channel.name + "."
 }}
 
 />
