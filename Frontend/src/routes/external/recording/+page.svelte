@@ -60,6 +60,10 @@
     }
 </script>
 
+<svelte:head>
+    <title>Recording</title>
+</svelte:head>
+
 {#if popup}
 <InfoPopup title={popupMessage} content="" close={() => popup = false} />
 {/if}
