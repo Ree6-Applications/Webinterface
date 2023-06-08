@@ -14,7 +14,6 @@
     onMount(async () => {
         correct = $page.url.searchParams.has("code");
         if(!correct) {
-            localStorage.setItem("redirect", $page.url.href);
             location.assign(BASE_PATH + "/auth/twitch/request")
             return;
         }
@@ -47,6 +46,9 @@
     })
 </script>
 
+<svelte:head>
+    <title>Twitch Autentication</title>
+</svelte:head>
 
 {#if loading}
 <div class="body">
