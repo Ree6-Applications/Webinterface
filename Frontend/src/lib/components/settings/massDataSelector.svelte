@@ -12,6 +12,7 @@
     export let endpoint: string;
     export let description: string;
 
+    export let deleteField: (json: any) => string; // Function used to read value for deleting object
     export let models: Model[] = [];
     
     let currentModel = 0;
@@ -35,6 +36,7 @@
             return;
         }
 
+        console.log(json)
         loading = false;
         json.object.forEach((element: any) => {
 
@@ -75,6 +77,8 @@
     
     const body = model2JSON(content);
     console.log(body)
+
+    loading = true;
     const json = await post_js(endpoint + "/add", body);
 
     if(!json.success) {
@@ -87,6 +91,7 @@
         return;
     }
 
+    loading = false;
     reload();    
 
 }} action2Handler={() => picking = false} close={() => picking = false}/>
@@ -148,7 +153,7 @@ close={async (b) => {
         {/if}
     </div>
 
-    {#if objectsLoaded && objects.length > 0}
+    {#if !loading && objects.length > 0}
     <div in:slide class="content default-margin">
         <div class="models">
 
@@ -158,7 +163,26 @@ close={async (b) => {
                     <span class="material-icons icon-small icon-primary">{object.model.primaryIcon}</span>
                     <p class="text-small">{object.model.renderFormat(object.object)}</p>
                 </div>                
-                <span class="material-icons clickable icon-primary icon-small">delete</span>
+                <span on:click={async () => {
+                    
+                    loading = true;
+
+                    const json = await post_js(endpoint + "/remove", JSON.stringify({
+                        "value": deleteField(object.object)
+                    }))
+
+                    if(!json.success) {
+                        setTimeout(() => {
+                            error = true;
+                            loading = false;
+                        }, 2000);
+                        return;
+                    }
+
+                    loading = false;
+                    reload();
+
+                }} on:keydown class="material-icons clickable icon-primary icon-small">delete</span>
             </div>
             {/each}
 

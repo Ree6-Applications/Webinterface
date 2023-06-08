@@ -109,10 +109,8 @@
 
 {:else}
 <div class="body">
-    <div in:fly={{y: 50, delay: 500}} class="column">
-        <span in:scale={{delay: 900}} class="material-icons colored found icon-primary" style="font-size: 80px;">search</span>
-        <h2>This recording doesn't exist!</h2>
-    </div>
+    <span in:scale={{delay: 900}} class="material-icons colored found icon-primary" style="font-size: 80px;">search</span>
+    <h2 in:fly={{y: 50, delay: 500}}>This recording doesn't exist!</h2>
 </div>
 {/if}
 

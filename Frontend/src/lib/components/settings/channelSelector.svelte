@@ -8,6 +8,7 @@
     export let title: string;
     export let windowTitle: string = "Select a channel.";
     export let icon: string;
+    export let type: string = "TEXT";
     export let description: string;
     export let endpoint: string;
 
@@ -17,7 +18,7 @@
     let current: Channel = {
         id: ":loading",
         name: "Loading...",
-        type: "TEXT"
+        type: type
     }
 
     onMount(async () => {
@@ -42,7 +43,7 @@
         current = {
             id: json.object.id,
             name: json.object.name,
-            type: "TEXT"
+            type: type
         }
 
         loading = false;
@@ -52,8 +53,9 @@
 </script>
 
 {#if channelPicker}
-<ChannelPicker message={windowTitle} callback={async (channel) => {    
+<ChannelPicker message={windowTitle} type={type} callback={async (channel) => {    
     channelPicker = false
+    if(channel == undefined) return;
     loading = true;
 
     if(channel.id == "-1") {
@@ -62,7 +64,7 @@
             current = {
                 id: null,
                 name: null,
-                type: "TEXT"
+                type: type
             }
             
             // Remove channel
@@ -105,7 +107,7 @@
 
             {#if current.id != null}
             <div class="text">
-                <span class="material-icons icon-primary icon-small">tag</span>
+                <span class="material-icons icon-primary icon-small">{type == "TEXT" ? "tag" : "graphic_eq"}</span>
                 <p>{current.name}</p>
             </div>
             {:else}

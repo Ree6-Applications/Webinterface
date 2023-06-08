@@ -1,4 +1,4 @@
-export const BASE_PATH = "https://api.ree6.de"
+export const BASE_PATH = "http://localhost:8888"
 
 export function get(path: string) {
 
@@ -71,7 +71,7 @@ export async function post_js(path: string, body: string) {
     const json = await res.json()
     if(!json.success) {
         console.error(json.message)
-        return {success: false}
+        return {success: false, message: json.message}
     }
 
     return json

@@ -175,7 +175,7 @@
             ]
         }
     ]}
-endpoint={"/guilds/" + $page.params.serverId + "/warnings/punishments"}/>
+endpoint={"/guilds/" + $page.params.serverId + "/warnings/punishments"} deleteField={(json) => json.punishmentId}/>
 
 <style lang="scss">
     @import '$lib/default.scss';

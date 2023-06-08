@@ -3,23 +3,24 @@
     import { onDestroy, onMount } from "svelte";
     import { fade, scale } from "svelte/transition";
 
+    export let current: Channel;
+    export let message: string;
+    export let type: string = "TEXT";
+    export let zIndex: number = 100;
+    export let callback: (id: Channel | undefined) => void;
+
     let channels: Channel[] = []
     let sub = currentChannels.subscribe((entities) => {
         for(let entity of entities) {
-            if(entity.type != "TEXT") continue;
+            if(entity.type != type) continue;
             channels.push(entity);
         }
     })
 
     onDestroy(() => sub());
 
-    export let current: Channel;
-    export let message: string;
-    export let zIndex: number = 100;
-    export let callback: (id: Channel) => void;
-
     function close() {
-        callback(current);
+        callback(undefined);
     }
 
 </script>
@@ -37,7 +38,7 @@
                 {#each channels as channel}
                 <div on:click={() => callback(channel)} on:keydown 
                     class="channel clickable {current.id == channel.id ? 'selected' : ''}">
-                    <span class="material-icons icon-primary icon-small">tag</span>
+                    <span class="material-icons icon-primary icon-small">{channel.type == "TEXT" ? "tag" : channel.type == "CATEGORY" ? "folder" : "graphic_eq"}</span>
                     <div class="name">{channel.name}</div>
                 </div>
                 {/each}
@@ -71,6 +72,7 @@
             display: flex;
             align-items: center;
             transition: 250ms ease;
+            gap: 0.2rem;
 
             &:hover {
                 background-color: var(--outer-space);

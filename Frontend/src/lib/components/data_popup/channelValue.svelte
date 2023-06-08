@@ -16,6 +16,8 @@
 <ChannelPicker current={current} zIndex={200} message="Select a channel." callback={(channel) => {
     picking = false;
 
+    if(channel == undefined) return;
+
     if(channel.id == "-1") {
         current = {
             id: null,

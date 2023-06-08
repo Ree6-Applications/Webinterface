@@ -9,6 +9,7 @@
     import SelectorValue from "./selectorValue.svelte";
 
     export let title: string;
+    export let zIndex = 50;
     
     let content: DataType<any>[] = [];
     export let builder: () => DataType<any>[];
@@ -26,7 +27,7 @@
 
 </script>
 
-<div out:fade={{duration: 250}} in:fade={{duration: 250}} class="dialog-outer">
+<div out:fade={{duration: 250}} in:fade={{duration: 250}} class="dialog-outer" style="z-index: {zIndex};">
     <div out:scale={{start: 0.8, duration: 250}} in:scale={{start: 0.8, duration: 250}} class="dialog">
 
         <div class="header">
