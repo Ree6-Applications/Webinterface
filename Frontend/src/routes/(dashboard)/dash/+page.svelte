@@ -30,7 +30,7 @@
 
         {:else}
 
-        <div class="button clickable">
+        <div on:click={() => location.assign("https://invite.ree6.de")} on:keydown class="button clickable">
             <span class="material-icons icon-primary">launch</span>
             <p>Setup</p>
         </div>

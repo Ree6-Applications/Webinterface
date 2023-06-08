@@ -43,7 +43,7 @@
     function selectServer(server: Server) {
 
         if(!server.setup) {
-            goto("/");
+            location.assign("https://invite.ree6.de")
             currentServer.set(server)
             expanded = false;
             return;
