@@ -12,7 +12,7 @@
 
     <groupId>de.presti.ree6</groupId>
     <artifactId>Webinterface-Backend</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
     <name>Webinterface-Backend</name>
     <description>The Backend for the Webinterface</description>
 
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>de.ree6</groupId>
             <artifactId>Ree6-SQL</artifactId>
-            <version>2.0.1</version>
+            <version>2fc3c1f3de</version>
         </dependency>
 
         <!-- Discord -->
