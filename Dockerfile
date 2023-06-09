@@ -8,5 +8,5 @@ RUN mvn -f /usr/src/app/pom.xml clean package
 FROM amazoncorretto:17-alpine3.16-full
 ARG JAR_FILE=/usr/src/app/target/*.jar
 COPY --from=build ${JAR_FILE} /usr/app/Ree6-Webinterface.jar
-EXPOSE 8080/tcp
+EXPOSE 8888/tcp
 ENTRYPOINT ["java","-jar","/usr/app/Ree6-Webinterface.jar"]
