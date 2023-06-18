@@ -1,17 +1,28 @@
+<script>
+
+    import { scale } from "svelte/transition";
+
+</script>
 <div class="body">
 
     <div class="column">
         <span class="material-icons colored found icon-primary" style="font-size: 80px;">search</span>
         <h2>This page was not found.</h2>
+        <a href="/dash" class="button icon-primary">Did you mean to go to the dashboard?</a>
     </div>
 </div>
 
 <style lang="scss">
+    @import '$lib/styles/comp.scss';
 
     .found {
         position: absolute;
         animation: found 10s infinite;
         text-shadow: 2px 2px 10px black;
+    }
+
+    a {
+        text-decoration: none;
     }
 
     @keyframes found {
