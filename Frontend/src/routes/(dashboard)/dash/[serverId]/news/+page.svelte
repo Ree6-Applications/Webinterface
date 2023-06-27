@@ -30,7 +30,7 @@
             name: "Role reward",
             primaryIcon: "military_tech",
             isModel: (json) => json.level,
-            renderFormat: (json) => "When becoming level " + json.level + ", the user gets the " + json.role.name + " role.",
+            renderFormat: (json) => "When becoming voice level " + json.level + ", the user gets the " + json.role.name + " role.",
             model: [
                 {
                     name: "Needed level",
@@ -57,9 +57,9 @@ endpoint={"/guilds/" + $page.params.serverId + "/voicerole"} deleteField={(json)
     models={[
         {
             name: "Role reward",
-            primaryIcon: "timelapse",
+            primaryIcon: "military_tech",
             isModel: (json) => json.level,
-            renderFormat: (json) => "More than " + json.level + " warnings result in a timeout for " + json.role.name + " seconds.",
+            renderFormat: (json) => "When becoming chat level " + json.level + ", the user gets the " + json.role.name + " role.",
             model: [
                 {
                     name: "Needed level",

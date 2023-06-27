@@ -78,6 +78,7 @@ render={(json) => {
 
 <div class="default-margin"></div>
 
+<!--
 <MassDataSelector icon="add_reaction" title="Reaction roles" description="Add reactions on messages that remove/add roles to users."
     models={[
         {
@@ -134,6 +135,7 @@ render={(json) => {
         }
     ]}
 endpoint={"/guilds/" + $page.params.serverId + "/reactionroles"} deleteField={(json) => json.role.id}/>
+-->
 
 <style lang="scss">
     @import '$lib/default.scss';
