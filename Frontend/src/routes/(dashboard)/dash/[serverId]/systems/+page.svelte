@@ -81,31 +81,59 @@ render={(json) => {
 <MassDataSelector icon="add_reaction" title="Reaction roles" description="Add reactions on messages that remove/add roles to users."
     models={[
         {
-            name: "Message",
+            name: "Reaction role",
             primaryIcon: "message",
             isModel: (json) => json.level,
             renderFormat: (json) => "More than " + json.level + " warnings result in a timeout for " + json.role.name + " seconds.",
             model: [
                 {
-                    name: "Needed level",
-                    jsonName: "level",
-                    type: "int",
-                    value: 1,
+                    name: "Channel",
+                    jsonName: "channelId",
+                    type: "channel",
+                    value: {
+                        id: null,
+                        name: "hi",
+                        type: "TEXT"
+                    },
                     visible: true,
                     unit: "",
                 },
                 {
-                    name: "Rewarded role",
-                    jsonName: "role",
+                    name: "Message ID",
+                    jsonName: "messageId",
+                    type: "string",
+                    value: null,
+                    visible: true,
+                    unit: "",
+                },
+                {
+                    name: "Emoji ID",
+                    jsonName: "emojiId",
+                    type: "string",
+                    value: null,
+                    visible: true,
+                    unit: "",
+                },
+                {
+                    name: "Formatted emoji",
+                    jsonName: "formattedEmoji",
+                    type: "string",
+                    value: null,
+                    visible: true,
+                    unit: "",
+                },
+                {
+                    name: "Role",
+                    jsonName: "roleId",
                     type: "role",
                     value: null,
                     visible: true,
-                    unit: ""
+                    unit: "",
                 }
             ]
         }
     ]}
-endpoint={"/guilds/" + $page.params.serverId + "/chatrole"} deleteField={(json) => json.role.id}/>
+endpoint={"/guilds/" + $page.params.serverId + "/reactionroles"} deleteField={(json) => json.role.id}/>
 
 <style lang="scss">
     @import '$lib/default.scss';
