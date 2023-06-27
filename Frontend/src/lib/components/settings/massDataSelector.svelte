@@ -12,7 +12,8 @@
     export let endpoint: string;
     export let description: string;
 
-    export let deleteField: (json: any) => string; // Function used to read value for deleting object
+    export let deleteField: (json: any) => string = (json) => ""; // Function used to read value for deleting object
+    export let deleteJson: (json: any) => any = (json) => {}; // Function used to create json for deleting object
     export let models: Model[] = [];
     
     let currentModel = 0;
@@ -167,9 +168,11 @@ close={async (b) => {
                     
                     loading = true;
 
-                    const json = await post_js(endpoint + "/remove", JSON.stringify({
+                    const requestJson = deleteField(object.object) != "" ? JSON.stringify({
                         "value": deleteField(object.object)
-                    }))
+                    }) : JSON.stringify(deleteJson(object.object));
+
+                    const json = await post_js(endpoint + "/remove", requestJson)
 
                     if(!json.success) {
                         setTimeout(() => {

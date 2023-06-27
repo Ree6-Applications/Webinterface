@@ -1,6 +1,8 @@
 <script lang="ts">
     import { page } from "$app/stores";
+  import BooleanSelector from "$lib/components/settings/booleanSelector.svelte";
     import ChannelSelector from "$lib/components/settings/channelSelector.svelte";
+  import MassDataSelector from "$lib/components/settings/massDataSelector.svelte";
     import MassDataSetup from "$lib/components/settings/massDataSetup.svelte";
     import MessageSelector from "$lib/components/settings/messageSelector.svelte";
     import { currentServer } from "$lib/scripts/servers";
@@ -70,9 +72,40 @@ render={(json) => {
 
 <MessageSelector icon="sticky_note_2" title="Suggestions embed message" description="Configure the message that will be shown in the suggestions embed." settingName="message_suggestion_menu"/>
 
-<h1 class="headline">Temporal voice channel</h1>
+<h1 class="headline">Interactions</h1>
 
 <ChannelSelector icon="mic" title="Temporal voice channel" type="VOICE" description="Select the channel that creates new temporal voice channels." endpoint={"/guilds/" + $page.params.serverId + "/temporalvoice"} />
+
+<div class="default-margin"></div>
+
+<MassDataSelector icon="add_reaction" title="Reaction roles" description="Add reactions on messages that remove/add roles to users."
+    models={[
+        {
+            name: "Message",
+            primaryIcon: "message",
+            isModel: (json) => json.level,
+            renderFormat: (json) => "More than " + json.level + " warnings result in a timeout for " + json.role.name + " seconds.",
+            model: [
+                {
+                    name: "Needed level",
+                    jsonName: "level",
+                    type: "int",
+                    value: 1,
+                    visible: true,
+                    unit: "",
+                },
+                {
+                    name: "Rewarded role",
+                    jsonName: "role",
+                    type: "role",
+                    value: null,
+                    visible: true,
+                    unit: ""
+                }
+            ]
+        }
+    ]}
+endpoint={"/guilds/" + $page.params.serverId + "/chatrole"} deleteField={(json) => json.role.id}/>
 
 <style lang="scss">
     @import '$lib/default.scss';
