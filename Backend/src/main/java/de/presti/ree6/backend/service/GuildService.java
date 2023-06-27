@@ -845,7 +845,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, true);
 
         List<ReactionRole> roles = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new ReactionRole(),
-                "SELECT * FROM ReactionRole WHERE guild = :gid",
+                "SELECT * FROM ReactionRole WHERE gid = :gid",
                 Map.of("gid", guildId));
 
         Map<Long, List<ReactionRole>> map = roles.stream().collect(Collectors.groupingBy(ReactionRole::getMessageId));
