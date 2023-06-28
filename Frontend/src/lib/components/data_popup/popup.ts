@@ -24,9 +24,9 @@ export function model2JSON(model: DataType<any>[]): string {
     model.forEach((data: DataType<any>) => {
 
         if(data.type == "string" || data.type == "int" || data.type == "selector") {
-            json += `"${data.jsonName}": "${data.value}",`;
+            json += `"${data.jsonName}":"${data.value}",`;
         } else {
-            json += `"${data.jsonName}": ${data.value == null ? null : '"' + data.value.id + '"'},`;
+            json += `"${data.jsonName}":${data.value == null ? null : '"' + data.value.id + '"'},`;
         }
     });
     json = json.slice(0, -1);

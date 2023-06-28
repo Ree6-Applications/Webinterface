@@ -325,7 +325,7 @@ public class GuildService {
     }
 
     public void addChatAutoRole(String sessionIdentifier, String guildId, String roleId, long level) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
+        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
 
         if (guildContainer.getRoleById(roleId) == null)
             throw new IllegalAccessException("Role not found");
@@ -845,7 +845,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, true);
 
         List<ReactionRole> roles = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new ReactionRole(),
-                "SELECT * FROM ReactionRole WHERE guild = :gid",
+                "SELECT * FROM ReactionRole WHERE gid = :gid",
                 Map.of("gid", guildId));
 
         Map<Long, List<ReactionRole>> map = roles.stream().collect(Collectors.groupingBy(ReactionRole::getMessageId));

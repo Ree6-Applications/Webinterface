@@ -249,7 +249,7 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/chatrole/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addChatAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId, @RequestBody LevelAutoRoleRequest levelAutoRoleRequest) {
         try {
-            guildService.addChatAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.roleId(), levelAutoRoleRequest.level());
+            guildService.addChatAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.role(), levelAutoRoleRequest.level());
             return new GenericResponse(true, "Chat Auto-role added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
@@ -283,7 +283,7 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/voicerole/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addVoiceAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") String guildId, @RequestBody LevelAutoRoleRequest levelAutoRoleRequest) {
         try {
-            guildService.addVoiceAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.roleId(), levelAutoRoleRequest.level());
+            guildService.addVoiceAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.role(), levelAutoRoleRequest.level());
             return new GenericResponse(true, "Voice Auto-role added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());

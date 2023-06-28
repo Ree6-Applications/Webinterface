@@ -29,9 +29,14 @@
             link: "/moderation",
         },
         {
-        icon: "touch_app",
-            name: "Interactions",
-            link: "/interactions",
+            icon: "confirmation_number",
+            name: "Tickets & tools",
+            link: "/systems",
+        },
+        {
+            icon: "newspaper",
+            name: "News & rewards",
+            link: "/news",
         },
         {
             icon: "leaderboard",
