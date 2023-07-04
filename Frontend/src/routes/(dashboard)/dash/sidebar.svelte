@@ -49,12 +49,15 @@
 
         if(!server.setup) {
             location.assign("https://invite.ree6.de")
-            currentServer.set(server)
             expanded = false;
             return;
         }
 
-        goto("/dash/" + server.id + "/stats")
+        if(server.admin) {
+            goto("/dash/" + server.id + "/stats")
+        } else {
+            goto("/dash/" + server.id + "/settings")
+        }
         currentServer.set(server)
         expanded = false;
     }
@@ -65,7 +68,7 @@
     <div class="server-selector">
         <span on:click={() => {
             goto("/dash")
-        }} on:keydown class="material-icons icon-large icon-primary middle clickable">face</span>
+        }} on:keydown class="material-icons icon-large icon-primary middle clickable">apps</span>
         <div class="server-current">
 
             {#if !$serversLoading}
@@ -88,10 +91,12 @@
             {#if expanded}
             <div in:slide out:slide class="list">
                 {#each Array.from(servers.values()) as server}
+                {#if server.setup}
                 <div class="server" on:click={() => selectServer(server)} on:keydown>
                     <img src="{server.icon}" class="material-icons img-small" alt="hi">
                     <p class="server-name text-medium">{server.name}</p>
                 </div>
+                {/if}
                 {/each}
             </div>
             {/if}
@@ -107,6 +112,7 @@
     {#if $currentServer.id != 0 && $page.url.pathname.startsWith("/dash/" + $currentServer.id)}
     <div class="element-list">
 
+        {#if $currentServer.admin}
         {#each elements as element}
         <div in:fade class="element {$page.url.pathname.startsWith("/dash/" + $currentServer.id + element.link) ? "element-selected" : ""}" on:click={() => {
             goto("/dash/" + $currentServer.id + element.link)
@@ -115,6 +121,17 @@
             <p class="text-medium">{element.name}</p>
         </div>
         {/each}
+
+        {:else}
+
+        <div in:fade class="element {$page.url.pathname.startsWith("/dash/" + $currentServer.id + "/settings") ? "element-selected" : ""}" on:click={() => {
+            goto("/dash/" + $currentServer.id + "/settings")
+        }} on:keydown>
+            <span class="material-icons icon-medium icon-primary">leaderboard</span>
+            <p class="text-medium">Leaderboards & opt-out</p>
+        </div>
+
+        {/if}
     </div>
     {/if}
 </div>
@@ -125,6 +142,7 @@
         width: 100%;
         height: 100%;
         max-width: 350px;
+        overflow-y: scroll;
     }
 
     .img-small {
