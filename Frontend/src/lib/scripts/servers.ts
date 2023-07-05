@@ -5,6 +5,7 @@ export interface Server {
     icon: string;
     name: string;
     setup: boolean;
+    admin: boolean;
     id: number;
 }
 
@@ -32,6 +33,7 @@ export let currentServer = writable<Server>({
     icon: "",
     name: "",
     setup: false,
+    admin: false,
     id: 0
 });
 
@@ -39,6 +41,16 @@ export let servers: Map<string, Server> = new Map<string, Server>();
 
 export function server(name: string): Server {
     return servers.get(name)!;
+}
+
+export function getServers(setup: boolean, admin: boolean): Server[] {
+    let returnServers: Server[] = [];
+    for(let server of Array.from(servers.values())) {
+        if(server.setup === setup && server.admin === admin) {
+            returnServers.push(server);
+        }
+    }
+    return returnServers;
 }
 
 export async function loadServers() {
@@ -54,6 +66,7 @@ export async function loadServers() {
                 icon: server.iconUrl,
                 name: server.name,
                 setup: server.hasBot,
+                admin: server.admin,
                 id: server.id
             });
         }

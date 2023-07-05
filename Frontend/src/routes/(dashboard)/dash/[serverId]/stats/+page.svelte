@@ -2,9 +2,10 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
     import LoadingIndicator from "$lib/components/loadingIndicator.svelte";
-    import { get } from "$lib/scripts/constants";
+    import { get, get_js } from "$lib/scripts/constants";
     import { currentServer, currentError, currentLoading, currentChannels, currentRoles } from "$lib/scripts/servers";
-    import { onDestroy } from "svelte";
+    import { onDestroy, onMount } from "svelte";
+  import DataCollection from "./dataCollection.svelte";
 
     let actions = [
         {
@@ -20,10 +21,10 @@
             link: '/moderation'
         },
         {
-            icon: 'movie',
-            title: 'Social media',
-            description: 'Social media alerts, Welcome messages',
-            link: '/media'
+            icon: 'confirmation_number',
+            title: 'Tickets & tools',
+            description: 'Tickets system, suggestion system',
+            link: '/systems'
         },
         {
             icon: 'leaderboard',
@@ -85,7 +86,11 @@
     {/each}
 </div>
 
+<DataCollection />
+
 <style lang="scss">
+
+    @import "$lib/styles/box.scss";
 
     .profile-img {
         border-radius: 20rem;

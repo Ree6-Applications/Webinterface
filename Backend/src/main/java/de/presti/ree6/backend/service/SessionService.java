@@ -25,6 +25,7 @@ public class SessionService {
 
     /**
      * Retrieve a Session from the Identifier.
+     *
      * @param identifier Identifier to identify the Session.
      * @return Session Container with the Session.
      * @throws IllegalAccessException If the Session could not be found.
@@ -53,7 +54,8 @@ public class SessionService {
 
     /**
      * Create a new Session.
-     * @param code Code to create the Session.
+     *
+     * @param code  Code to create the Session.
      * @param state State to create the Session.
      * @return Session Container with the Session.
      * @throws IllegalAccessException If the Session could not be created.
@@ -88,8 +90,9 @@ public class SessionService {
 
     /**
      * Retrieve a Guild from the Identifier and the Guild ID.
+     *
      * @param identifier Identifier to identify the Session.
-     * @param guildId Guild ID to identify the Guild.
+     * @param guildId    Guild ID to identify the Guild.
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
      */
@@ -99,8 +102,9 @@ public class SessionService {
 
     /**
      * Retrieve a Guild from the Identifier and the Guild ID.
-     * @param identifier Identifier to identify the Session.
-     * @param guildId Guild ID to identify the Guild.
+     *
+     * @param identifier       Identifier to identify the Session.
+     * @param guildId          Guild ID to identify the Guild.
      * @param retrieveChannels If the Channels should be retrieved.
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
@@ -111,14 +115,30 @@ public class SessionService {
 
     /**
      * Retrieve a Guild from the Identifier and the Guild ID.
-     * @param identifier Identifier to identify the Session.
-     * @param guildId Guild ID to identify the Guild.
+     *
+     * @param identifier       Identifier to identify the Session.
+     * @param guildId          Guild ID to identify the Guild.
      * @param retrieveChannels If the Channels should be retrieved.
-     * @param retrieveRoles If the Roles should be retrieved.
+     * @param retrieveRoles    If the Roles should be retrieved.
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
      */
     public GuildContainer retrieveGuild(String identifier, String guildId, boolean retrieveChannels, boolean retrieveRoles) throws IllegalAccessException {
+        return retrieveGuild(identifier, guildId, retrieveChannels, retrieveRoles, true);
+    }
+
+    /**
+     * Retrieve a Guild from the Identifier and the Guild ID.
+     *
+     * @param identifier       Identifier to identify the Session.
+     * @param guildId          Guild ID to identify the Guild.
+     * @param retrieveChannels If the Channels should be retrieved.
+     * @param retrieveRoles    If the Roles should be retrieved.
+     * @param permissionCheck  If the Permission should be checked.
+     * @return Guild Container with the Guild.
+     * @throws IllegalAccessException If the Guild could not be found.
+     */
+    public GuildContainer retrieveGuild(String identifier, String guildId, boolean retrieveChannels, boolean retrieveRoles, boolean permissionCheck) throws IllegalAccessException {
         SessionContainer sessionContainer = retrieveSession(identifier);
 
         OAuth2Guild oAuth2Guild = null;
@@ -141,16 +161,21 @@ public class SessionService {
         }
 
         Member member = guild.retrieveMemberById(sessionContainer.getUser().getId()).complete();
-
-        if (member != null && member.hasPermission(Permission.ADMINISTRATOR)) {
-            return new GuildContainer(guild, retrieveChannels, retrieveRoles);
+        if (permissionCheck) {
+            if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) {
+                throw new IllegalAccessException("Not enough permissions!");
+            }
         }
 
-        throw new IllegalAccessException("Not enough permissions!");
+        GuildContainer guildContainer = new GuildContainer(guild, retrieveChannels, retrieveRoles);
+        guildContainer.setAdmin(member.hasPermission(Permission.ADMINISTRATOR));
+
+        return guildContainer;
     }
 
     /**
      * Retrieve a Guild from the Guild ID.
+     *
      * @param guildId Guild ID to identify the Guild.
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
@@ -161,7 +186,8 @@ public class SessionService {
 
     /**
      * Retrieve a Guild from the Guild ID.
-     * @param guildId Guild ID to identify the Guild.
+     *
+     * @param guildId          Guild ID to identify the Guild.
      * @param retrieveChannels If the Channels should be retrieved.
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
@@ -179,17 +205,19 @@ public class SessionService {
 
     /**
      * Retrieve a List of Guilds from the Identifier.
+     *
      * @param identifier Identifier to identify the Session.
      * @return List of Guild Containers with the Guilds.
      * @throws IllegalAccessException If the Guilds could not be found.
      */
     public List<GuildContainer> retrieveGuilds(String identifier) throws IllegalAccessException {
-        return retrieveGuilds(identifier, true);
+        return retrieveGuilds(identifier, false);
     }
 
     /**
      * Retrieve a List of Guilds from the Identifier.
-     * @param identifier Identifier to identify the Session.
+     *
+     * @param identifier       Identifier to identify the Session.
      * @param permissionFilter If the Guilds should be filtered by the Permission.
      * @return List of Guild Containers with the Guilds.
      * @throws IllegalAccessException If the Guilds could not be found.
