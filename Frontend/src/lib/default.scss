@@ -18,3 +18,9 @@
 .hr-v {
     margin: 0px 0.01rem;
 }
+
+@media (max-width: 1300px) {
+    .headline {
+        text-align: center;
+    }
+}

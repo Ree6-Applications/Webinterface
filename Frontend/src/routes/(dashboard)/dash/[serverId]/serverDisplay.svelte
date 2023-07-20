@@ -32,8 +32,10 @@
     
     {#each servers as server}
     <div class="server">
-        <img src="{server.icon}" class="material-icons icon-replacer icon-primary" alt="hi">
-        <h3>{server.name}</h3>
+        <div class="title">
+            <img src="{server.icon}" class="material-icons icon-replacer" alt="hi">
+            <h3>{server.name}</h3>
+        </div>
 
         {#if server.setup}
 
@@ -90,6 +92,14 @@
             max-width: 17%;
             background-color: var(--outer-space);
 
+            .title {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+                justify-content: center;
+            }
+
             h3 {
                 width: 180px;
                 text-align: center;
@@ -112,6 +122,46 @@
                     background-color: var(--eerie-black);
                 }
             }
+        }
+    }
+
+    @media (max-width: 600px) {
+
+        .servers {
+            flex-wrap: nowrap;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .servers .server {
+            display: flex;
+            flex-direction: row;
+            min-width: 0vw;
+            max-width: 100vw;
+            width: auto;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1rem;
+            
+            .title {
+                flex-direction: row;
+                justify-content: start;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            h3 {
+                text-align: start;
+                white-space: nowrap;
+                width: 80%;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .icon-replacer {
+            aspect-ratio: 1/1;
+            width: 40px;
+            border-radius: 10rem;
         }
     }
 </style>

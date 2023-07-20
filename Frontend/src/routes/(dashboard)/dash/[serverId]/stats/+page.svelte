@@ -51,12 +51,12 @@
     <div class="stats">
         <div class="stat">
             <span class="material-icons icon-primary icon-medium">tag</span>
-            <p class="text-medium">{$currentChannels.length} channels or categories</p>
+            <p>{$currentChannels.length} channels or categories</p>
         </div>
     
         <div class="stat">
             <span class="material-icons icon-primary icon-medium">military_tech</span>
-            <p class="text-medium">{$currentRoles.length} roles</p>
+            <p>{$currentRoles.length} roles</p>
         </div>
     </div>
     {:else}
@@ -138,6 +138,7 @@
             align-items: center;
             padding: 0.6rem;
             border-radius: 1rem;
+            font-size: 1.2rem;
             background-color: var(--outer-space);
         }
     }
@@ -179,6 +180,46 @@
             &:hover {
                 box-shadow: 0px 0.25rem 0px 0px var(--eerie-black);
                 transform: translateY(-0.25rem);
+            }
+        }
+    }
+
+    @media (max-width: 800px) {
+
+        .middle {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            height: auto;
+            padding: 1rem;
+        }
+
+        .profile-img {
+            border-radius: 20rem;
+            width: 35px;
+            aspect-ratio: 1/1;
+        }
+
+        .server-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .stats .stat {
+            font-size: 1rem;
+        }
+
+        .actions {
+            flex-wrap: nowrap;
+            flex-direction: column;
+
+            .action {
+                width: auto;
             }
         }
     }
