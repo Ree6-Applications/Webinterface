@@ -99,3 +99,11 @@
         }
     }
 }
+
+@media (max-width: 1300px) {
+    .box .box-title {
+        align-items: start;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
