@@ -97,7 +97,7 @@ public class Server {
         try {
             List<String> argList = Arrays.stream(args).map(String::toLowerCase).toList();
 
-            int shards = instance.config.getConfiguration().getInt("bot.misc.shards", 1);
+            int shards = instance.config.getConfiguration().getInt("discord.bot.client.shards", 1);
 
             BotVersion version = BotVersion.RELEASE;
 
