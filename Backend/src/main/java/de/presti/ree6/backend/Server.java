@@ -135,7 +135,7 @@ public class Server {
                 getConfig().getConfiguration().getString("hikari.sql.host"), getConfig().getConfiguration().getInt("hikari.sql.port"),
                 getConfig().getConfiguration().getString("hikari.misc.storageFile"), databaseTyp,
                 getConfig().getConfiguration().getInt("hikari.misc.poolSize"),
-                getConfig().getConfiguration().getBoolean("hikari.misc.createEmbeddedServer"));
+                getConfig().getConfiguration().getBoolean("hikari.misc.createEmbeddedServer"), false);
 
         credentialManager = CredentialManagerBuilder.builder()
                 .withStorageBackend(new DatabaseStorageBackend())
