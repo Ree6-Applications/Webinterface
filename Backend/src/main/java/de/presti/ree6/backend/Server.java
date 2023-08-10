@@ -157,7 +157,7 @@ public class Server {
         Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
 
         ThreadUtil.createNewThread(x -> {
-            List<Recording> recordings = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Recording(), "SELECT * FROM Recording", null);
+            List<Recording> recordings = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Recording(), "FROM Recording", null);
 
             if (recordings != null && !recordings.isEmpty()) {
                 for (Recording recording : recordings) {
@@ -167,7 +167,7 @@ public class Server {
                 }
             }
 
-            List<TwitchIntegration> twitchIntegrations = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new TwitchIntegration(), "SELECT * FROM TwitchIntegration", null);
+            List<TwitchIntegration> twitchIntegrations = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new TwitchIntegration(), "FROM TwitchIntegration", null);
             twitchIntegrations.forEach(twitchIntegration -> {
                 if (twitchIntegration.getLastUpdated().getTime() + (twitchIntegration.getExpiresIn() * 1000L) - Duration.ofMinutes(10).toMillis() <= System.currentTimeMillis()) {
                     Optional<OAuth2Credential> cred = twitchIdentityProvider.refreshCredential(CustomOAuth2Util.convertToOriginal(twitchIntegration));
