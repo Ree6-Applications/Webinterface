@@ -193,6 +193,8 @@ public class Server {
         // Shutdown Bot Instance.
         BotWorker.shutdown();
 
+        credentialManager.save();
+
         // Shutdown the SQL Connection.
         SQLSession.getSqlConnector().close();
     }
