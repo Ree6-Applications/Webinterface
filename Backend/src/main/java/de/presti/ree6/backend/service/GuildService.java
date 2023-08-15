@@ -17,16 +17,13 @@ import de.presti.ree6.sql.entities.webhook.*;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
@@ -365,6 +362,8 @@ public class GuildService {
 
     //endregion
 
+    //region Recording
+
     public Recording getRecording(String sessionIdentifier, String recordId) throws IllegalAccessException {
         SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
         List<GuildContainer> guilds = sessionService.retrieveGuilds(sessionIdentifier, false);
@@ -406,6 +405,8 @@ public class GuildService {
         SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
         return recording.getRecording();
     }
+
+    //endregion
 
     //region Temporal Voice
 

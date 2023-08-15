@@ -1,5 +1,7 @@
 package de.presti.ree6.backend.controller;
 
+import de.presti.ree6.backend.Server;
+import de.presti.ree6.backend.utils.data.container.api.BackendStatusResponse;
 import de.presti.ree6.backend.utils.data.container.api.GenericResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
@@ -21,12 +23,19 @@ public class ErrorControllerImpl implements ErrorController {
     private final ErrorAttributes errorAttributes;
 
     /**
+     * The Application version;
+     */
+    private final String version;
+
+    /**
      * Controller for the Error Controller
      *
      * @param errorAttributes Attributes that give more Info about the Error.
      */
     public ErrorControllerImpl(ErrorAttributes errorAttributes) {
         this.errorAttributes = errorAttributes;
+        String tempVersion = Server.getInstance().getClass().getPackage().getImplementationVersion();
+        version = tempVersion == null ? "4.0.6" : tempVersion;
     }
 
     /**
@@ -35,10 +44,10 @@ public class ErrorControllerImpl implements ErrorController {
      * @return Generic Response with the Error Message.
      */
     @RequestMapping(value = "/error", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse handleError(HttpServletRequest request) {
+    public BackendStatusResponse handleError(HttpServletRequest request) {
         HttpStatus httpStatus = getStatus(request);
 
-        return new GenericResponse(false, httpStatus.getReasonPhrase());
+        return new BackendStatusResponse(false, httpStatus.getReasonPhrase(), version);
     }
 
     /**
