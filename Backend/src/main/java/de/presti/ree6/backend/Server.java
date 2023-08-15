@@ -182,6 +182,7 @@ public class Server {
                     cred.ifPresent(oAuth2Credential -> credentialManager.addCredential("twitch", CustomOAuth2Util.convert(twitchIntegration.getUserId(), oAuth2Credential)));
                 }
             });
+            credentialManager.save();
         }, throwable -> log.error("Failed running Data clear Thread", throwable), Duration.ofMinutes(5), true, false);
     }
 
