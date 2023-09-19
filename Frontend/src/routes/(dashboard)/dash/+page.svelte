@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { serversLoading, type Server, getServers } from "$lib/scripts/servers";
+  import { serversLoading, type Server, getServers } from "$lib/scripts/servers";
   import { onDestroy } from "svelte";
   import ServerDisplay from "./[serverId]/serverDisplay.svelte";
+  import { INVITE_URL } from "$lib/scripts/constants";
 
     let adminServers: Server[] = [];
     let normalServers: Server[] = [];
@@ -32,7 +33,7 @@
 <div class="center">
     <h2>Seems like the bot isn't on any of your servers.</h2>
     <p class="text-bg">Seeing this probably means you're new on discord! In that case, welcome!</p>
-    <a href="https://invite.ree6.de" class="button link hover-primary">
+    <a href={INVITE_URL} class="button link hover-primary">
         <span class="material-icons">launch</span>
         <p>Try to invite the bot</p>
     </a>

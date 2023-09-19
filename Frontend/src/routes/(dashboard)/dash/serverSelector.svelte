@@ -3,6 +3,7 @@
     import LoadingIndicator from "$lib/components/loadingIndicator.svelte";
     import { currentServer, serversLoading, type Server, servers } from "$lib/scripts/servers";
     import { slide } from "svelte/transition";
+    import { INVITE_URL } from "$lib/scripts/constants";
 
     let expanded = false;
 
@@ -12,7 +13,7 @@
     function selectServer(server: Server) {
 
         if(!server.setup) {
-            location.assign("https://invite.ree6.de")
+            location.assign(INVITE_URL)
             expanded = false;
             return;
         }
