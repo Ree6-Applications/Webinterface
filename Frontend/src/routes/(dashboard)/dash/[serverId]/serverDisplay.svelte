@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import LoadingIndicator from "$lib/components/loadingIndicator.svelte";
   import { currentServer, type Server, serversLoading } from "$lib/scripts/servers";
+  import { INVITE_URL } from "$lib/scripts/constants";
 
     export let description: String;
     export let servers: Server[];
@@ -9,7 +10,7 @@
     function selectServer(server: Server) {
 
         if(!server.setup) {
-            location.assign("https://invite.ree6.de")
+            location.assign(INVITE_URL)
             return;
         }
 
@@ -46,7 +47,7 @@
 
         {:else}
 
-        <div on:click={() => location.assign("https://invite.ree6.de")} on:keydown class="button clickable">
+        <div on:click={() => location.assign({INVITE_URL})} on:keydown class="button clickable">
             <span class="material-icons icon-primary">launch</span>
             <p>Setup</p>
         </div>
