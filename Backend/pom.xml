@@ -12,7 +12,7 @@
 
     <groupId>de.presti.ree6</groupId>
     <artifactId>Webinterface-Backend</artifactId>
-    <version>4.0.8</version>
+    <version>4.0.9</version>
     <name>Webinterface-Backend</name>
     <description>The Backend for the Webinterface</description>
 

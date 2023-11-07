@@ -50,7 +50,7 @@ public class Config {
                     """);
             yamlFile.path("config")
                     .comment("Do not change this!")
-                    .path("version").addDefault("4.0.0")
+                    .path("version").addDefault("4.0.9")
                     .parent().path("creation").addDefault(System.currentTimeMillis());
 
             yamlFile.path("hikari")
@@ -92,6 +92,9 @@ public class Config {
                             Domains that are allowed to request the backend.
                             We recommend doing *.HOST.TLD, and then putting the backend behind something like API.HOST.TLD!""");
 
+            yamlFile.path("customization").comment("Settings to customize the Backend to your liking!").blankLine()
+                    .path("leaderboardTop").addDefault(5).commentSide("How many Users should be displayed on the Leaderboard?");
+
             try {
                 yamlFile.save(getFile());
             } catch (Exception ignored) {
@@ -111,7 +114,7 @@ public class Config {
     public void migrateOldConfig() {
         String configVersion = yamlFile.getString("config.version", "4.0.0");
 
-        if (compareVersion(configVersion, "4.0.0") || configVersion.equals("4.0.0"))
+        if (compareVersion(configVersion, "4.0.9") || configVersion.equals("4.0.9"))
             return;
 
         Map<String, Object> resources = yamlFile.getValues(true);

@@ -36,6 +36,10 @@ public class Data {
         return Server.getInstance().getConfig().getConfiguration().getString("webinterface.allowedDomains", "https://*.ree6.de,http://localhost:[5173,8888]");
     }
 
+    public static int getLeaderboardTop() {
+        return Server.getInstance().getConfig().getConfiguration().getInt("customization.leaderboardTop", 5);
+    }
+
     public static final String defaultIconUrl = "https://i0.wp.com/www.alphr.com/wp-content/uploads/2019/02/Discord-Spoiler-Tag-Featured.jpg?resize=1200%2C1080&ssl=1";
 }
 

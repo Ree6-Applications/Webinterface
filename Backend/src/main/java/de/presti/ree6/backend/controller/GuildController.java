@@ -4,6 +4,7 @@ package de.presti.ree6.backend.controller;
 import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.service.GuildService;
 import de.presti.ree6.backend.service.SessionService;
+import de.presti.ree6.backend.utils.data.Data;
 import de.presti.ree6.backend.utils.data.container.*;
 import de.presti.ree6.backend.utils.data.container.api.*;
 import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
@@ -181,7 +182,7 @@ public class GuildController {
 
             LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
 
-            leaderboardContainer.setVoiceLeaderboard(SQLSession.getSqlConnector().getSqlWorker().getTopVoice(guildId, 5).stream().map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
+            leaderboardContainer.setVoiceLeaderboard(SQLSession.getSqlConnector().getSqlWorker().getTopVoice(guildId, Data.getLeaderboardTop()).stream().map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
 
             leaderboardContainer.setGuildId(guildContainer.getId());
 
@@ -199,7 +200,7 @@ public class GuildController {
 
             LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
 
-            leaderboardContainer.setChatLeaderboard(SQLSession.getSqlConnector().getSqlWorker().getTopChat(guildId, 5).stream().map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
+            leaderboardContainer.setChatLeaderboard(SQLSession.getSqlConnector().getSqlWorker().getTopChat(guildId, Data.getLeaderboardTop()).stream().map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
 
             leaderboardContainer.setGuildId(guildContainer.getId());
 
