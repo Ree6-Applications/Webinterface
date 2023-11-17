@@ -13,7 +13,7 @@
     function selectServer(server: Server) {
 
         if(!server.setup) {
-            location.assign(INVITE_URL)
+            location.assign(new URL(INVITE_URL))
             expanded = false;
             return;
         }
