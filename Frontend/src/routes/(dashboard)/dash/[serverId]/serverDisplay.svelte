@@ -10,7 +10,7 @@
     function selectServer(server: Server) {
 
         if(!server.setup) {
-            location.assign(INVITE_URL)
+            location.assign(new URL(INVITE_URL))
             return;
         }
 
@@ -47,7 +47,7 @@
 
         {:else}
 
-        <div on:click={() => location.assign({INVITE_URL})} on:keydown class="button clickable">
+        <div on:click={() => location.assign(new URL(INVITE_URL))} on:keydown class="button clickable">
             <span class="material-icons icon-primary">launch</span>
             <p>Setup</p>
         </div>
