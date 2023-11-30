@@ -73,12 +73,11 @@ public class Server {
      */
     public Server(String[] args) {
         instance = this;
-
         load(args);
     }
 
     /**
-     * Call to load and Initialize Data.
+     * Call to load and initialize Data.
      *
      * @param args {@link String[]} used as List of the Arguments given at the start of the Application.
      */
