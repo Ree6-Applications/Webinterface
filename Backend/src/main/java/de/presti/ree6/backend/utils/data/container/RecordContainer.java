@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChanne
 public class RecordContainer {
 
     String creationTime;
-    String guildId;
+    long guildId;
     ChannelContainer voiceChannel;
     UserContainer creator;
 

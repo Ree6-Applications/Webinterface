@@ -7,5 +7,5 @@ package de.presti.ree6.backend.utils.data.container.api;
  * @param roleId Role ID of the Punishments.
  * @param timeoutTime Timeout Time of the Punishments.
  */
-public record PunishmentsRequest(String neededWarnings, String action, String roleId, String timeoutTime) {
+public record PunishmentsRequest(String neededWarnings, String action, long roleId, String timeoutTime) {
 }

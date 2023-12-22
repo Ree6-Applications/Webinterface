@@ -14,12 +14,12 @@ import lombok.Setter;
 public class WarningContainer {
 
     UserContainer user;
-    String guildId;
-    String warnings;
+    long guildId;
+    int warnings;
 
     public WarningContainer(Warning warning) {
-        guildId = String.valueOf(warning.getGuildId());
-        warnings = String.valueOf(warning.getWarnings());
+        guildId = warning.getGuildId();
+        warnings = warning.getWarnings();
     }
 
     public WarningContainer(Warning warning, UserContainer userContainer) {

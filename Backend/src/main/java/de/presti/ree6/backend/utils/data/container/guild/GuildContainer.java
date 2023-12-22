@@ -26,7 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GuildContainer {
 
-    String id;
+    long id;
 
     String name;
 
@@ -49,17 +49,17 @@ public class GuildContainer {
     @JsonIgnore
     Guild guild;
 
-    public GuildContainer(String id, String name, String iconUrl, boolean hasBot, boolean isAdmin) {
+    public GuildContainer(long id, String name, String iconUrl, boolean hasBot, boolean isAdmin) {
         this(id, name, iconUrl, hasBot, isAdmin, Collections.emptyList(), Collections.emptyList(), new ArrayList<>(), new ArrayList<>(), null);
     }
 
     public GuildContainer(OAuth2Guild oAuth2Guild) {
-        this(oAuth2Guild.getId(), oAuth2Guild.getName(), oAuth2Guild.getIconUrl() != null ? oAuth2Guild.getIconUrl() : Data.defaultIconUrl,
+        this(oAuth2Guild.getIdLong(), oAuth2Guild.getName(), oAuth2Guild.getIconUrl() != null ? oAuth2Guild.getIconUrl() : Data.defaultIconUrl,
                 oAuth2Guild.botJoined(BotWorker.getShardManager()), oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
     }
 
     public GuildContainer(Guild guild) {
-        this(guild.getId(), guild.getName(), guild.getIconUrl() != null ? guild.getIconUrl() : Data.defaultIconUrl,
+        this(guild.getIdLong(), guild.getName(), guild.getIconUrl() != null ? guild.getIconUrl() : Data.defaultIconUrl,
                 BotWorker.getShardManager().getGuildById(guild.getId()) != null, false);
         this.guild = guild;
     }
@@ -89,24 +89,24 @@ public class GuildContainer {
         }
     }
 
-    public RoleContainer getRoleById(String id) {
-        return getRoles().stream().filter(role -> role.getId().equals(id)).findFirst().orElse(null);
+    public RoleContainer getRoleById(long id) {
+        return getRoles().stream().filter(role -> role.getId() == id).findFirst().orElse(null);
     }
 
-    public ChannelContainer getChannelById(String id) {
-        return getChannels().stream().filter(channel -> channel.getId().equals(id)).findFirst().orElse(null);
+    public ChannelContainer getChannelById(long id) {
+        return getChannels().stream().filter(channel -> channel.getId() == id).findFirst().orElse(null);
     }
 
-    public Role getGuildRoleById(String id) {
-        return getGuildRoles().stream().filter(role -> role.getId().equals(id)).findFirst().orElse(null);
+    public Role getGuildRoleById(long id) {
+        return getGuildRoles().stream().filter(role -> role.getIdLong() == id).findFirst().orElse(null);
     }
 
-    public GuildChannel getGuildChannelById(String id) {
-        return getGuildChannels().stream().filter(channel -> channel.getId().equals(id)).findFirst().orElse(null);
+    public GuildChannel getGuildChannelById(long id) {
+        return getGuildChannels().stream().filter(channel -> channel.getIdLong() == id).findFirst().orElse(null);
     }
 
-    public ChannelContainer getCategoryById(String id) {
-        return getChannels().stream().filter(channel -> channel.getId().equals(id) && channel.getType() == ChannelType.CATEGORY).findFirst().orElse(null);
+    public ChannelContainer getCategoryById(long id) {
+        return getChannels().stream().filter(channel -> channel.getId() == id && channel.getType() == ChannelType.CATEGORY).findFirst().orElse(null);
     }
 
     public Guild getGuild() {

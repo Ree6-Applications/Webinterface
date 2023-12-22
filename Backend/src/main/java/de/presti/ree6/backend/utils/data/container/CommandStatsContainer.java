@@ -17,6 +17,6 @@ public class CommandStatsContainer {
     }
 
     String command;
-    int uses;
+    long uses;
 
 }

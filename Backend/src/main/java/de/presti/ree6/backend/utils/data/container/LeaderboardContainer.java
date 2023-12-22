@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class LeaderboardContainer {
 
-    String guildId;
+    long guildId;
 
     List<UserLevelContainer> chatLeaderboard;
 

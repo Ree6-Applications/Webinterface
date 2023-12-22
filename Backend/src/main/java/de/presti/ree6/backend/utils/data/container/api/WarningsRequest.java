@@ -5,5 +5,5 @@ package de.presti.ree6.backend.utils.data.container.api;
  * @param userId User ID of the Warnings.
  * @param warnings Warnings of the Warnings.
  */
-public record WarningsRequest(String userId, String warnings) {
+public record WarningsRequest(long userId, String warnings) {
 }

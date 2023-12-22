@@ -96,7 +96,7 @@ public class SessionService {
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(String identifier, String guildId) throws IllegalAccessException {
+    public GuildContainer retrieveGuild(String identifier, long guildId) throws IllegalAccessException {
         return retrieveGuild(identifier, guildId, false);
     }
 
@@ -109,7 +109,7 @@ public class SessionService {
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(String identifier, String guildId, boolean retrieveChannels) throws IllegalAccessException {
+    public GuildContainer retrieveGuild(String identifier, long guildId, boolean retrieveChannels) throws IllegalAccessException {
         return retrieveGuild(identifier, guildId, retrieveChannels, false);
     }
 
@@ -123,7 +123,7 @@ public class SessionService {
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(String identifier, String guildId, boolean retrieveChannels, boolean retrieveRoles) throws IllegalAccessException {
+    public GuildContainer retrieveGuild(String identifier, long guildId, boolean retrieveChannels, boolean retrieveRoles) throws IllegalAccessException {
         return retrieveGuild(identifier, guildId, retrieveChannels, retrieveRoles, true);
     }
 
@@ -138,7 +138,7 @@ public class SessionService {
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(String identifier, String guildId, boolean retrieveChannels, boolean retrieveRoles, boolean permissionCheck) throws IllegalAccessException {
+    public GuildContainer retrieveGuild(String identifier, long guildId, boolean retrieveChannels, boolean retrieveRoles, boolean permissionCheck) throws IllegalAccessException {
         SessionContainer sessionContainer = retrieveSession(identifier);
 
         OAuth2Guild oAuth2Guild = null;
@@ -180,7 +180,7 @@ public class SessionService {
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(String guildId) throws IllegalAccessException {
+    public GuildContainer retrieveGuild(long guildId) throws IllegalAccessException {
         return retrieveGuild(guildId, false);
     }
 
@@ -192,7 +192,7 @@ public class SessionService {
      * @return Guild Container with the Guild.
      * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(String guildId, boolean retrieveChannels) throws IllegalAccessException {
+    public GuildContainer retrieveGuild(long guildId, boolean retrieveChannels) throws IllegalAccessException {
 
         // Retrieve the Guild by its giving ID.
         Guild guild = BotWorker.getShardManager().getGuildById(guildId);

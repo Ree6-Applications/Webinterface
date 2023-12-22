@@ -16,29 +16,29 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 @AllArgsConstructor
 public class ChannelContainer {
 
-    String id;
-    String guildId;
+    long id;
+    long guildId;
     String name;
     ChannelType type;
 
     public ChannelContainer(GuildChannel guildChannel) {
-        this.id = guildChannel.getId();
-        this.guildId = guildChannel.getGuild().getId();
+        this.id = guildChannel.getIdLong();
+        this.guildId = guildChannel.getGuild().getIdLong();
         this.name = guildChannel.getName();
         this.type = guildChannel.getType();
     }
 
     public ChannelContainer(Webhook webhook) {
         IWebhookContainer webhookContainer = webhook.getChannel();
-        this.id = webhookContainer.getId();
-        this.guildId = webhook.getGuild().getId();
+        this.id = webhookContainer.getIdLong();
+        this.guildId = webhook.getGuild().getIdLong();
         this.name = webhookContainer.getName();
         this.type = webhookContainer.getType();
     }
 
     public ChannelContainer(Category category) {
-        this.id = category.getId();
-        this.guildId = category.getGuild().getId();
+        this.id = category.getIdLong();
+        this.guildId = category.getGuild().getIdLong();
         this.name = category.getName();
         this.type = category.getType();
     }

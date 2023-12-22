@@ -14,16 +14,16 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PunishmentContainer {
 
-    String punishmentId;
-    String guildId;
+    long punishmentId;
+    long guildId;
     String neededWarnings;
     String action;
     String timeoutTime;
     RoleContainer role;
 
     public PunishmentContainer(Punishments punishments) {
-        punishmentId = String.valueOf(punishments.getId());
-        guildId = String.valueOf(punishments.getGuildId());
+        punishmentId = punishments.getId();
+        guildId = punishments.getGuild();
         neededWarnings = String.valueOf(punishments.getWarnings());
         action = String.valueOf(punishments.getAction());
         timeoutTime = String.valueOf(punishments.getTimeoutTime());
@@ -31,7 +31,7 @@ public class PunishmentContainer {
 
     public PunishmentContainer(Punishments punishments, GuildContainer guildContainer) {
         this(punishments);
-        role = guildContainer.getRoleById(String.valueOf(punishments.getRoleId()));
+        role = guildContainer.getRoleById(punishments.getRoleId());
     }
 
 }

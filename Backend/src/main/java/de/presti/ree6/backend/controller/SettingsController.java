@@ -46,7 +46,7 @@ public class SettingsController {
      */
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<List<Setting>> retrieveSettings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                  @PathVariable(name = "guildId") String guildId) {
+                                                  @PathVariable(name = "guildId") long guildId) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
             return new GenericObjectResponse<>(true, SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guildId), "Setting retrieved!");
@@ -64,7 +64,7 @@ public class SettingsController {
      */
     @GetMapping(value = "/{settingName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<Setting> retrieveSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                           @PathVariable(name = "guildId") String guildId,
+                                           @PathVariable(name = "guildId") long guildId,
                                            @PathVariable(name = "settingName") String settingName) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
@@ -88,7 +88,7 @@ public class SettingsController {
      */
     @PostMapping(value = "/{settingName}/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<Setting> updateSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                         @PathVariable(name = "guildId") String guildId,
+                                         @PathVariable(name = "guildId") long guildId,
                                          @PathVariable(name = "settingName") String settingName,
                                          @RequestBody GenericValueRequest request) {
         try {
@@ -114,7 +114,7 @@ public class SettingsController {
      */
     @GetMapping(value = "/{settingName}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse deleteSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                         @PathVariable(name = "guildId") String guildId,
+                                         @PathVariable(name = "guildId") long guildId,
                                          @PathVariable(name = "settingName") String settingName) {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);

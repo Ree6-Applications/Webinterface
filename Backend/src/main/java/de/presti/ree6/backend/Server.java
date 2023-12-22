@@ -16,6 +16,7 @@ import de.presti.ree6.sql.SQLSession;
 import de.presti.ree6.sql.entities.Recording;
 import de.presti.ree6.sql.entities.TwitchIntegration;
 import de.presti.ree6.backend.utils.ThreadUtil;
+import de.presti.ree6.sql.util.SQLConfig;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -129,12 +130,20 @@ public class Server {
             default -> databaseTyp = DatabaseTyp.SQLite;
         }
 
-        new SQLSession(getConfig().getConfiguration().getString("hikari.sql.user"),
-                getConfig().getConfiguration().getString("hikari.sql.db"), getConfig().getConfiguration().getString("hikari.sql.pw"),
-                getConfig().getConfiguration().getString("hikari.sql.host"), getConfig().getConfiguration().getInt("hikari.sql.port"),
-                getConfig().getConfiguration().getString("hikari.misc.storageFile"), databaseTyp,
-                getConfig().getConfiguration().getInt("hikari.misc.poolSize"),
-                getConfig().getConfiguration().getBoolean("hikari.misc.createEmbeddedServer"), false);
+        SQLConfig sqlConfig = SQLConfig.builder()
+                .username(getConfig().getConfiguration().getString("hikari.sql.user"))
+                .database(getConfig().getConfiguration().getString("hikari.sql.db"))
+                .password(getConfig().getConfiguration().getString("hikari.sql.pw"))
+                .host(getConfig().getConfiguration().getString("hikari.sql.host"))
+                .port(getConfig().getConfiguration().getInt("hikari.sql.port"))
+                .path(getConfig().getConfiguration().getString("hikari.misc.storageFile"))
+                .typ(databaseTyp)
+                .poolSize(getConfig().getConfiguration().getInt("hikari.misc.poolSize"))
+                .createEmbeddedServer(getConfig().getConfiguration().getBoolean("hikari.misc.createEmbeddedServer"))
+                .debug(false)
+                .build();
+
+        new SQLSession(sqlConfig);
 
         credentialManager = CredentialManagerBuilder.builder()
                 .withStorageBackend(new DatabaseStorageBackend())

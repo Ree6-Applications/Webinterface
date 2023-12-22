@@ -12,16 +12,16 @@ import net.dv8tion.jda.api.entities.Role;
 @AllArgsConstructor
 public class RoleContainer {
 
-    String id;
-    String guildId;
+    long id;
+    long guildId;
     String name;
     String iconUrl;
     int color;
 
     public RoleContainer(Role role) {
-        id = role.getId();
+        id = role.getIdLong();
         name = role.getName();
-        guildId = role.getGuild().getId();
+        guildId = role.getGuild().getIdLong();
         iconUrl = role.getIcon() != null ? role.getIcon().getIconUrl() : "";
         color = role.getColorRaw();
     }

@@ -27,7 +27,7 @@ public class CustomCommandContainer {
     public CustomCommandContainer(CustomCommand command, GuildContainer guildContainer) {
         this(command);
         if (command.getChannelId() != -1) {
-            channel = guildContainer.getChannelById(String.valueOf(command.getChannelId()));
+            channel = guildContainer.getChannelById(command.getChannelId());
         }
     }
 }
