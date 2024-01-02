@@ -414,7 +414,7 @@ public class GuildService {
     public ChannelContainer getTemporalVoice(String sessionIdentifier, long guildId) throws IllegalAccessException {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
         TemporalVoicechannel temporalVoicechannel = SQLSession.getSqlConnector().getSqlWorker()
-                .getEntity(new TemporalVoicechannel(), "FROM TemporalVoicechannel WHERE guildId=:gid", Map.of("gid", guildId));
+                .getEntity(new TemporalVoicechannel(), "FROM TemporalVoicechannel WHERE guildChannelId.guildId=:gid", Map.of("gid", guildId));
 
         if (temporalVoicechannel == null)
             return new ChannelContainer();
@@ -429,7 +429,7 @@ public class GuildService {
             throw new IllegalAccessException("Channel not found");
 
         TemporalVoicechannel temporalVoicechannel = SQLSession.getSqlConnector().getSqlWorker()
-                .getEntity(new TemporalVoicechannel(), "FROM TemporalVoicechannel WHERE guildId=:gid", Map.of("gid", guildId));
+                .getEntity(new TemporalVoicechannel(), "FROM TemporalVoicechannel WHERE guildChannelId.guildId=:gid", Map.of("gid", guildId));
 
         if (temporalVoicechannel != null) {
             SQLSession.getSqlConnector().getSqlWorker().deleteEntity(temporalVoicechannel);
@@ -567,7 +567,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, false);
 
         Suggestions suggestions = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Suggestions(),
-                "FROM Suggestions WHERE guildId = :id", Map.of("id", guildId));
+                "FROM Suggestions WHERE guildChannelId.guildId = :id", Map.of("id", guildId));
 
         if (suggestions == null)
             return new ChannelContainer();
@@ -581,7 +581,7 @@ public class GuildService {
         Guild guild = guildContainer.getGuild();
 
         Suggestions suggestions = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Suggestions(),
-                "FROM Suggestions WHERE guildId = :id", Map.of("id", guildId));
+                "FROM Suggestions WHERE guildChannelId.guildId = :id", Map.of("id", guildId));
 
         boolean requireChannel = false;
 
@@ -624,7 +624,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
 
         return SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Warning(),
-                "FROM Warning WHERE guildId = :gid",
+                "FROM Warning WHERE guildUserId.guildId = :gid",
                 Map.of("gid", guildId)).stream().map(c -> new WarningContainer(c, new UserContainer(guildContainer.getGuild().retrieveMemberById(c.getUserId()).complete()))).toList();
     }
 
@@ -669,7 +669,7 @@ public class GuildService {
         }
 
         Warning warning = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Warning(),
-                "FROM Warning WHERE guildId = :gid AND userId = :uid",
+                "FROM Warning WHERE guildUserId.guildId = :gid AND guildUserId.userId = :uid",
                 Map.of("gid", guildId, "uid", userId));
 
         if (warning == null) {
@@ -697,7 +697,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
 
         SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Warning(),
-                "FROM Warning WHERE guildId = :gid",
+                "FROM Warning WHERE guildUserId.guildId = :gid",
                 Map.of("gid", guildId)).forEach(SQLSession.getSqlConnector().getSqlWorker()::deleteEntity);
     }
 
@@ -707,7 +707,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
 
         return SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Punishments(),
-                "FROM Punishments WHERE guildId = :gid",
+                "FROM Punishments WHERE guildUserId.guildId = :gid",
                 Map.of("gid", guildId)).stream().map(c -> new PunishmentContainer(c, guildContainer)).toList();
     }
 
@@ -715,7 +715,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
 
         SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Punishments(),
-                "FROM Punishments WHERE guildId = :gid",
+                "FROM Punishments WHERE guildUserId.guildId = :gid",
                 Map.of("gid", guildId)).forEach(c -> SQLSession.getSqlConnector().getSqlWorker().deleteEntity(c));
     }
 
@@ -723,7 +723,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
 
         Punishments punishments = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Punishments(),
-                "FROM Punishments WHERE guildId = :gid AND id = :id",
+                "FROM Punishments WHERE guildUserId.guildId = :gid AND id = :id",
                 Map.of("gid", guildId, "id", punishmentId));
 
         if (punishments == null)
@@ -840,7 +840,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true, true);
 
         List<ReactionRole> roles = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new ReactionRole(),
-                "FROM ReactionRole WHERE guildId = :gid",
+                "FROM ReactionRole WHERE guildUserId.guildId = :gid",
                 Map.of("gid", guildId));
 
         Map<Long, List<ReactionRole>> map = roles.stream().collect(Collectors.groupingBy(ReactionRole::getMessageId));
@@ -900,7 +900,7 @@ public class GuildService {
             reactionRole.setFormattedEmote(formattedEmoji);
             reactionRole.setGuildId(guild.getIdLong());
             reactionRole.setMessageId(messageIdNumber);
-            reactionRole.setRoleId(role.getId());
+            reactionRole.getGuildRoleId().setRoleId(role.getId());
 
             SQLSession.getSqlConnector().getSqlWorker().updateEntity(reactionRole);
         } catch (NumberFormatException e) {
@@ -922,7 +922,7 @@ public class GuildService {
             //message.removeReaction(Emoji.fromFormatted(emojiIdNumber)).queue();
 
             ReactionRole reactionRole = SQLSession.getSqlConnector().getSqlWorker().getEntity(new ReactionRole(),
-                    "FROM ReactionRole WHERE guildId = :gid AND messageId = :mid AND emoteId = :eid",
+                    "FROM ReactionRole WHERE guildAndId.guildId = :gid AND messageId = :mid AND emoteId = :eid",
                     Map.of("gid", guildId, "mid", messageId, "eid", emojiId));
 
             if (reactionRole == null)

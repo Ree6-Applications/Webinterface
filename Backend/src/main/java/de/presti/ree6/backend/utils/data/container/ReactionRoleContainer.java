@@ -21,7 +21,7 @@ public class ReactionRoleContainer {
     EmojiUnion emojiUnion;
 
     public ReactionRoleContainer(ReactionRole reactionRole, GuildContainer guildContainer) {
-        role = guildContainer.getRoleById(reactionRole.getRoleId());
+        role = guildContainer.getRoleById(reactionRole.getId());
         emoji = reactionRole.getFormattedEmote();
         emojiUnion = Emoji.fromFormatted(reactionRole.getFormattedEmote());
     }
