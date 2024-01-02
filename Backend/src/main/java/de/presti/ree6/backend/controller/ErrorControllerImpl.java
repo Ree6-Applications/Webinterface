@@ -35,7 +35,7 @@ public class ErrorControllerImpl implements ErrorController {
     public ErrorControllerImpl(ErrorAttributes errorAttributes) {
         this.errorAttributes = errorAttributes;
         String tempVersion = Server.getInstance().getClass().getPackage().getImplementationVersion();
-        version = tempVersion == null ? "4.1.1" : tempVersion;
+        version = tempVersion == null ? "4.0.11" : tempVersion;
     }
 
     /**
