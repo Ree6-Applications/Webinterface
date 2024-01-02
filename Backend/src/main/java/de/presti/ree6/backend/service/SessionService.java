@@ -144,14 +144,14 @@ public class SessionService {
         OAuth2Guild oAuth2Guild = null;
         try {
             oAuth2Guild = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete()
-                    .stream().filter(c -> c.getId().equals(guildId) && c.hasPermission(Permission.ADMINISTRATOR)).findFirst().orElse(null);
+                    .stream().filter(c -> c.getIdLong() == guildId && c.hasPermission(Permission.ADMINISTRATOR)).findFirst().orElse(null);
         } catch (Exception ignore) {
         }
 
         // Retrieve the Guild by its giving ID.
         Guild guild = BotWorker.getShardManager().getGuildById(guildId);
 
-        // If the Guild couldn't be loaded redirect to Error page.
+        // If the Guild couldn't be loaded, redirect to Error page.
         if (guild == null) {
             if (oAuth2Guild != null) {
                 return new GuildContainer(oAuth2Guild);
@@ -197,7 +197,7 @@ public class SessionService {
         // Retrieve the Guild by its giving ID.
         Guild guild = BotWorker.getShardManager().getGuildById(guildId);
 
-        // If the Guild couldn't be loaded redirect to Error page.
+        // If the Guild couldn't be loaded, redirect to Error page.
         if (guild == null) throw new IllegalAccessException("Guild not found!");
 
         return new GuildContainer(guild, retrieveChannels);

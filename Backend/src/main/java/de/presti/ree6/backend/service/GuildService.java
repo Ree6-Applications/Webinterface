@@ -206,7 +206,7 @@ public class GuildService {
         List<WebhookTwitch> twitchChannels = SQLSession.getSqlConnector().getSqlWorker().getAllTwitchWebhooks(guildId);
 
         return twitchChannels.stream().map(twitchChannel -> new NotifierContainer(twitchChannel.getName(), twitchChannel.getMessage(), guildContainer.getGuild().retrieveWebhooks()
-                .complete().stream().filter(c -> c.getId().equals(twitchChannel.getGuildId())).map(ChannelContainer::new).findFirst().orElse(null))).toList();
+                .complete().stream().filter(c -> c.getIdLong() == twitchChannel.getGuildId()).map(ChannelContainer::new).findFirst().orElse(null))).toList();
     }
 
     public void addTwitchNotifier(String sessionIdentifier, long guildId, GenericNotifierRequest notifierRequest) throws IllegalAccessException {
@@ -290,7 +290,7 @@ public class GuildService {
         List<WebhookInstagram> instagramUsers = SQLSession.getSqlConnector().getSqlWorker().getAllInstagramWebhooks(guildId);
 
         return instagramUsers.stream().map(instagramUser -> new NotifierContainer(instagramUser.getName(), instagramUser.getMessage(), guildContainer.getGuild().retrieveWebhooks()
-                .complete().stream().filter(c -> c.getId().equals(instagramUser.getGuildId())).map(ChannelContainer::new).findFirst().orElse(null))).toList();
+                .complete().stream().filter(c -> c.getIdLong() == instagramUser.getGuildId()).map(ChannelContainer::new).findFirst().orElse(null))).toList();
     }
 
     public void addInstagramNotifier(String sessionIdentifier, long guildId, GenericNotifierRequest notifierRequest) throws IllegalAccessException {
