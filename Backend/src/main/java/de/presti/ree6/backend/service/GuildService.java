@@ -900,7 +900,7 @@ public class GuildService {
             reactionRole.setFormattedEmote(formattedEmoji);
             reactionRole.setGuildId(guild.getIdLong());
             reactionRole.setMessageId(messageIdNumber);
-            reactionRole.setRoleId(role.getId());
+            reactionRole.getGuildRoleId().setRoleId(role.getId());
 
             SQLSession.getSqlConnector().getSqlWorker().updateEntity(reactionRole);
         } catch (NumberFormatException e) {
