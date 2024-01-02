@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.utils.data.container;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,8 +17,12 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 @AllArgsConstructor
 public class ChannelContainer {
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     long id;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     long guildId;
+
     String name;
     ChannelType type;
 

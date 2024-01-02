@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.utils.data.container;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
 import de.presti.ree6.backend.utils.data.container.role.RoleContainer;
 import de.presti.ree6.sql.entities.Punishments;
@@ -14,7 +15,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PunishmentContainer {
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     long punishmentId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     long guildId;
     String neededWarnings;
     String action;

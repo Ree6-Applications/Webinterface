@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.utils.data.container;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import de.presti.ree6.backend.utils.data.container.user.UserContainer;
 import de.presti.ree6.sql.entities.Warning;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,11 @@ import lombok.Setter;
 public class WarningContainer {
 
     UserContainer user;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     long guildId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     int warnings;
 
     public WarningContainer(Warning warning) {

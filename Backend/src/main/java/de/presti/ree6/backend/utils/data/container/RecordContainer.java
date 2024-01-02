@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.utils.data.container;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.utils.data.container.user.UserContainer;
 import de.presti.ree6.sql.entities.Recording;
@@ -16,7 +17,10 @@ import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChanne
 public class RecordContainer {
 
     String creationTime;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     long guildId;
+
     ChannelContainer voiceChannel;
     UserContainer creator;
 

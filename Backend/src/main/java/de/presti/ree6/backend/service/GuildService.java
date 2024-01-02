@@ -489,7 +489,24 @@ public class GuildService {
         ticketContainer.setChannel(guildContainer.getChannelById(tickets.getChannelId()));
         ticketContainer.setCategory(guildContainer.getCategoryById(tickets.getTicketCategory()));
 
+
         ChannelContainer logChannel = guildContainer.getChannelById(tickets.getLogChannelId());
+
+        if (tickets.getLogChannelId() == 0) {
+            guildContainer.getGuild().retrieveWebhooks().queue(x -> {
+                Tickets updateTickets = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Tickets(), "FROM Tickets WHERE guildId=:gid", Map.of("gid", guildId));
+                if (updateTickets == null) return;
+
+                net.dv8tion.jda.api.entities.Webhook webhook = x.stream().filter(entry -> entry.getToken() != null)
+                        .filter(entry ->  entry.getToken().equalsIgnoreCase(tickets.getLogChannelWebhookToken()))
+                        .findFirst().orElse(null);
+
+                if (webhook != null) {
+                    updateTickets.setLogChannelId(webhook.getChannel().getIdLong());
+                    SQLSession.getSqlConnector().getSqlWorker().updateEntity(updateTickets);
+                }
+            });
+        }
 
         if (logChannel == null) {
             logChannel = new ChannelContainer();
@@ -707,7 +724,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
 
         return SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Punishments(),
-                "FROM Punishments WHERE guildUserId.guildId = :gid",
+                "FROM Punishments WHERE guildAndId.guildId = :gid",
                 Map.of("gid", guildId)).stream().map(c -> new PunishmentContainer(c, guildContainer)).toList();
     }
 
@@ -715,7 +732,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
 
         SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Punishments(),
-                "FROM Punishments WHERE guildUserId.guildId = :gid",
+                "FROM Punishments WHERE guildAndId.guildId = :gid",
                 Map.of("gid", guildId)).forEach(c -> SQLSession.getSqlConnector().getSqlWorker().deleteEntity(c));
     }
 
@@ -723,7 +740,7 @@ public class GuildService {
         GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
 
         Punishments punishments = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Punishments(),
-                "FROM Punishments WHERE guildUserId.guildId = :gid AND id = :id",
+                "FROM Punishments WHERE guildAndId.guildId = :gid AND id = :id",
                 Map.of("gid", guildId, "id", punishmentId));
 
         if (punishments == null)

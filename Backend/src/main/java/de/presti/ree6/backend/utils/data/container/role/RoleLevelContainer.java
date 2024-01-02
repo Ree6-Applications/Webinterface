@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.utils.data.container.role;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.sql.entities.roles.ChatAutoRole;
@@ -15,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RoleLevelContainer {
 
-    @JsonRawValue
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     long level;
 
     RoleContainer role;

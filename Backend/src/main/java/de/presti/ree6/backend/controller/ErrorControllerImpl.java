@@ -35,11 +35,12 @@ public class ErrorControllerImpl implements ErrorController {
     public ErrorControllerImpl(ErrorAttributes errorAttributes) {
         this.errorAttributes = errorAttributes;
         String tempVersion = Server.getInstance().getClass().getPackage().getImplementationVersion();
-        version = tempVersion == null ? "4.0.6" : tempVersion;
+        version = tempVersion == null ? "4.1.1" : tempVersion;
     }
 
     /**
      * Handle received Error.
+     *
      * @param request Request that was sent.
      * @return Generic Response with the Error Message.
      */
@@ -52,11 +53,12 @@ public class ErrorControllerImpl implements ErrorController {
 
     /**
      * Return the HTTP Status.
+     *
      * @param request Request that was sent.
      * @return HTTP Status.
      */
     private HttpStatus getStatus(HttpServletRequest request) {
-        Integer statusCode = (Integer)request.getAttribute("jakarta.servlet.error.status_code");
+        Integer statusCode = (Integer) request.getAttribute("jakarta.servlet.error.status_code");
         if (statusCode == null) {
             return HttpStatus.INTERNAL_SERVER_ERROR;
         } else {

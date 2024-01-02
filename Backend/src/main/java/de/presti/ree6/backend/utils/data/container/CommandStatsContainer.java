@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.utils.data.container;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import de.presti.ree6.sql.entities.stats.GuildCommandStats;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,8 @@ public class CommandStatsContainer {
     }
 
     String command;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     long uses;
 
 }

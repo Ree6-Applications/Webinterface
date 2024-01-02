@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.utils.data.container;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,8 @@ public class MessageContainer {
 
     String id;
     String channelId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     long guildId;
     String message;
     String embedJson;

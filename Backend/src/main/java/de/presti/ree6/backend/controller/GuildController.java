@@ -4,6 +4,7 @@ package de.presti.ree6.backend.controller;
 import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.service.GuildService;
 import de.presti.ree6.backend.service.SessionService;
+import de.presti.ree6.backend.utils.data.ConverterUtil;
 import de.presti.ree6.backend.utils.data.Data;
 import de.presti.ree6.backend.utils.data.container.*;
 import de.presti.ree6.backend.utils.data.container.api.*;
@@ -145,12 +146,7 @@ public class GuildController {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
 
-            long roleId = -1;
-
-            try {
-                roleId = Long.parseLong(request.value());
-            } catch (Exception ignored) {
-            }
+            long roleId = ConverterUtil.convertStringToLong(request.value());
 
             if (roleId == -1) {
                 return new GenericResponse(false, "Role not found!");
@@ -168,19 +164,13 @@ public class GuildController {
         try {
             GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
 
-            long roleId = -1;
-
-            try {
-                roleId = Long.parseLong(request.value());
-            } catch (Exception ignored) {
-            }
+            long roleId = ConverterUtil.convertStringToLong(request.value());
 
             if (roleId == -1) {
                 return new GenericResponse(false, "Role not found!");
             }
 
-            if (guildContainer.getRoleById(roleId) == null)
-                throw new IllegalAccessException("Role not found!");
+            if (guildContainer.getRoleById(roleId) == null) throw new IllegalAccessException("Role not found!");
 
             if (!SQLSession.getSqlConnector().getSqlWorker().isAutoRoleSetup(guildId, roleId)) {
                 SQLSession.getSqlConnector().getSqlWorker().addAutoRole(guildId, roleId);
@@ -200,7 +190,7 @@ public class GuildController {
     @GetMapping(value = "/{guildId}/leaderboard/voice", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<LeaderboardContainer> retrieveLeaderboardVoice(@PathVariable(name = "guildId") long guildId) {
         try {
-            // Call this to check if guild exists. If not exception is thrown.
+            // Call this to check if the guild exists. If not, exception is thrown.
             GuildContainer guildContainer = sessionService.retrieveGuild(guildId);
 
             LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
@@ -218,7 +208,7 @@ public class GuildController {
     @GetMapping(value = "/{guildId}/leaderboard/chat", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericObjectResponse<LeaderboardContainer> retrieveLeaderboardChat(@PathVariable(name = "guildId") long guildId) {
         try {
-            // Call this to check if guild exists. If not exception is thrown.
+            // Call this to check if the guild exists. If not, exception is thrown.
             GuildContainer guildContainer = sessionService.retrieveGuild(guildId);
 
             LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
@@ -262,7 +252,7 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/chatrole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeChatAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest valueRequest) {
         try {
-            long level = Long.parseLong(valueRequest.value());
+            long level = ConverterUtil.convertStringToLong(valueRequest.value());
             guildService.removeChatAutoRole(sessionIdentifier, guildId, level);
             return new GenericResponse(true, "Chat Auto-role removed!");
         } catch (Exception e) {
@@ -296,7 +286,7 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/voicerole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse removeVoiceAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest valueRequest) {
         try {
-            long level = Long.parseLong(valueRequest.value());
+            long level = ConverterUtil.convertStringToLong(valueRequest.value());
             guildService.removeVoiceAutoRole(sessionIdentifier, guildId, level);
             return new GenericResponse(true, "Voice Auto-role removed!");
         } catch (Exception e) {
@@ -332,17 +322,9 @@ public class GuildController {
         try {
 
             ByteArrayResource resource = new ByteArrayResource(guildService.getRecordingBytes(sessionIdentifier, recordId));
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .contentLength(resource.contentLength())
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            ContentDisposition.attachment()
-                                    .filename("recording.wav")
-                                    .build().toString())
-                    .body(resource);
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).contentLength(resource.contentLength()).header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename("recording.wav").build().toString()).body(resource);
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(null);
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
@@ -611,12 +593,7 @@ public class GuildController {
     public GenericResponse addTemporalVoiceChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
         try {
 
-            long channelId = -1;
-
-            try {
-                channelId = Long.parseLong(request.value());
-            } catch (Exception ignored) {
-            }
+            long channelId = ConverterUtil.convertStringToLong(request.value());
 
             if (channelId == -1) {
                 return new GenericResponse(false, "Channel not found!");
@@ -710,12 +687,7 @@ public class GuildController {
     @PostMapping(value = "/{guildId}/suggestions/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public GenericResponse addSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
         try {
-            long channelId = -1;
-
-            try {
-                channelId = Long.parseLong(request.value());
-            } catch (Exception ignored) {
-            }
+            long channelId = ConverterUtil.convertStringToLong(request.value());
 
             if (channelId == -1) {
                 return new GenericResponse(false, "Channel not found!");
@@ -862,7 +834,7 @@ public class GuildController {
     public GenericResponse addReactionRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody ReactionRoleRequest request) {
         try {
             guildService.addReactionRole(sessionIdentifier, guildId, request.emojiId(), request.formattedEmoji(), request.channelId(), request.messageId(), request.roleId());
-            return new GenericResponse(true,"ReactionRole added!");
+            return new GenericResponse(true, "ReactionRole added!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
         }
@@ -872,7 +844,7 @@ public class GuildController {
     public GenericResponse removeReactionRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody ReactionRoleDeleteRequest request) {
         try {
             guildService.removeReactionRole(sessionIdentifier, guildId, request.emojiId(), request.messageId());
-            return new GenericResponse(true,"ReactionRole removed!");
+            return new GenericResponse(true, "ReactionRole removed!");
         } catch (Exception e) {
             return new GenericResponse(false, e.getMessage());
         }

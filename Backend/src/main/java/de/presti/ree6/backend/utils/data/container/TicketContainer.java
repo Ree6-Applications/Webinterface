@@ -1,5 +1,6 @@
 package de.presti.ree6.backend.utils.data.container;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class TicketContainer {
 
     public ChannelContainer category;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     public long ticketCount;
 
     public ChannelContainer logChannel;
