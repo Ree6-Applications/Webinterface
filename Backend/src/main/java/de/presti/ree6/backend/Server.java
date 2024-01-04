@@ -63,6 +63,12 @@ public class Server {
     TwitchIdentityProvider twitchIdentityProvider;
 
     /**
+     * Backend Version.
+     */
+    @Getter
+    private String backendVersion;
+
+    /**
      * Yaml Config Manager instance.
      */
     Config config;
@@ -74,6 +80,9 @@ public class Server {
      */
     public Server(String[] args) {
         instance = this;
+
+        String tempVersion = getInstance().getClass().getPackage().getImplementationVersion();
+        backendVersion = tempVersion == null ? "4.0.11" : tempVersion;
         load(args);
     }
 
@@ -89,31 +98,6 @@ public class Server {
 
         // Initialize the Config.
         config.init();
-
-        // Creating OAuth2 Instance.
-        oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfiguration().getLong("discord.client.id")).setClientSecret(config.getConfiguration().getString("discord.client.secret")).build();
-
-        // Create a new JDA Session.
-        try {
-            List<String> argList = Arrays.stream(args).map(String::toLowerCase).toList();
-
-            int shards = instance.config.getConfiguration().getInt("discord.bot.client.shards", 1);
-
-            BotVersion version = BotVersion.RELEASE;
-
-            if (argList.contains("--dev")) {
-                version = BotVersion.DEVELOPMENT_BUILD;
-            } else if (argList.contains("--beta")) {
-                version = BotVersion.BETA_BUILD;
-            }
-
-            BotWorker.createBot(version, "3.0.0", shards);
-
-            log.info("Service (JDA) has been started. Creation was successful.");
-        } catch (Exception exception) {
-            //Inform if not successful.
-            log.error("Service (JDA) couldn't be started. Creation was unsuccessful.", exception);
-        }
 
         // Creating a new SQL-Connector Instance.
         DatabaseTyp databaseTyp;
@@ -144,6 +128,31 @@ public class Server {
                 .build();
 
         new SQLSession(sqlConfig);
+
+        // Creating OAuth2 Instance.
+        oAuth2Client = new OAuth2Client.Builder().setClientId(config.getConfiguration().getLong("discord.client.id")).setClientSecret(config.getConfiguration().getString("discord.client.secret")).build();
+
+        // Create a new JDA Session.
+        try {
+            List<String> argList = Arrays.stream(args).map(String::toLowerCase).toList();
+
+            int shards = instance.config.getConfiguration().getInt("discord.bot.client.shards", 1);
+
+            BotVersion version = BotVersion.RELEASE;
+
+            if (argList.contains("--dev")) {
+                version = BotVersion.DEVELOPMENT_BUILD;
+            } else if (argList.contains("--beta")) {
+                version = BotVersion.BETA_BUILD;
+            }
+
+            BotWorker.createBot(version, "3.0.0", shards);
+
+            log.info("Service (JDA) has been started. Creation was successful.");
+        } catch (Exception exception) {
+            //Inform if not successful.
+            log.error("Service (JDA) couldn't be started. Creation was unsuccessful.", exception);
+        }
 
         credentialManager = CredentialManagerBuilder.builder()
                 .withStorageBackend(new DatabaseStorageBackend())

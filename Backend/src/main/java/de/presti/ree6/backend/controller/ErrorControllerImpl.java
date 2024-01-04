@@ -23,19 +23,12 @@ public class ErrorControllerImpl implements ErrorController {
     private final ErrorAttributes errorAttributes;
 
     /**
-     * The Application version;
-     */
-    private final String version;
-
-    /**
      * Controller for the Error Controller
      *
      * @param errorAttributes Attributes that give more Info about the Error.
      */
     public ErrorControllerImpl(ErrorAttributes errorAttributes) {
         this.errorAttributes = errorAttributes;
-        String tempVersion = Server.getInstance().getClass().getPackage().getImplementationVersion();
-        version = tempVersion == null ? "4.0.11" : tempVersion;
     }
 
     /**
@@ -48,7 +41,7 @@ public class ErrorControllerImpl implements ErrorController {
     public BackendStatusResponse handleError(HttpServletRequest request) {
         HttpStatus httpStatus = getStatus(request);
 
-        return new BackendStatusResponse(false, httpStatus.getReasonPhrase(), version);
+        return new BackendStatusResponse(false, httpStatus.getReasonPhrase(), Server.getInstance().getBackendVersion());
     }
 
     /**
