@@ -19,11 +19,11 @@ public class WebinterfaceApplication {
      */
     public static void main(String[] args) {
 
-        // Initialize SpringApplication.
-        SpringApplication application = new SpringApplication(WebinterfaceApplication.class);
-
         // Initialize the Server class
         new Server(args);
+
+        // Initialize SpringApplication.
+        SpringApplication application = new SpringApplication(WebinterfaceApplication.class);
 
         // Run the Application.
         application.run(args);
