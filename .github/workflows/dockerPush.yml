@@ -15,7 +15,7 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  push_to_registry:
+  backend:
     name: Build and push Backend image
     runs-on: ubuntu-latest
     steps:
