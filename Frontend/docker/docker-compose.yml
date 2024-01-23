@@ -1,0 +1,36 @@
+version: "3"
+# Created by "Jiří Štefka <jiri@stefka.eu>"
+# This code is under the GPLv3 license.
+
+services:
+  ree6_frontend:
+    container_name: ree6_frontend
+    # The name of the image that will be created when building this container
+    image: prestischmesti/ree6-frontend
+
+    # Uncomment the lines below to enable Traefik
+    # labels:
+    #   - traefik.http.routers.ree6_frontend.rule=Host(`ree6.example.com`) # Set to your domain (+subdomain)
+    #   - traefik.http.routers.ree6_frontend.entrypoints=websecure
+    #   - traefik.http.routers.ree6_frontend.tls.certresolver=lets-encrypt
+    #   - traefik.http.routers.ree6_frontend.service=ree6_frontend
+    #   - traefik.http.services.ree6_frontend.loadBalancer.server.port=3000 # Must be same as `PORT` variable
+    # networks:
+    #   - traefik
+    #
+    environment:
+      - BACKEND_URL="https://api.ree6.de" # Change this to use your backend url
+      - INVITE_URL="https://invite.ree6.de" # Change this to your bot's invite link
+      - TZ=Europe/Prague # Set your timezone
+
+      - DEBUG=false # Enable `npm build`'s output and unset `NODE_ENV=production`
+      - HOST=0.0.0.0 # IP address to listen to
+      - PORT=3000 # Port to listen to
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+
+# Traefik
+# networks:
+#   traefik:
+#     external: true
