@@ -6,7 +6,7 @@ LABEL developer="Jiří Štefka <jiri@stefka.eu>"
 LABEL maintainer="Jiří Štefka <jiri@stefka.eu>"
 
 # Install git (needed to download the Frontend)
-RUN apk add git
+RUN apk add --no-cache git
 
 COPY start.sh /start.sh
 
