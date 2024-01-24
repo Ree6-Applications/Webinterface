@@ -92,6 +92,7 @@ public class Server {
      * @param args {@link String[]} used as List of the Arguments given at the start of the Application.
      */
     public void load(String[] args) {
+        log.info("Starting Backend {}", backendVersion);
 
         // Create Config Instance.
         config = new Config();
@@ -113,6 +114,9 @@ public class Server {
 
             default -> databaseTyp = DatabaseTyp.SQLite;
         }
+
+
+        log.info("Using {} as Database", databaseTyp.name());
 
         SQLConfig sqlConfig = SQLConfig.builder()
                 .username(getConfig().getConfiguration().getString("hikari.sql.user"))
