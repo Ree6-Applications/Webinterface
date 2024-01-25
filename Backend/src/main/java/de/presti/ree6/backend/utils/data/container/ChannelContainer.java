@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.attribute.IWebhookContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 
 @Getter
 @Setter
@@ -25,6 +26,13 @@ public class ChannelContainer {
 
     String name;
     ChannelType type;
+
+    public ChannelContainer(StandardGuildMessageChannel guildChannel) {
+        this.id = guildChannel.getIdLong();
+        this.guildId = guildChannel.getGuild().getIdLong();
+        this.name = guildChannel.getName();
+        this.type = guildChannel.getType();
+    }
 
     public ChannelContainer(GuildChannel guildChannel) {
         this.id = guildChannel.getIdLong();

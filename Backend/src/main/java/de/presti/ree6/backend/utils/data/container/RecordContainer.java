@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 
 @Getter
@@ -28,7 +29,16 @@ public class RecordContainer {
         ///this.data = Base64.encodeBase64String(recording.getRecording());
         this.creationTime = String.valueOf(recording.getCreation());
         this.guildId = recording.getGuildId();
-        this.voiceChannel = new ChannelContainer(BotWorker.getShardManager().getChannelById(StandardGuildMessageChannel.class, recording.getVoiceId()));
         this.creator = new UserContainer(BotWorker.getShardManager().retrieveUserById(recording.getCreatorId()).complete());
+
+        Guild guild = BotWorker.getShardManager().getGuildById(recording.getGuildId());
+
+        if (guild != null) {
+            StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, recording.getVoiceId());
+
+            if (channel != null) {
+                this.voiceChannel = new ChannelContainer(channel);
+            }
+        }
     }
 }
