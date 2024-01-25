@@ -8,19 +8,21 @@ LABEL maintainer="Jiří Štefka <jiri@stefka.eu>"
 # Install git (needed to download the Frontend)
 RUN apk add --no-cache git
 
-COPY start.sh /start.sh
-
 # Clone Ree6 frontend
 RUN git clone https://github.com/Ree6-Applications/Webinterface /Webinterface
+
+# Setup the files and permissions
 RUN chown -R node:node /Webinterface
-
-# The USER instruction sets the user name to use as the default user for the remainder of the current stage
 USER node:node
-
 WORKDIR /Webinterface/Frontend
 
 # Install the needed modules
 RUN npm install vite && npm install && npm i -D @sveltejs/adapter-node --force
 
-# This is the command that will be run inside the image when you tell Docker to start the container
-CMD ["sh","/start.sh"]
+# Patch the config to use the node adapter
+RUN sed -i "s@import adapter from '\@sveltejs/adapter-auto';@import adapter from '\@sveltejs/adapter-node';@g" svelte.config.js
+
+RUN npm run build
+RUN rm -rf src/ static/
+
+CMD ["node", "build/index.js"]
