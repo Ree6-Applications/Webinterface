@@ -61,7 +61,7 @@
         <dependency>
             <groupId>de.ree6</groupId>
             <artifactId>Ree6-SQL</artifactId>
-            <version>22956b2</version>
+            <version>6911247157</version>
         </dependency>
 
         <!-- Discord -->
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-spring-boot-starter</artifactId>
-            <version>7.1.0</version>
+            <version>7.3.0</version>
         </dependency>
 
         <!-- Utilities -->
