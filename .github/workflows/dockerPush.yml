@@ -35,7 +35,7 @@ jobs:
           images: ree6/backend
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5.1.0
+        uses: docker/build-push-action@v5.3.0
         with:
           context: Backend/
           push: true
