@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.2</version>
+        <version>3.2.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>de.presti.ree6</groupId>
     <artifactId>Webinterface-Backend</artifactId>
-    <version>4.0.14</version>
+    <version>4.0.15</version>
     <name>Webinterface-Backend</name>
     <description>The Backend for the Webinterface</description>
 
@@ -37,22 +37,22 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.4</version>
             <scope>test</scope>
         </dependency>
 
@@ -61,14 +61,14 @@
         <dependency>
             <groupId>de.ree6</groupId>
             <artifactId>Ree6-SQL</artifactId>
-            <version>6911247157</version>
+            <version>da620ec7a5</version>
         </dependency>
 
         <!-- Discord -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.20</version>
+            <version>5.0.0-beta.22</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
@@ -81,14 +81,14 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-spring-boot-starter</artifactId>
-            <version>7.4.0</version>
+            <version>7.8.0</version>
         </dependency>
 
         <!-- Utilities -->
         <dependency>
             <groupId>com.github.twitch4j</groupId>
             <artifactId>twitch4j</artifactId>
-            <version>1.19.0</version>
+            <version>1.20.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.Carleslc.Simple-YAML</groupId>
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <version>1.18.32</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
