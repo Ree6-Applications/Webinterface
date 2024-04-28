@@ -13,7 +13,7 @@ services:
 
       - HOST=0.0.0.0 # IP address to listen to
 
-      - TZ=Europe/Prague # Set your timezone
+      - TZ=Europe/Berlin # Set your timezone
       - NODE_ENV=production # Internal server error messages will not send stacktrace to the browser in production
 
     # Uncomment the lines below to enable Traefik
