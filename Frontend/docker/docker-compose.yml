@@ -1,0 +1,38 @@
+version: "3"
+# Created by "Jiří Štefka <jiri@stefka.eu>"
+# This code is under the GPLv3 license.
+
+services:
+  ree6_frontend:
+    container_name: ree6_frontend
+    image: ree6/frontend
+
+    environment:
+      - BACKEND_URL="https://api.ree6.de" # Change this to use your backend url
+      - INVITE_URL="https://invite.ree6.de" # Change this to your bot's invite link
+
+      - HOST=0.0.0.0 # IP address to listen to
+
+      - TZ=Europe/Prague # Set your timezone
+      - NODE_ENV=production # Internal server error messages will not send stacktrace to the browser in production
+
+    # Uncomment the lines below to enable Traefik
+    # Don't forget to uncomment the bottom of the file as well
+    # Don't forget to comment out the `ports` section
+    # labels:
+    #   - traefik.http.routers.ree6_frontend.rule=Host(`ree6.example.com`) # Set to your domain (+subdomain)
+    #   - traefik.http.routers.ree6_frontend.entrypoints=websecure
+    #   - traefik.http.routers.ree6_frontend.tls.certresolver=lets-encrypt
+    #   - traefik.http.routers.ree6_frontend.service=ree6_frontend
+    #   - traefik.http.services.ree6_frontend.loadBalancer.server.port=3000 # Must be same as `PORT` variable
+    # networks:
+    #   - traefik
+    ports: # Comment this out if using traefik
+      - 3000:3000 # Comment this out if using traefik
+
+    restart: unless-stopped
+
+# Uncomment this for Traefik
+# networks:
+#   traefik:
+#     external: true
