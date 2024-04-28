@@ -8,8 +8,8 @@ services:
     image: ree6/frontend
 
     environment:
-      - BACKEND_URL="https://api.ree6.de" # Change this to use your backend url
-      - INVITE_URL="https://invite.ree6.de" # Change this to your bot's invite link
+      - BACKEND_URL=https://api.ree6.de # Change this to use your backend url
+      - INVITE_URL=https://invite.ree6.de # Change this to your bot's invite link
 
       - HOST=0.0.0.0 # IP address to listen to
 

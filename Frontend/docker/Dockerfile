@@ -1,9 +1,13 @@
-# Created by "Jiří Štefka <jiri@stefka.eu>"
+# Originaly created by "Jiří Štefka <jiri@stefka.eu>"
+# Modified by Presti
 # This code is under the GPLv3 license.
 FROM node:18-alpine
 
-LABEL developer="Jiří Štefka <jiri@stefka.eu>"
+LABEL developer="Presti <presti@ree6.de>"
 LABEL maintainer="Jiří Štefka <jiri@stefka.eu>"
+
+COPY start.sh /start.sh
+RUN chown -R node:node /start.sh
 
 # Install git (needed to download the Frontend)
 RUN apk add --no-cache git
@@ -23,6 +27,6 @@ RUN npm install vite && npm install && npm i -D @sveltejs/adapter-node --force
 RUN sed -i "s@import adapter from '\@sveltejs/adapter-auto';@import adapter from '\@sveltejs/adapter-node';@g" svelte.config.js
 
 RUN npm run build
-RUN rm -rf src/ static/
 
-CMD ["node", "build/index.js"]
+# This is the command that will be run inside the image when you tell Docker to start the container
+CMD ["sh","/start.sh"]
