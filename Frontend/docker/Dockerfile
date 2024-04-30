@@ -1,7 +1,7 @@
 # Originaly created by "Jiří Štefka <jiri@stefka.eu>"
 # Modified by Presti
 # This code is under the GPLv3 license.
-FROM node:18-alpine
+FROM node:20-alpine
 
 LABEL developer="Presti <presti@ree6.de>"
 LABEL maintainer="Jiří Štefka <jiri@stefka.eu>"
