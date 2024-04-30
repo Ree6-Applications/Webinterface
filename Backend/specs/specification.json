@@ -1,0 +1,4328 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Ree6 Backend",
+    "version": "v4.0.15"
+  },
+  "servers": [
+    {
+      "url": "https://api.ree6.de",
+      "description": "Ree6 Production API"
+    }
+  ],
+  "paths": {
+    "/settings/{guildId}/{settingName}/update": {
+      "post": {
+        "tags": [
+          "Settings Endpoints"
+        ],
+        "operationId": "updateSetting",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "settingName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseSetting"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/youtube/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeYoutubeNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/youtube/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addYoutubeNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericNotifierRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/welcome/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeWelcomeChannel",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/welcome/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addWelcomeChannel",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/warnings/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeWarnings",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarningsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseWarningContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/warnings/punishments/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removePunishments",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/warnings/punishments/clear": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "clearPunishments",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/warnings/punishments/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addPunishments",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PunishmentsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponsePunishmentContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/warnings/clear": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "clearWarnings",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/warnings/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addWarnings",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarningsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseWarningContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/voicerole/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeVoiceAutoRole",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/voicerole/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addVoiceAutoRole",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LevelAutoRoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/twitter/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeTwitterNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/twitter/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addTwitterNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericNotifierRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/twitch/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeTwitchNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/twitch/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addTwitchNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericNotifierRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/tickets/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeTicket",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/tickets/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addTicket",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/temporalvoice/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeTemporalVoiceChannel",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/temporalvoice/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addTemporalVoiceChannel",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/suggestions/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeSuggestion",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/suggestions/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addSuggestion",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/reddit/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeRedditNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/reddit/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addRedditNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericNotifierRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/reactionroles/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeReactionRole",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReactionRoleDeleteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/reactionroles/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addReactionRole",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReactionRoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/log/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeLogChannel",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/log/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addLogChannel",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/instagram/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeInstagramNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/instagram/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addInstagramNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericNotifierRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/commands/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeCustomCommand",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/commands/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addCustomCommand",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomCommandRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseCustomCommandContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/chatrole/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeChatAutoRole",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/chatrole/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addChatAutoRole",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LevelAutoRoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/blacklist/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeGuildBlacklist",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/blacklist/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addGuildBlacklist",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/autorole/remove": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "removeGuildAutoRole",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/autorole/add": {
+      "post": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "addGuildAutoRole",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/{guildId}/{settingName}": {
+      "get": {
+        "tags": [
+          "Settings Endpoints"
+        ],
+        "operationId": "retrieveSetting",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "settingName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseSetting"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/{guildId}/{settingName}/delete": {
+      "get": {
+        "tags": [
+          "Settings Endpoints"
+        ],
+        "operationId": "deleteSetting",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "settingName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/{guildId}/": {
+      "get": {
+        "tags": [
+          "Settings Endpoints"
+        ],
+        "operationId": "retrieveSettings",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListSetting"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveGuild",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseGuildContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/youtube": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveYoutubeNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListNotifierContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/welcome": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveWelcomeChannel",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseChannelContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/warnings": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveWarnings",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListWarningContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/warnings/punishments": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrievePunishments",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListPunishmentContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/voicerole": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveVoiceRoles",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListRoleLevelContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/twitter": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveTwitterNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListNotifierContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/twitch": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveTwitchNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListNotifierContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/tickets": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveTicket",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseTicketContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/temporalvoice": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveTemporalVoice",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseChannelContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/suggestions": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveSuggestion",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseChannelContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/stats": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveStats",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseGuildStatsContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/roles": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveGuildRoles",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListRoleContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/reddit": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveRedditNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListNotifierContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/reactionroles": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveReactionRoles",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListMessageReactionRoleContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/opt-out": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "optOut",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/opt-out/check": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "checkOptOut",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/log": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveLogChannel",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseChannelContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/leaderboard/voice": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveLeaderboardVoice",
+        "parameters": [
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseLeaderboardContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/leaderboard/chat": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveLeaderboardChat",
+        "parameters": [
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseLeaderboardContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/instagram": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveInstagramNotifier",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListNotifierContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/commands": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveCustomCommands",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListCustomCommandContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/chatrole": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveChatRoles",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListRoleLevelContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/channels": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveGuildChannels",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListChannelContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/blacklist": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveGuildBlacklist",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/{guildId}/autorole": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveGuildAutoRole",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "guildId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListRoleContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/recording": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveRecording",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recordId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseRecordContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/recording/download": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "downloadRecording",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recordId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guilds/": {
+      "get": {
+        "tags": [
+          "Guild Endpoints"
+        ],
+        "operationId": "retrieveGuilds",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseListGuildContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/twitch": {
+      "get": {
+        "tags": [
+          "Session Endpoints"
+        ],
+        "operationId": "authenticateTwitch",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/twitch/request": {
+      "get": {
+        "tags": [
+          "Session Endpoints"
+        ],
+        "operationId": "createTwitch",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/auth/discord": {
+      "get": {
+        "tags": [
+          "Session Endpoints"
+        ],
+        "operationId": "completeSession",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseSessionContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/discord/request": {
+      "get": {
+        "tags": [
+          "Session Endpoints"
+        ],
+        "operationId": "createSession",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/auth/check": {
+      "get": {
+        "tags": [
+          "Session Endpoints"
+        ],
+        "operationId": "checkSession",
+        "parameters": [
+          {
+            "name": "X-Session-Authenticator",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericObjectResponseSessionContainer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/error": {
+      "get": {
+        "tags": [
+          "Error Endpoints"
+        ],
+        "operationId": "handleError",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackendStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Error Endpoints"
+        ],
+        "operationId": "handleError_3",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackendStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Error Endpoints"
+        ],
+        "operationId": "handleError_2",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackendStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Error Endpoints"
+        ],
+        "operationId": "handleError_5",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackendStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "Error Endpoints"
+        ],
+        "operationId": "handleError_6",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackendStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Error Endpoints"
+        ],
+        "operationId": "handleError_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackendStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Error Endpoints"
+        ],
+        "operationId": "handleError_4",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackendStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GenericValueRequest": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseSetting": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/Setting"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GuildAndName": {
+        "type": "object",
+        "properties": {
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Setting": {
+        "type": "object",
+        "properties": {
+          "settingId": {
+            "$ref": "#/components/schemas/GuildAndName"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          },
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "booleanValue": {
+            "type": "boolean"
+          },
+          "stringValue": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericNotifierRequest": {
+        "type": "object",
+        "properties": {
+          "channelId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "WarningsRequest": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "warnings": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseWarningContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/WarningContainer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "UserContainer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "discriminator": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "WarningContainer": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserContainer"
+          },
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "warnings": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PunishmentsRequest": {
+        "type": "object",
+        "properties": {
+          "neededWarnings": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "roleId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "timeoutTime": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponsePunishmentContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/PunishmentContainer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "PunishmentContainer": {
+        "type": "object",
+        "properties": {
+          "punishmentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "neededWarnings": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "timeoutTime": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/RoleContainer"
+          }
+        }
+      },
+      "RoleContainer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "iconUrl": {
+            "type": "string"
+          },
+          "color": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "LevelAutoRoleRequest": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "role": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "TicketsRequest": {
+        "type": "object",
+        "properties": {
+          "channelId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "logChannelId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ReactionRoleDeleteRequest": {
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "string"
+          },
+          "emojiId": {
+            "type": "string"
+          }
+        }
+      },
+      "ReactionRoleRequest": {
+        "type": "object",
+        "properties": {
+          "emojiId": {
+            "type": "string"
+          },
+          "formattedEmoji": {
+            "type": "string"
+          },
+          "channelId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "messageId": {
+            "type": "string"
+          },
+          "roleId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "CustomCommandRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "embedJson": {
+            "type": "string"
+          },
+          "channelId": {
+            "type": "string"
+          }
+        }
+      },
+      "ChannelContainer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "TEXT",
+              "PRIVATE",
+              "VOICE",
+              "GROUP",
+              "CATEGORY",
+              "NEWS",
+              "STAGE",
+              "GUILD_NEWS_THREAD",
+              "GUILD_PUBLIC_THREAD",
+              "GUILD_PRIVATE_THREAD",
+              "FORUM",
+              "MEDIA",
+              "UNKNOWN"
+            ]
+          }
+        }
+      },
+      "CustomCommandContainer": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/ChannelContainer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "embedJson": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseCustomCommandContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/CustomCommandContainer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseListSetting": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Setting"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseGuildContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/GuildContainer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GuildContainer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "iconUrl": {
+            "type": "string"
+          },
+          "hasBot": {
+            "type": "boolean"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChannelContainer"
+            }
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleContainer"
+            }
+          },
+          "admin": {
+            "type": "boolean"
+          }
+        }
+      },
+      "GenericObjectResponseListNotifierContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NotifierContainer"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "NotifierContainer": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/ChannelContainer"
+          }
+        }
+      },
+      "GenericObjectResponseChannelContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/ChannelContainer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseListWarningContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WarningContainer"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseListPunishmentContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PunishmentContainer"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseListRoleLevelContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleLevelContainer"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "RoleLevelContainer": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "role": {
+            "$ref": "#/components/schemas/RoleContainer"
+          }
+        }
+      },
+      "GenericObjectResponseTicketContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/TicketContainer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "TicketContainer": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "$ref": "#/components/schemas/ChannelContainer"
+          },
+          "category": {
+            "$ref": "#/components/schemas/ChannelContainer"
+          },
+          "ticketCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "logChannel": {
+            "$ref": "#/components/schemas/ChannelContainer"
+          },
+          "ticketMenuMessage": {
+            "type": "string"
+          },
+          "ticketOpenMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "CommandStatsContainer": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "uses": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "GenericObjectResponseGuildStatsContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/GuildStatsContainer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GuildStatsContainer": {
+        "type": "object",
+        "properties": {
+          "invites": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commandStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommandStatsContainer"
+            }
+          }
+        }
+      },
+      "GenericObjectResponseListRoleContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleContainer"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "EmojiUnion": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "UNICODE",
+              "CUSTOM"
+            ]
+          },
+          "formatted": {
+            "type": "string"
+          },
+          "asReactionCode": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseListMessageReactionRoleContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageReactionRoleContainer"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "MessageContainer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "channelId": {
+            "type": "string"
+          },
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "embedJson": {
+            "type": "string"
+          }
+        }
+      },
+      "MessageReactionRoleContainer": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "$ref": "#/components/schemas/MessageContainer"
+          },
+          "roleReactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReactionRoleContainer"
+            }
+          }
+        }
+      },
+      "ReactionRoleContainer": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/RoleContainer"
+          },
+          "emoji": {
+            "type": "string"
+          },
+          "emojiUnion": {
+            "$ref": "#/components/schemas/EmojiUnion"
+          }
+        }
+      },
+      "GenericObjectResponseLeaderboardContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/LeaderboardContainer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GuildUserId": {
+        "type": "object",
+        "properties": {
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "LeaderboardContainer": {
+        "type": "object",
+        "properties": {
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "chatLeaderboard": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserLevelContainer"
+            }
+          },
+          "voiceLeaderboard": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserLevelContainer"
+            }
+          }
+        }
+      },
+      "UserLevel": {
+        "type": "object",
+        "properties": {
+          "guildUserId": {
+            "$ref": "#/components/schemas/GuildUserId"
+          },
+          "experience": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "rank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "formattedNeededExperience": {
+            "type": "string"
+          },
+          "formattedExperience": {
+            "type": "string"
+          },
+          "totalExperienceForNextLevel": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "progress": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "UserLevelContainer": {
+        "type": "object",
+        "properties": {
+          "userLevel": {
+            "$ref": "#/components/schemas/UserLevel"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserContainer"
+          }
+        }
+      },
+      "GenericObjectResponseListCustomCommandContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomCommandContainer"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseListChannelContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChannelContainer"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseListString": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseRecordContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/RecordContainer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "RecordContainer": {
+        "type": "object",
+        "properties": {
+          "creationTime": {
+            "type": "string"
+          },
+          "guildId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "voiceChannel": {
+            "$ref": "#/components/schemas/ChannelContainer"
+          },
+          "creator": {
+            "$ref": "#/components/schemas/UserContainer"
+          }
+        }
+      },
+      "GenericObjectResponseListGuildContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GuildContainer"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GenericObjectResponseSessionContainer": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "object": {
+            "$ref": "#/components/schemas/SessionContainer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "SessionContainer": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserContainer"
+          }
+        }
+      },
+      "BackendStatusResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "backendInfo": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
