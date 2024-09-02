@@ -4,10 +4,10 @@
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2024-02-12T17:45:54+01:00",
-    "name": "Pterodactyl egg Frontend Ree6",
-    "author": "Blacksquadman1@gamingbaeren.de",
-    "description": "Pterodactyl egg for the Frontend",
+    "exported_at": "2024-09-02T11:23:10+02:00",
+    "name": "Ree6 Frontend",
+    "author": "presti@presti.me",
+    "description": "A Egg for the Ree6 Webinterface Fronted",
     "features": null,
     "docker_images": {
         "Nodejs 20": "ghcr.io\/parkervcp\/yolks:nodejs_20",
@@ -38,6 +38,26 @@
             "user_viewable": true,
             "user_editable": false,
             "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Backend Url",
+            "description": "",
+            "env_variable": "VITE_API_URL",
+            "default_value": "https:\/\/api.ree6.de",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|url",
+            "field_type": "text"
+        },
+        {
+            "name": "Invite Link",
+            "description": "",
+            "env_variable": "VITE_INVITE_LINK",
+            "default_value": "https:\/\/invite.ree6.de",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
             "field_type": "text"
         }
     ]
