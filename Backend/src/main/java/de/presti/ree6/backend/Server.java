@@ -163,7 +163,7 @@ public class Server {
                 .build();
 
         TwitchAuth.registerIdentityProvider(credentialManager, getConfig().getConfiguration().getString("twitch.client.id"),
-                getConfig().getConfiguration().getString("twitch.client.secret"), Data.getTwitchRedirectUrl());
+                getConfig().getConfiguration().getString("twitch.client.secret"), Data.getTwitchRedirectUrl(), false);
 
         twitchIdentityProvider = (TwitchIdentityProvider) credentialManager.getIdentityProviderByName("twitch").orElse(null);
 
