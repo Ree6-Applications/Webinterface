@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
+
+    const bubble = createBubbler();
     import { onMount } from "svelte";
     import DataPopup from "../data_popup/dataPopup.svelte";
     import { jsonIntoModel, type DataType, type ConfigurableDataType } from "../data_popup/popup";
@@ -6,24 +9,37 @@
     import LoadingIndicator from "../loadingIndicator.svelte";
     import { get_js, post_js } from "$lib/scripts/constants";
 
-    export let icon: string;
-    export let title: string;
-    export let endpoint: string;
-    export let description: string;
-    export let primaryIcon: string;
 
-    export let isEnabled: (json: any) => boolean;
-    export let model: ConfigurableDataType<any>[];
-    export let render: (json: any) => string;
+    interface Props {
+        icon: string;
+        title: string;
+        endpoint: string;
+        description: string;
+        primaryIcon: string;
+        isEnabled: (json: any) => boolean;
+        model: ConfigurableDataType<any>[];
+        render: (json: any) => string;
+    }
 
-    let loading = true;
-    let error = false;
-    let errorMessage = "Something went wrong."
+    let {
+        icon,
+        title,
+        endpoint,
+        description,
+        primaryIcon,
+        isEnabled,
+        model,
+        render
+    }: Props = $props();
 
-    let enabled = false;
-    let picking = false;
-    let config = false;
-    let object: any = {};
+    let loading = $state(true);
+    let error = $state(false);
+    let errorMessage = $state("Something went wrong.")
+
+    let enabled = $state(false);
+    let picking = $state(false);
+    let config = $state(false);
+    let object: any = $state({});
 
     onMount(() => reload())
 
@@ -101,25 +117,25 @@ action2Handler={() => picking = false}
         <div class="button-bar">
             {#if !enabled}
 
-            <div on:click={() => {
+            <div onclick={() => {
                 picking = true
                 config = false
-            }} on:keydown class="button">
+            }} onkeydown={bubble('keydown')} class="button">
                 <span class="material-icons icon-small icon-primary">add</span>
                 <p class="text-small">Setup</p>
             </div>
 
             {:else}
 
-            <div on:click={() => {
+            <div onclick={() => {
                 picking = true
                 config = true
-            }} on:keydown class="button">
+            }} onkeydown={bubble('keydown')} class="button">
                 <span class="material-icons icon-small icon-primary">settings</span>
                 <p class="text-small">Settings</p>
             </div>
 
-            <div on:click={async () => {
+            <div onclick={async () => {
                 
                 loading = true;
                 const json = await post_js(endpoint + "/remove", "{}")
@@ -136,7 +152,7 @@ action2Handler={() => picking = false}
 
                 reload()
 
-            }} on:keydown class="button">
+            }} onkeydown={bubble('keydown')} class="button">
                 <span class="material-icons icon-small icon-primary">close</span>
                 <p class="text-small">Disable</p>
             </div>

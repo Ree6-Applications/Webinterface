@@ -1,7 +1,11 @@
 <script lang="ts">
-    export let size: string = "30";
-    export let message: string = "Something went wrong!";
-    export let error: boolean = false;
+    interface Props {
+        size?: string;
+        message?: string;
+        error?: boolean;
+    }
+
+    let { size = "30", message = "Something went wrong!", error = false }: Props = $props();
 </script>
 
 <div class="loading">

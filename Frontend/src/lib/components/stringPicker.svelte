@@ -1,12 +1,26 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
+
+    const bubble = createBubbler();
     import { fade, scale } from "svelte/transition";
 
-    export let current: string | null;
-    export let message: string;
-    export let strings: string[] = []
-    export let nullable: boolean = false;
-    export let zIndex: number = 100;
-    export let callback: (selected: string | null) => void;
+    interface Props {
+        current: string | null;
+        message: string;
+        strings?: string[];
+        nullable?: boolean;
+        zIndex?: number;
+        callback: (selected: string | null) => void;
+    }
+
+    let {
+        current,
+        message,
+        strings = [],
+        nullable = false,
+        zIndex = 100,
+        callback
+    }: Props = $props();
 
     function close() {
         callback(current);
@@ -19,19 +33,19 @@
 
         <div class="header">
             <h2>{message}</h2>
-            <span on:click={close} on:keydown class="material-icons icon-medium clickable hover-primary">close</span>
+            <span onclick={close} onkeydown={bubble('keydown')} class="material-icons icon-medium clickable hover-primary">close</span>
         </div>
 
         <div class="content">
             <div class="channels">
                 {#each strings as string}
-                <div on:click={() => callback(string)} on:keydown 
+                <div onclick={() => callback(string)} onkeydown={bubble('keydown')} 
                     class="channel clickable {current == string ? 'selected' : ''}">
                     <div class="name">{string}</div>
                 </div>
                 {/each}
                 {#if nullable}
-                <div on:click={() => callback(null)} on:keydown 
+                <div onclick={() => callback(null)} onkeydown={bubble('keydown')} 
                     class="channel clickable {current == null ? 'selected' : ''}">
                     <span class="material-icons icon-primary icon-small">close</span>
                     <div class="name">None</div>

@@ -7,15 +7,24 @@
     import { currentServer } from "$lib/scripts/servers";
 
 
-    export let title: string;
-    export let icon: string;
-    export let description: string;
-    export let prefix: string;
+    interface Props {
+        title: string;
+        icon: string;
+        description: string;
+        prefix: string;
+    }
+
+    let {
+        title,
+        icon,
+        description,
+        prefix
+    }: Props = $props();
     
-    let loadingFeature = "";
-    let loaded = true;
-    let loading = false;
-    let features: Map<string, CustomSetting> = new Map();
+    let loadingFeature = $state("");
+    let loaded = $state(true);
+    let loading = $state(false);
+    let features: Map<string, CustomSetting> = $state(new Map());
 
     type CustomSetting = {
         id: string,
@@ -121,12 +130,12 @@
 
         {#if !$settingsLoading && !loading}
         <div class="button-bar">
-            <div class="button" on:click={enableAll} on:keydown={() => {}}>
+            <div class="button" onclick={enableAll} onkeydown={() => {}}>
                 <span class="material-icons icon-small icon-primary">done_all</span>
                 <p class="text-small">Enable all</p>
             </div>
 
-            <div class="button" on:click={disableAll} on:keydown={() => {}}>
+            <div class="button" onclick={disableAll} onkeydown={() => {}}>
                 <span class="material-icons icon-small icon-primary">close</span>
                 <p class="text-small">Disable all</p>
             </div>
@@ -143,7 +152,7 @@
     <div in:slide class="chips default-margin">
         {#each Array.from(features.values()) as feature}
         <div class="chip clickable chip-hover {feature.value == "true" ? 'chip-enabled' : ''}"
-            on:click={() => toggle(feature.id, true)} on:keydown={() => {}}
+            onclick={() => toggle(feature.id, true)} onkeydown={() => {}}
         >
             {#if loadingFeature == feature.id}
             <LoadingIndicator size="1.8rem"  />
@@ -158,7 +167,7 @@
     {/if}
 </div>
 
-<!-- svelte-ignore css-unused-selector -->
+<!-- svelte-ignore css_unused_selector -->
 <style lang="scss">
     @import '$lib/default.scss';
     @import '$lib/styles/box.scss';

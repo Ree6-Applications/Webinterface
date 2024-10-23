@@ -6,10 +6,10 @@
     import { onMount } from "svelte";
     import { fly, scale } from "svelte/transition";
 
-    let loading = true;
+    let loading = $state(true);
     let correct = false;
-    let success = false;
-    let message = '';
+    let success = $state(false);
+    let message = $state('');
 
     onMount(async () => {
         correct = $page.url.searchParams.has("code");

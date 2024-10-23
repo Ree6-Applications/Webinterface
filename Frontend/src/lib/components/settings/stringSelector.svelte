@@ -1,14 +1,26 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
+
+    const bubble = createBubbler();
     import LoadingIndicator from "../loadingIndicator.svelte";
     import { setting, updateSetting } from "$lib/scripts/settings";
     import { currentServer } from "$lib/scripts/servers";
 
-    export let title: string;
-    export let icon: string;
-    export let description: string;
-    export let settingName: string;
+    interface Props {
+        title: string;
+        icon: string;
+        description: string;
+        settingName: string;
+    }
 
-    let editing = false;
+    let {
+        title,
+        icon,
+        description,
+        settingName
+    }: Props = $props();
+
+    let editing = $state(false);
     let current = setting(settingName);
     let store = current.value;
 
@@ -43,14 +55,14 @@
             <input bind:value={$store} placeholder="Any word" />
             {/if}
 
-            <div on:click={() => {
+            <div onclick={() => {
                 if(!editing) {
                     editing = true
                 } else {
                     updateSetting(settingName, $currentServer.id + "", $store)
                     editing = false
                 }
-            }} on:keydown class="button icon-button">
+            }} onkeydown={bubble('keydown')} class="button icon-button">
                 <span class="material-icons icon-small icon-primary">{editing ? "check" : "edit"}</span>
             </div>
         </div>

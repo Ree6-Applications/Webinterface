@@ -1,10 +1,22 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
+
+    const bubble = createBubbler();
     import StringPicker from "../stringPicker.svelte";
 
-    export let current: string | null = null;
-    export let strings: string[] = []
-    export let callback: (value: string | null) => void;
-    export let picking = false;
+    interface Props {
+        current?: string | null;
+        strings?: string[];
+        callback: (value: string | null) => void;
+        picking?: boolean;
+    }
+
+    let {
+        current = $bindable(null),
+        strings = [],
+        callback,
+        picking = $bindable(false)
+    }: Props = $props();
 
 </script>
 
@@ -21,9 +33,9 @@
 }} />
 {/if}
 
-<div class="chip chip-hover clickable" on:click={() => {
+<div class="chip chip-hover clickable" onclick={() => {
     picking = true;
-}} on:keydown>
+}} onkeydown={bubble('keydown')}>
     {#if current != null}
     <p class="text-small">{strings.filter((value, _) => value.split(":")[0] == current)[0].split(":")[1]}</p>
     {:else}

@@ -1,10 +1,22 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
+
+    const bubble = createBubbler();
     import { fade, scale } from "svelte/transition";
 
-    export let title: string;
-    export let content: string;
-    export let zIndex: number = 100;
-    export let close: (confirmed: boolean) => void;
+    interface Props {
+        title: string;
+        content: string;
+        zIndex?: number;
+        close: (confirmed: boolean) => void;
+    }
+
+    let {
+        title,
+        content,
+        zIndex = 100,
+        close
+    }: Props = $props();
 
 </script>
 
@@ -13,7 +25,7 @@
 
         <div class="header">
             <h2 class="text-large">{title}</h2>
-            <span on:click={() => close(false)} on:keydown class="material-icons icon-medium clickable hover-primary">close</span>
+            <span onclick={() => close(false)} onkeydown={bubble('keydown')} class="material-icons icon-medium clickable hover-primary">close</span>
         </div>
 
         <div class="content text-small">
@@ -23,8 +35,8 @@
         </div>
 
         <div class="buttons">
-            <button class="text-medium" on:click={() => close(true)}>Yes</button>
-            <button class="text-medium" on:click={() => close(false)}>No</button>
+            <button class="text-medium" onclick={() => close(true)}>Yes</button>
+            <button class="text-medium" onclick={() => close(false)}>No</button>
         </div>
     </div>
 </div>

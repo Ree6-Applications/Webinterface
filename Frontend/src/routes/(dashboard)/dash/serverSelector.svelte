@@ -1,14 +1,21 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
+
+    const bubble = createBubbler();
     import { goto } from "$app/navigation";
     import LoadingIndicator from "$lib/components/loadingIndicator.svelte";
     import { currentServer, serversLoading, type Server, servers } from "$lib/scripts/servers";
     import { slide } from "svelte/transition";
     import { INVITE_URL } from "$lib/scripts/constants";
 
-    let expanded = false;
+    let expanded = $state(false);
 
-    export let menuButton = false;
-    export let expandedSb = false;
+    interface Props {
+        menuButton?: boolean;
+        expandedSb?: boolean;
+    }
+
+    let { menuButton = false, expandedSb = $bindable(false) }: Props = $props();
 
     function selectServer(server: Server) {
 
@@ -31,20 +38,20 @@
 <div class="server-selector">
 
     {#if menuButton}
-    <span on:click={() => {
+    <span onclick={() => {
         expandedSb = !expandedSb
-    }} on:keydown class="material-icons icon-large icon-primary middle clickable">{expandedSb ? "close" : "menu"}</span>
+    }} onkeydown={bubble('keydown')} class="material-icons icon-large icon-primary middle clickable">{expandedSb ? "close" : "menu"}</span>
     {/if}
 
-    <span on:click={() => {
+    <span onclick={() => {
         goto("/dash")
-    }} on:keydown class="material-icons icon-large icon-primary middle clickable">apps</span>
+    }} onkeydown={bubble('keydown')} class="material-icons icon-large icon-primary middle clickable">apps</span>
     <div class="server-current">
 
         {#if !$serversLoading}
-        <div class="up" on:click={() => {
+        <div class="up" onclick={() => {
             expanded = !expanded;
-        }} on:keydown>
+        }} onkeydown={bubble('keydown')}>
             <div class="title">
                 {#if $currentServer.id == 0}
                 <span class="material-icons icon-medium icon-primary">ads_click</span>
@@ -62,7 +69,7 @@
         <div in:slide out:slide class="list">
             {#each Array.from(servers.values()) as server}
             {#if server.setup}
-            <div class="server" on:click={() => selectServer(server)} on:keydown>
+            <div class="server" onclick={() => selectServer(server)} onkeydown={bubble('keydown')}>
                 <img src="{server.icon}" class="material-icons img-small" alt="hi">
                 <p class="server-name text-medium">{server.name}</p>
             </div>

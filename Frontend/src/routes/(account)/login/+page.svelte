@@ -4,9 +4,9 @@
     import { BASE_PATH } from "$lib/scripts/constants";
     import { goto } from "$app/navigation";
 
-    let loading = true;
-    let message = '';
-    let correct = false;
+    let loading = $state(true);
+    let message = $state('');
+    let correct = $state(false);
 
     onMount(async () => {
         correct = $page.url.searchParams.has("code") && $page.url.searchParams.has("state");

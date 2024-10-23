@@ -3,6 +3,11 @@
     import { currentError, currentLoading, currentServer, currentChannels, currentRoles, type Role, type Channel } from "$lib/scripts/servers";
     import { loadSettings } from "$lib/scripts/settings";
     import { onDestroy } from "svelte";
+    interface Props {
+        children?: import('svelte').Snippet;
+    }
+
+    let { children }: Props = $props();
 
     let sub = currentServer.subscribe(async (server) => {
         if(server.id == 0) return;
@@ -52,4 +57,4 @@
 
 </script>
 
-<slot />
+{@render children?.()}

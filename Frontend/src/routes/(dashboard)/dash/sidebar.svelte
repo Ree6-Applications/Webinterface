@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
     import LoadingIndicator from "$lib/components/loadingIndicator.svelte";
@@ -9,7 +12,11 @@
 
     let expanded = false;
 
-    export let callback = () => {};
+  interface Props {
+    callback?: any;
+  }
+
+  let { callback = () => {} }: Props = $props();
 
     onMount(() => {
         console.log($page.url.pathname)
@@ -59,10 +66,10 @@
 
     {#if $currentServer.admin}
     {#each elements as element}
-    <div in:fade class="element {$page.url.pathname.startsWith("/dash/" + $currentServer.id + element.link) ? "element-selected" : ""}" on:click={() => {
+    <div in:fade class="element {$page.url.pathname.startsWith("/dash/" + $currentServer.id + element.link) ? "element-selected" : ""}" onclick={() => {
         goto("/dash/" + $currentServer.id + element.link)
         callback();
-    }} on:keydown>
+    }} onkeydown={bubble('keydown')}>
         <span class="material-icons icon-medium icon-primary">{element.icon}</span>
         <p class="text-medium">{element.name}</p>
     </div>
@@ -70,10 +77,10 @@
 
     {:else}
 
-    <div in:fade class="element {$page.url.pathname.startsWith("/dash/" + $currentServer.id + "/settings") ? "element-selected" : ""}" on:click={() => {
+    <div in:fade class="element {$page.url.pathname.startsWith("/dash/" + $currentServer.id + "/settings") ? "element-selected" : ""}" onclick={() => {
         goto("/dash/" + $currentServer.id + "/settings")
         callback();
-    }} on:keydown>
+    }} onkeydown={bubble('keydown')}>
         <span class="material-icons icon-medium icon-primary">leaderboard</span>
         <p class="text-medium">Leaderboards & opt-out</p>
     </div>

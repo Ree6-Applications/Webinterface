@@ -1,14 +1,21 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
+
+    const bubble = createBubbler();
     import type { Channel } from "$lib/scripts/servers";
     import ChannelPicker from "../channelPicker.svelte";
 
-    export let current: Channel = {
+    interface Props {
+        current?: Channel;
+        callback: (value: Channel) => void;
+        picking?: boolean;
+    }
+
+    let { current = $bindable({
         id: null,
         name: null,
         type: "TEXT"
-    };
-    export let callback: (value: Channel) => void;
-    export let picking = false;
+    }), callback, picking = $bindable(false) }: Props = $props();
 
 </script>
 
@@ -31,9 +38,9 @@
 }} />
 {/if}
 
-<div class="chip chip-hover clickable" on:click={() => {
+<div class="chip chip-hover clickable" onclick={() => {
     picking = true;
-}} on:keydown>
+}} onkeydown={bubble('keydown')}>
     {#if current.id != null}
     <span class="material-icons icon-primary">tag</span>
     <p class="text-small">{current.name}</p>

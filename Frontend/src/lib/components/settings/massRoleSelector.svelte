@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
+
+    const bubble = createBubbler();
     import { onMount } from "svelte";
     import LoadingIndicator from "../loadingIndicator.svelte";
     import RolePicker from "../rolePicker.svelte";
@@ -6,17 +9,27 @@
     import { slide } from "svelte/transition";
     import type { Role } from "$lib/scripts/servers";
 
-    export let icon: string;
-    export let title: string;
-    export let windowTitle: string = "Select a role to add.";
-    export let description: string;
-    export let endpoint: string;
+    interface Props {
+        icon: string;
+        title: string;
+        windowTitle?: string;
+        description: string;
+        endpoint: string;
+    }
 
-    let roles: Role[] = [];
-    let roleLoading: string | null = null;
-    let rolePicker = false;
-    let error = false;
-    let loading = true;
+    let {
+        icon,
+        title,
+        windowTitle = "Select a role to add.",
+        description,
+        endpoint
+    }: Props = $props();
+
+    let roles: Role[] = $state([]);
+    let roleLoading: string | null = $state(null);
+    let rolePicker = $state(false);
+    let error = $state(false);
+    let loading = $state(true);
 
     onMount(async () => {
 
@@ -114,9 +127,9 @@
         {:else}
 
         <div class="button-bar">
-            <div on:click={() => {
+            <div onclick={() => {
                 rolePicker = true
-            }} on:keydown class="button icon-button">
+            }} onkeydown={bubble('keydown')} class="button icon-button">
                 <span class="material-icons icon-small icon-primary">add</span>
             </div>
         </div>
@@ -131,7 +144,7 @@
             <p class="text-small">{role.name}</p>
 
             {#if roleLoading != role.id}
-            <span on:click={async () => {
+            <span onclick={async () => {
                 if(roleLoading != null) return;
                 roleLoading = role.id;
 
@@ -160,7 +173,7 @@
 
                 roleLoading = null;
 
-            }} on:keydown class="material-icons icon-primary clickable chip-button">close</span>
+            }} onkeydown={bubble('keydown')} class="material-icons icon-primary clickable chip-button">close</span>
             {:else}
             <LoadingIndicator size="1.5rem" />
             {/if}
