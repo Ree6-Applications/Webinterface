@@ -21,10 +21,13 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,20 +42,37 @@ public class GuildService {
 
     //region Stats
 
-    public GuildStatsContainer getStats(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-        return new GuildStatsContainer(SQLSession.getSqlConnector().getSqlWorker().getInvites(guildId).size(),
-                SQLSession.getSqlConnector().getSqlWorker().getStats(guildId).stream().map(CommandStatsContainer::new).toList());
+    public Mono<Optional<GuildStatsContainer>> getStats(String sessionIdentifier, long guildId) throws IllegalAccessException {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId).mapNotNull(guildContainerOptional -> {
+            if (guildContainerOptional.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return Mono.zip(SQLSession.getSqlConnector().getSqlWorker().getInvites(guildId), SQLSession.getSqlConnector().getSqlWorker().getStats(guildId))
+                    .map(tuple2 -> Optional.of(new GuildStatsContainer(tuple2.getT1().size(), tuple2.getT2().stream().map(CommandStatsContainer::new).toList()))).block();
+        });
     }
 
-    public List<CommandStatsContainer> getCommandStats(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-        return SQLSession.getSqlConnector().getSqlWorker().getStats(guildId).stream().map(CommandStatsContainer::new).toList();
+    public Mono<Optional<List<CommandStatsContainer>>> getCommandStats(String sessionIdentifier, long guildId) throws IllegalAccessException {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(guildContainerOptional -> {
+            if (guildContainerOptional.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return SQLSession.getSqlConnector().getSqlWorker().getStats(guildId)
+                    .map(list -> Optional.of(list.stream().map(CommandStatsContainer::new).toList())).block();
+        });
     }
 
-    public int getInviteCount(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-        return SQLSession.getSqlConnector().getSqlWorker().getInvites(guildId).size();
+    public Mono<Integer> getInviteCount(String sessionIdentifier, long guildId) throws IllegalAccessException {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(guildContainerOptional -> {
+            if (guildContainerOptional.isEmpty()) {
+                return 0;
+            }
+
+            return SQLSession.getSqlConnector().getSqlWorker().getInvites(guildId)
+                    .map(List::size).block();
+        });
     }
 
     //endregion
