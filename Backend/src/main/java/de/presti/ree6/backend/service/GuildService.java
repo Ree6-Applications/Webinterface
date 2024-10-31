@@ -606,20 +606,35 @@ public class GuildService {
 
     //region OptOut
 
-    public String checkOptOut(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
-        return SQLSession.getSqlConnector().getSqlWorker().isOptOut(guildId, sessionContainer.getUser().getId()) ? "optedOut" : "optedIn";
+    public Mono<Optional<String>> checkOptOut(String sessionIdentifier, long guildId) {
+        return sessionService.retrieveSession(sessionIdentifier).publishOn(Schedulers.boundedElastic()).mapNotNull(x -> {
+            if (x.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return SQLSession.getSqlConnector().getSqlWorker().isOptOut(guildId, x.get().getUser().getId()).map(y -> Optional.of(y ? "optedOut" : "optedIn")).block();
+        });
     }
 
-    public String optOut(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
-        if (!SQLSession.getSqlConnector().getSqlWorker().isOptOut(guildId, sessionContainer.getUser().getId())) {
-            SQLSession.getSqlConnector().getSqlWorker().optOut(guildId, sessionContainer.getUser().getId());
-            return "Opted out!";
-        } else {
-            SQLSession.getSqlConnector().getSqlWorker().optIn(guildId, sessionContainer.getUser().getId());
-            return "Opted in!";
-        }
+    public Mono<Optional<String>> optOut(String sessionIdentifier, long guildId) {
+        return sessionService.retrieveSession(sessionIdentifier).publishOn(Schedulers.boundedElastic()).mapNotNull(x -> {
+            if (x.isEmpty()) {
+                return Optional.empty();
+            }
+
+            SessionContainer sessionContainer = x.get();
+
+            return SQLSession.getSqlConnector().getSqlWorker().isOptOut(guildId, sessionContainer.getUser().getId()).map(y -> {
+                if (y) {
+                    SQLSession.getSqlConnector().getSqlWorker().optIn(guildId, sessionContainer.getUser().getId());
+                    return Optional.of("Opted in!");
+                } else {
+                    SQLSession.getSqlConnector().getSqlWorker().optOut(guildId, sessionContainer.getUser().getId());
+                    return Optional.of("Opted out!");
+                }
+
+            }).block();
+        });
     }
 
     //endregion
