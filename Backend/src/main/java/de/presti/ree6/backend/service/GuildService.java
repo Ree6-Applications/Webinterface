@@ -15,9 +15,11 @@ import de.presti.ree6.sql.entities.*;
 import de.presti.ree6.sql.entities.custom.CustomCommand;
 import de.presti.ree6.sql.entities.webhook.*;
 import de.presti.ree6.sql.keys.GuildUserId;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class GuildService {
 
@@ -79,111 +82,168 @@ public class GuildService {
 
     //region Log channel
 
-    public ChannelContainer getLogChannel(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
-        WebhookLog webhook = SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guildId);
-        if (webhook == null) {
-            return new ChannelContainer();
-        }
-
-        if (webhook.getChannelId() != 0) {
-            return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getChannelId()));
-        } else {
-            net.dv8tion.jda.api.entities.Webhook webhook1 = guildContainer.getGuild().retrieveWebhooks().complete().stream()
-                    .filter(entry -> entry.getIdLong() == webhook.getWebhookId() && entry.getToken().equalsIgnoreCase(webhook.getToken())).findFirst().orElse(null);
-
-            if (webhook1 != null) {
-                webhook.setChannelId(webhook1.getChannel().getIdLong());
-                SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
-                return new ChannelContainer(webhook1);
+    public Mono<Optional<ChannelContainer>> getLogChannel(String sessionIdentifier, long guildId) {
+        ChannelContainer errorReturnValue = null;
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, true).publishOn(Schedulers.boundedElastic()).mapNotNull(guildOptional -> {
+            if (guildOptional.isEmpty()) {
+                return Optional.ofNullable(errorReturnValue);
             }
-        }
 
-        return new ChannelContainer();
+            GuildContainer guildContainer = guildOptional.get();
+
+            return SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(webhookLogOptional -> {
+                if (webhookLogOptional.isEmpty()) {
+                    return Optional.ofNullable(errorReturnValue);
+                }
+
+                WebhookLog webhook = webhookLogOptional.get();
+
+                if (webhook.getChannelId() != 0) {
+                    return Optional.of(new ChannelContainer(guildContainer.getGuildChannelById(webhook.getChannelId())));
+                } else {
+                    net.dv8tion.jda.api.entities.Webhook webhook1 = guildContainer.getGuild().retrieveWebhooks().complete().stream()
+                            .filter(entry -> entry.getIdLong() == webhook.getWebhookId() && entry.getToken().equalsIgnoreCase(webhook.getToken())).findFirst().orElse(null);
+
+                    if (webhook1 != null) {
+                        webhook.setChannelId(webhook1.getChannel().getIdLong());
+                        SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook).block();
+                        return Optional.of(new ChannelContainer(webhook1));
+                    }
+                }
+
+                return Optional.ofNullable(errorReturnValue);
+            }).block();
+        });
     }
 
-    public void updateLogChannel(String sessionIdentifier, long guildId, String channelId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-        Guild guild = guildContainer.getGuild();
-        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
+    public Mono<Boolean> updateLogChannel(String sessionIdentifier, long guildId, String channelId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, true).publishOn(Schedulers.boundedElastic()).mapNotNull(guildOptional -> {
+            if (guildOptional.isEmpty()) {
+                return false;
+            }
 
-        net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-Log").complete();
+            GuildContainer guildContainer = guildOptional.get();
 
-        WebhookWelcome welcome = deleteWelcomeChannel(guild);
+            Guild guild = guildContainer.getGuild();
+            StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
 
-        SQLSession.getSqlConnector().getSqlWorker().setLogWebhook(guildId, channel.getIdLong(), newWebhook.getIdLong(), newWebhook.getToken());
+            net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-Log").complete();
+
+            deleteLogChannel(guild).block();
+
+            SQLSession.getSqlConnector().getSqlWorker().setLogWebhook(guildId, channel.getIdLong(), newWebhook.getIdLong(), newWebhook.getToken());
+
+            return true;
+        });
     }
 
-    public WebhookLog removeLogChannel(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        return deleteLogChannel(sessionService.retrieveGuild(sessionIdentifier, guildId).getGuild());
+    public Mono<Optional<WebhookLog>> removeLogChannel(String sessionIdentifier, long guildId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(x -> {
+            if (x.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return deleteLogChannel(x.get().getGuild()).block();
+        });
     }
 
-    private WebhookLog deleteLogChannel(Guild guild) {
-        WebhookLog webhook = SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guild.getIdLong());
+    private Mono<Optional<WebhookLog>> deleteLogChannel(Guild guild) {
+        return SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guild.getIdLong()).map(webhookLogOptional -> {
+            if (webhookLogOptional.isEmpty()) {
+                return Optional.empty();
+            }
 
-        if (webhook != null) {
+            WebhookLog webhook = webhookLogOptional.get();
             guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
                     .filter(entry -> entry.getIdLong() == webhook.getWebhookId() && entry.getToken().equalsIgnoreCase(webhook.getToken()))
                     .forEach(entry -> entry.delete().queue()));
-        }
 
-        return webhook;
+            return webhookLogOptional;
+        });
     }
 
     //endregion
 
     //region Welcome channel
 
-    public ChannelContainer getWelcomeChannel(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, true);
-        WebhookWelcome webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId);
-        if (webhook == null) {
-            return new ChannelContainer();
-        }
-
-        if (webhook.getChannelId() != 0) {
-            return new ChannelContainer(guildContainer.getGuildChannelById(webhook.getChannelId()));
-        } else {
-            net.dv8tion.jda.api.entities.Webhook webhook1 = guildContainer.getGuild().retrieveWebhooks().complete().stream()
-                    .filter(entry -> entry.getIdLong() == webhook.getWebhookId() && entry.getToken().equalsIgnoreCase(webhook.getToken())).findFirst().orElse(null);
-
-            if (webhook1 != null) {
-                webhook.setChannelId(webhook1.getChannel().getIdLong());
-                SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook);
-                return new ChannelContainer(webhook1);
+    public Mono<Optional<ChannelContainer>> getWelcomeChannel(String sessionIdentifier, long guildId) {
+        ChannelContainer errorReturnValue = null;
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, true).publishOn(Schedulers.boundedElastic()).mapNotNull(guildOptional -> {
+            if (guildOptional.isEmpty()) {
+                return Optional.ofNullable(errorReturnValue);
             }
-        }
 
-        return new ChannelContainer();
+            GuildContainer guildContainer = guildOptional.get();
+
+            return SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(webhookLogOptional -> {
+                if (webhookLogOptional.isEmpty()) {
+                    return Optional.ofNullable(errorReturnValue);
+                }
+
+                WebhookWelcome webhook = webhookLogOptional.get();
+
+                if (webhook.getChannelId() != 0) {
+                    return Optional.of(new ChannelContainer(guildContainer.getGuildChannelById(webhook.getChannelId())));
+                } else {
+                    net.dv8tion.jda.api.entities.Webhook webhook1 = guildContainer.getGuild().retrieveWebhooks().complete().stream()
+                            .filter(entry -> entry.getIdLong() == webhook.getWebhookId() && entry.getToken().equalsIgnoreCase(webhook.getToken())).findFirst().orElse(null);
+
+                    if (webhook1 != null) {
+                        webhook.setChannelId(webhook1.getChannel().getIdLong());
+                        SQLSession.getSqlConnector().getSqlWorker().updateEntity(webhook).block();
+                        return Optional.of(new ChannelContainer(webhook1));
+                    }
+                }
+
+                return Optional.ofNullable(errorReturnValue);
+            }).block();
+        });
     }
 
-    public void updateWelcomeChannel(String sessionIdentifier, long guildId, String channelId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-        Guild guild = guildContainer.getGuild();
+    public Mono<Boolean> updateWelcomeChannel(String sessionIdentifier, long guildId, String channelId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, true).publishOn(Schedulers.boundedElastic()).mapNotNull(guildOptional -> {
+            if (guildOptional.isEmpty()) {
+                return false;
+            }
 
-        StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
+            GuildContainer guildContainer = guildOptional.get();
 
-        WebhookWelcome welcome = deleteWelcomeChannel(guild);
+            Guild guild = guildContainer.getGuild();
+            StandardGuildMessageChannel channel = guild.getChannelById(StandardGuildMessageChannel.class, channelId);
 
-        net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-Welcome").complete();
+            net.dv8tion.jda.api.entities.Webhook newWebhook = channel.createWebhook("Ree6-Welcome").complete();
 
-        SQLSession.getSqlConnector().getSqlWorker().setWelcomeWebhook(guildId, channel.getIdLong(), newWebhook.getIdLong(), newWebhook.getToken());
+            deleteWelcomeChannel(guild).block();
+
+            SQLSession.getSqlConnector().getSqlWorker().setWelcomeWebhook(guildId, channel.getIdLong(), newWebhook.getIdLong(), newWebhook.getToken());
+
+            return true;
+        });
     }
 
-    public WebhookWelcome removeWelcomeChannel(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        return deleteWelcomeChannel(sessionService.retrieveGuild(sessionIdentifier, guildId).getGuild());
+    public Mono<Optional<WebhookWelcome>> removeWelcomeChannel(String sessionIdentifier, long guildId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(x -> {
+            if (x.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return deleteWelcomeChannel(x.get().getGuild()).block();
+        });
     }
 
-    private WebhookWelcome deleteWelcomeChannel(Guild guild) {
-        WebhookWelcome webhook = SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guild.getIdLong());
+    private Mono<Optional<WebhookWelcome>> deleteWelcomeChannel(Guild guild) {
+        return SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guild.getIdLong()).map(webhookLogOptional -> {
+            if (webhookLogOptional.isEmpty()) {
+                return Optional.empty();
+            }
 
-        if (webhook != null) {
+            WebhookWelcome webhook = webhookLogOptional.get();
             guild.retrieveWebhooks().queue(c -> c.stream().filter(entry -> entry.getToken() != null)
                     .filter(entry -> entry.getIdLong() == webhook.getWebhookId() && entry.getToken().equalsIgnoreCase(webhook.getToken()))
                     .forEach(entry -> entry.delete().queue()));
-        }
 
-        return webhook;
+            return webhookLogOptional;
+        });
     }
 
     //endregion
@@ -254,7 +314,7 @@ public class GuildService {
         List<WebhookYouTube> youtubers = SQLSession.getSqlConnector().getSqlWorker().getAllYouTubeWebhooks(guildId);
 
         return youtubers.stream().map(youtuber -> new NotifierContainer(youtuber.getName(), youtuber.getMessage(), guildContainer.getGuild().retrieveWebhooks()
-                .complete().stream().filter(c -> c.getIdLong()  == youtuber.getGuildId()).map(ChannelContainer::new).findFirst().orElse(null))).toList();
+                .complete().stream().filter(c -> c.getIdLong() == youtuber.getGuildId()).map(ChannelContainer::new).findFirst().orElse(null))).toList();
     }
 
     public void addYouTubeNotifier(String sessionIdentifier, long guildId, GenericNotifierRequest notifierRequest) throws IllegalAccessException {
@@ -337,46 +397,92 @@ public class GuildService {
 
     //region Chat
 
-    public List<RoleLevelContainer> getChatAutoRoles(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
-        return SQLSession.getSqlConnector().getSqlWorker().getChatLevelRewards(guildId).entrySet().stream().map(x -> new RoleLevelContainer(x.getKey(), guildContainer.getRoleById(x.getValue()))).toList();
+    public Mono<Optional<List<RoleLevelContainer>>> getChatAutoRoles(String sessionIdentifier, long guildId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, true).publishOn(Schedulers.boundedElastic())
+                .mapNotNull(guildContainerOptional -> {
+            if (guildContainerOptional.isEmpty()) {
+                return Optional.empty();
+            }
+
+            GuildContainer guildContainer = guildContainerOptional.get();
+
+            return SQLSession.getSqlConnector().getSqlWorker().getChatLevelRewards(guildId)
+                    .mapNotNull(levelRewardMap -> Optional.of(levelRewardMap.entrySet().stream()
+                            .map(x -> new RoleLevelContainer(x.getKey(), guildContainer.getRoleById(x.getValue()))).toList())).block();
+        });
     }
 
-    public void addChatAutoRole(String sessionIdentifier, long guildId, long roleId, long level) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
+    public Mono<Boolean> addChatAutoRole(String sessionIdentifier, long guildId, long roleId, long level) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, true).map(x -> {
+            if (x.isEmpty()) {
+                return false;
+            }
 
-        if (guildContainer.getRoleById(roleId) == null)
-            throw new IllegalAccessException("Role not found");
+            GuildContainer guildContainer = x.get();
 
-        SQLSession.getSqlConnector().getSqlWorker().addChatLevelReward(guildId, roleId, level);
+            if (guildContainer.getRoleById(roleId) == null)
+                return false;
+
+            SQLSession.getSqlConnector().getSqlWorker().addChatLevelReward(guildId, roleId, level);
+            return true;
+        });
     }
 
-    public void removeChatAutoRole(String sessionIdentifier, long guildId, long level) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
-        SQLSession.getSqlConnector().getSqlWorker().removeChatLevelReward(guildId, level);
+    public Mono<Boolean> removeChatAutoRole(String sessionIdentifier, long guildId, long level) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, false).map(x -> {
+            if (x.isEmpty()) {
+                return false;
+            }
+
+            SQLSession.getSqlConnector().getSqlWorker().removeChatLevelReward(guildId, level);
+            return true;
+        });
     }
 
     //endregion
 
     //region Voice
 
-    public List<RoleLevelContainer> getVoiceAutoRoles(String sessionIdentifier, long guildId) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
-        return SQLSession.getSqlConnector().getSqlWorker().getVoiceLevelRewards(guildId).entrySet().stream().map(x -> new RoleLevelContainer(x.getKey(), guildContainer.getRoleById(x.getValue()))).toList();
+    public Mono<Optional<List<RoleLevelContainer>>> getVoiceAutoRoles(String sessionIdentifier, long guildId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, true).publishOn(Schedulers.boundedElastic())
+                .mapNotNull(guildContainerOptional -> {
+            if (guildContainerOptional.isEmpty()) {
+                return Optional.empty();
+            }
+
+            GuildContainer guildContainer = guildContainerOptional.get();
+
+            return SQLSession.getSqlConnector().getSqlWorker().getVoiceLevelRewards(guildId)
+                    .mapNotNull(levelRewardMap -> Optional.of(levelRewardMap.entrySet().stream()
+                            .map(x -> new RoleLevelContainer(x.getKey(), guildContainer.getRoleById(x.getValue()))).toList())).block();
+        });
     }
 
-    public void addVoiceAutoRole(String sessionIdentifier, long guildId, long roleId, long level) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
+    public Mono<Boolean> addVoiceAutoRole(String sessionIdentifier, long guildId, long roleId, long level) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, true).map(x -> {
+            if (x.isEmpty()) {
+                return false;
+            }
 
-        if (guildContainer.getRoleById(roleId) == null)
-            throw new IllegalAccessException("Role not found");
+            GuildContainer guildContainer = x.get();
 
-        SQLSession.getSqlConnector().getSqlWorker().addVoiceLevelReward(guildId, roleId, level);
+            if (guildContainer.getRoleById(roleId) == null)
+                return false;
+
+            SQLSession.getSqlConnector().getSqlWorker().addVoiceLevelReward(guildId, roleId, level);
+            return true;
+        });
     }
 
-    public void removeVoiceAutoRole(String sessionIdentifier, long guildId, long level) throws IllegalAccessException {
-        GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, false);
-        SQLSession.getSqlConnector().getSqlWorker().removeVoiceLevelReward(guildId, level);
+    public Mono<Boolean> removeVoiceAutoRole(String sessionIdentifier, long guildId, long level) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, false).map(x -> {
+            if (x.isEmpty()) {
+                return false;
+            }
+
+            SQLSession.getSqlConnector().getSqlWorker().removeVoiceLevelReward(guildId, level);
+            return true;
+        });
     }
 
     //endregion
@@ -385,46 +491,70 @@ public class GuildService {
 
     //region Recording
 
-    public Recording getRecording(String sessionIdentifier, String recordId) throws IllegalAccessException {
-        SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
-        List<GuildContainer> guilds = sessionService.retrieveGuilds(sessionIdentifier, false);
+    public Mono<Optional<Recording>> getRecording(String sessionIdentifier, String recordId) {
+        Recording errorReturnValue = null;
+        return sessionService.retrieveSession(sessionIdentifier).publishOn(Schedulers.boundedElastic()).mapNotNull(x -> {
+            if (x.isEmpty()) {
+                return Optional.ofNullable(errorReturnValue);
+            }
 
-        Recording recording = SQLSession.getSqlConnector().getSqlWorker().getEntity(new Recording(), "FROM Recording WHERE identifier=:id", Map.of("id", recordId));
+            SessionContainer sessionContainer = x.get();
 
-        if (recording == null)
-            throw new IllegalAccessException("Recording not found!");
-
-        if (guilds.stream().anyMatch(g -> g.getId() == recording.getGuildId())) {
-            boolean found = false;
-
-            for (JsonElement element : recording.getJsonArray()) {
-                if (element.isJsonPrimitive()) {
-                    JsonPrimitive primitive = element.getAsJsonPrimitive();
-                    if (primitive.isString() && primitive.getAsString().equalsIgnoreCase(String.valueOf(sessionContainer.getUser().getId()))) {
-                        found = true;
-                        break;
-                    }
+            return sessionService.retrieveGuilds(sessionIdentifier, false).publishOn(Schedulers.boundedElastic()).mapNotNull(y -> {
+                if (y.isEmpty()) {
+                    return Optional.ofNullable(errorReturnValue);
                 }
-            }
 
-            if (found) {
-                return recording;
-            } else {
-                throw new IllegalAccessException("You were not part of this recording.");
-            }
-        } else {
-            throw new IllegalAccessException("You were not part of the Guild this recording was made in!");
-        }
+                List<GuildContainer> guilds = y.get();
+
+                return SQLSession.getSqlConnector().getSqlWorker().getEntity(new Recording(), "FROM Recording WHERE identifier=:id",
+                        Map.of("id", recordId)).map(recordingOptional -> {
+                    if (recordingOptional.isEmpty()) {
+                        return Optional.ofNullable(errorReturnValue);
+                    }
+
+                    Recording recording = recordingOptional.get();
+
+                    if (guilds.stream().anyMatch(g -> g.getId() == recording.getGuildId())) {
+                        boolean found = false;
+
+                        for (JsonElement element : recording.getJsonArray()) {
+                            if (element.isJsonPrimitive()) {
+                                JsonPrimitive primitive = element.getAsJsonPrimitive();
+                                if (primitive.isString() && primitive.getAsString().equalsIgnoreCase(String.valueOf(sessionContainer.getUser().getId()))) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (found) {
+                            return recordingOptional;
+                        } else {
+                            log.warn("User {} tried accessing a recording he is not part of.", sessionContainer.getUser().getId());
+                            return Optional.ofNullable(errorReturnValue);
+                        }
+                    } else {
+                        log.warn("User {} tried accessing a recording he is not part of.", sessionContainer.getUser().getId());
+                        return Optional.ofNullable(errorReturnValue);
+                    }
+                }).block();
+            }).block();
+        });
     }
 
-    public RecordContainer getRecordingContainer(String sessionIdentifier, String recordId) throws IllegalAccessException {
-        return new RecordContainer(getRecording(sessionIdentifier, recordId));
+    public Mono<Optional<RecordContainer>> getRecordingContainer(String sessionIdentifier, String recordId) {
+        return getRecording(sessionIdentifier, recordId).map(x -> x.map(RecordContainer::new));
     }
 
-    public byte[] getRecordingBytes(String sessionIdentifier, String recordId) throws IllegalAccessException {
-        Recording recording = getRecording(sessionIdentifier, recordId);
-        SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
-        return recording.getRecording();
+    public Mono<Optional<byte[]>> getRecordingBytes(String sessionIdentifier, String recordId) {
+        return getRecording(sessionIdentifier, recordId).publishOn(Schedulers.boundedElastic()).mapNotNull(x -> {
+            if (x.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return SQLSession.getSqlConnector().getSqlWorker().deleteEntity(x.get()).thenReturn(Optional.ofNullable(x.get().getRecording())).block();
+        });
     }
 
     //endregion
@@ -518,7 +648,7 @@ public class GuildService {
                 if (updateTickets == null) return;
 
                 net.dv8tion.jda.api.entities.Webhook webhook = x.stream().filter(entry -> entry.getToken() != null)
-                        .filter(entry ->  entry.getToken().equalsIgnoreCase(tickets.getLogChannelWebhookToken()))
+                        .filter(entry -> entry.getToken().equalsIgnoreCase(tickets.getLogChannelWebhookToken()))
                         .findFirst().orElse(null);
 
                 if (webhook != null) {
