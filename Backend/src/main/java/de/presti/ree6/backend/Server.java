@@ -82,7 +82,7 @@ public class Server {
         instance = this;
 
         String tempVersion = getInstance().getClass().getPackage().getImplementationVersion();
-        backendVersion = tempVersion == null ? "4.0.11" : tempVersion;
+        backendVersion = tempVersion == null ? "5.0.0" : tempVersion;
         load(args);
     }
 
