@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
+
+    const bubble = createBubbler();
     import { fade, scale } from "svelte/transition";
     import type { DataType } from "./popup";
     import { onMount } from "svelte";
@@ -8,18 +11,31 @@
     import IntValue from "./intValue.svelte";
     import SelectorValue from "./selectorValue.svelte";
 
-    export let title: string;
-    export let zIndex = 50;
     
-    let content: DataType<any>[] = [];
-    export let builder: () => DataType<any>[];
+    let content: DataType<any>[] = $state([]);
 
-    export let action1: string | undefined = undefined;
-    export let action1Handler: ((data: DataType<any>[]) => void) | undefined = undefined;
-    export let action2: string | undefined = undefined;
-    export let action2Handler: ((data: DataType<any>[]) => void) | undefined = undefined;
 
-    export let close: () => void;
+    interface Props {
+        title: string;
+        zIndex?: number;
+        builder: () => DataType<any>[];
+        action1?: string | undefined;
+        action1Handler?: ((data: DataType<any>[]) => void) | undefined;
+        action2?: string | undefined;
+        action2Handler?: ((data: DataType<any>[]) => void) | undefined;
+        close: () => void;
+    }
+
+    let {
+        title,
+        zIndex = 50,
+        builder,
+        action1 = undefined,
+        action1Handler = undefined,
+        action2 = undefined,
+        action2Handler = undefined,
+        close
+    }: Props = $props();
 
     onMount(() => {
         content = builder();
@@ -32,7 +48,7 @@
 
         <div class="header">
             <h2>{title}</h2>
-            <span on:click={close} on:keydown class="material-icons icon-medium clickable hover-primary">close</span>
+            <span onclick={close} onkeydown={bubble('keydown')} class="material-icons icon-medium clickable hover-primary">close</span>
         </div>
 
         <div class="content">
@@ -60,10 +76,10 @@
 
             <div class="buttons default-margin">
                 {#if action1 != undefined}
-                <button class="text-medium" on:click={() => (action1Handler ?? (() => {}))(content)} on:keydown>{action1}</button>
+                <button class="text-medium" onclick={() => (action1Handler ?? (() => {}))(content)} onkeydown={bubble('keydown')}>{action1}</button>
                 {/if}
                 {#if action2 != undefined}
-                <button class="text-medium" on:click={() => (action2Handler ?? (() => {}))(content)} on:keydown>{action2}</button>
+                <button class="text-medium" onclick={() => (action2Handler ?? (() => {}))(content)} onkeydown={bubble('keydown')}>{action2}</button>
                 {/if}
             </div>
         </div>

@@ -1,11 +1,18 @@
 <script lang="ts">
+  import { createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import { goto } from "$app/navigation";
   import LoadingIndicator from "$lib/components/loadingIndicator.svelte";
   import { currentServer, type Server, serversLoading } from "$lib/scripts/servers";
   import { INVITE_URL } from "$lib/scripts/constants";
 
-    export let description: String;
-    export let servers: Server[];
+  interface Props {
+    description: String;
+    servers: Server[];
+  }
+
+  let { description, servers }: Props = $props();
 
     function selectServer(server: Server) {
 
@@ -40,14 +47,14 @@
 
         {#if server.setup}
 
-        <div on:click={() => selectServer(server)} on:keydown class="button clickable">
+        <div onclick={() => selectServer(server)} onkeydown={bubble('keydown')} class="button clickable">
             <span class="material-icons icon-primary">edit</span>
             <p>Manage</p>
         </div>
 
         {:else}
 
-        <div on:click={() => location.assign(new URL(INVITE_URL))} on:keydown class="button clickable">
+        <div onclick={() => location.assign(new URL(INVITE_URL))} onkeydown={bubble('keydown')} class="button clickable">
             <span class="material-icons icon-primary">launch</span>
             <p>Setup</p>
         </div>

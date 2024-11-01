@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
+
+    const bubble = createBubbler();
     import { get_js, post_js } from "$lib/scripts/constants";
     import { onMount } from "svelte";
     import DataPopup from "../data_popup/dataPopup.svelte";
@@ -7,23 +10,35 @@
     import ConfirmPopup from "../confirmPopup.svelte";
     import { slide } from "svelte/transition";
 
-    export let icon: string;
-    export let title: string;
-    export let endpoint: string;
-    export let description: string;
 
-    export let deleteField: (json: any) => string = (json) => ""; // Function used to read value for deleting object
-    export let deleteJson: (json: any) => any = (json) => {}; // Function used to create json for deleting object
-    export let models: Model[] = [];
+    interface Props {
+        icon: string;
+        title: string;
+        endpoint: string;
+        description: string;
+        deleteField?: (json: any) => string;
+        deleteJson?: (json: any) => any;
+        models?: Model[];
+    }
+
+    let {
+        icon,
+        title,
+        endpoint,
+        description,
+        deleteField = (json) => "",
+        deleteJson = (json) => {},
+        models = []
+    }: Props = $props();
     
-    let currentModel = 0;
-    let picking = false;
-    let loading = true;
-    let error = false;
+    let currentModel = $state(0);
+    let picking = $state(false);
+    let loading = $state(true);
+    let error = $state(false);
     let objectsLoaded = false;
 
-    let confirm = false;
-    let objects: any[] = [];
+    let confirm = $state(false);
+    let objects: any[] = $state([]);
 
     onMount(() => reload())
 
@@ -135,16 +150,16 @@ close={async (b) => {
         {#if !loading}
         <div class="button-bar">
             {#each models as model}
-            <div class="button" on:click={() => {
+            <div class="button" onclick={() => {
                 currentModel = models.indexOf(model);
                 picking = true;
-            }} on:keydown={() => {}}>
+            }} onkeydown={() => {}}>
                 <span class="material-icons icon-small icon-primary">add</span>
                 <p class="text-small">{model.name}</p>
             </div>
             {/each}
 
-            <div class="button" on:click={clear} on:keydown={() => {}}>
+            <div class="button" onclick={clear} onkeydown={() => {}}>
                 <span class="material-icons icon-small icon-primary">delete</span>
                 <p class="text-small">Delete all</p>
             </div>
@@ -164,7 +179,7 @@ close={async (b) => {
                     <span class="material-icons icon-small icon-primary">{object.model.primaryIcon}</span>
                     <p class="text-small">{object.model.renderFormat(object.object)}</p>
                 </div>                
-                <span on:click={async () => {
+                <span onclick={async () => {
                     
                     loading = true;
 
@@ -185,7 +200,7 @@ close={async (b) => {
                     loading = false;
                     reload();
 
-                }} on:keydown class="material-icons clickable icon-primary icon-small">delete</span>
+                }} onkeydown={bubble('keydown')} class="material-icons clickable icon-primary icon-small">delete</span>
             </div>
             {/each}
 

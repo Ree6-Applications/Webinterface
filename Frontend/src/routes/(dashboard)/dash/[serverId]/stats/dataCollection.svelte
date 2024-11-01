@@ -4,8 +4,8 @@
   import { get_js } from "$lib/scripts/constants";
   import { onMount } from "svelte";
 
-    let loading = true;
-    let optOut = true;
+    let loading = $state(true);
+    let optOut = $state(true);
 
     onMount(() => reload());
 
@@ -41,7 +41,7 @@
         {:else}
         <div class="button-bar">
 
-            <div on:click={async () => {
+            <div onclick={async () => {
                 if(loading) return;
                 loading = true;
 

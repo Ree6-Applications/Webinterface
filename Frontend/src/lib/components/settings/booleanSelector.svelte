@@ -3,10 +3,19 @@
     import { setting, updateSetting } from "$lib/scripts/settings";
     import { currentServer } from "$lib/scripts/servers";
 
-    export let title: string;
-    export let icon: string;
-    export let description: string;
-    export let settingName: string;
+    interface Props {
+        title: string;
+        icon: string;
+        description: string;
+        settingName: string;
+    }
+
+    let {
+        title,
+        icon,
+        description,
+        settingName
+    }: Props = $props();
 
     let current = setting(settingName);
     let store = current.value;
@@ -34,7 +43,7 @@
         {:else}
         <div class="button-bar">
 
-            <div on:click={() => {
+            <div onclick={() => {
                 updateSetting(settingName, $currentServer.id + "", $store == "true" ? "false" : "true")
             }} class="button">
                 <span class="material-icons icon-small icon-primary">{$store == "true" ? "close" : "check"}</span>

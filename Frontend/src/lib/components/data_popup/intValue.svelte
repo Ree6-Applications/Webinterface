@@ -1,18 +1,30 @@
 <script lang="ts">
+    import { createBubbler } from 'svelte/legacy';
 
-    export let current: number | null = null;
-    export let callback: (value: number | null) => void;
-    export let picking = false;
-    export let unit = "";
+    const bubble = createBubbler();
 
-    let writing: string;
+    interface Props {
+        current?: number | null;
+        callback: (value: number | null) => void;
+        picking?: boolean;
+        unit?: string;
+    }
+
+    let {
+        current = $bindable(null),
+        callback,
+        picking = $bindable(false),
+        unit = ""
+    }: Props = $props();
+
+    let writing: string = $state();
 
 </script>
 
 {#if picking}
 <div class="flex">
     <input bind:value={writing} placeholder="Any integer" />
-    <span class="material-icons button icon-primary icon-button better-hover" on:click={() => {
+    <span class="material-icons button icon-primary icon-button better-hover" onclick={() => {
         picking = false;
         try {
             current = parseInt(writing);
@@ -23,13 +35,13 @@
             current = null;
         }
         callback(current);
-    }} on:keydown>check</span>
+    }} onkeydown={bubble('keydown')}>check</span>
 </div>
 {:else}
-<div class="chip chip-hover clickable" on:click={() => {
+<div class="chip chip-hover clickable" onclick={() => {
     picking = true;
     writing = current == null ? "" : current.toString();
-}} on:keydown>
+}} onkeydown={bubble('keydown')}>
     {#if current == null}
     <span class="material-icons icon-primary">close</span>
     <p class="text-small">Nothing</p>

@@ -6,7 +6,7 @@
     import { fly, scale, slide } from "svelte/transition";
 
     let leaderboards: Map<string, any[]> = new Map<string, any[]>()
-    let loading = false;
+    let loading = $state(false);
 
     onMount(async () => {
         loading = true;

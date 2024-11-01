@@ -4,9 +4,9 @@
   import ServerDisplay from "./[serverId]/serverDisplay.svelte";
   import { INVITE_URL } from "$lib/scripts/constants";
 
-    let adminServers: Server[] = [];
-    let normalServers: Server[] = [];
-    let inviteServers: Server[] = [];
+    let adminServers: Server[] = $state([]);
+    let normalServers: Server[] = $state([]);
+    let inviteServers: Server[] = $state([]);
 
     const sub = serversLoading.subscribe(b => {
         if(!b) {
