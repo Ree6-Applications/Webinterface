@@ -11,6 +11,8 @@ import de.presti.ree6.sql.util.SettingsManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.Collections;
 import java.util.List;
@@ -45,14 +47,25 @@ public class SettingsController {
      * @return Generic Object Response with the Settings.
      */
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<Setting>> retrieveSettings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
-                                                  @PathVariable(name = "guildId") long guildId) {
-        try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            return new GenericObjectResponse<>(true, SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guildId), "Setting retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, Collections.emptyList(), e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<Setting>>> retrieveSettings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+                                                                       @PathVariable(name = "guildId") long guildId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(guildOptional -> {
+           if (guildOptional.isEmpty()) {
+               return new GenericObjectResponse<>(false, Collections.emptyList(), "Guild doesn't exist.");
+           }
+
+           return SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guildId)
+                   .map(settings -> {
+                       if (settings.isEmpty()) {
+                           return new GenericObjectResponse<>(false,
+                                   SettingsManager.getSettings().stream()
+                                           .map(x -> new Setting(guildId, x.getName(), x.getDisplayName(), x.getValue())).toList(),
+                                   null);
+                       }
+
+                       return new GenericObjectResponse<>(true, settings, null);
+                   }).block();
+        });
     }
 
     /**
@@ -63,15 +76,18 @@ public class SettingsController {
      * @return Generic Object Response with the Setting.
      */
     @GetMapping(value = "/{settingName}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<Setting> retrieveSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+    public Mono<GenericObjectResponse<Setting>> retrieveSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                            @PathVariable(name = "guildId") long guildId,
                                            @PathVariable(name = "settingName") String settingName) {
-        try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            return new GenericObjectResponse<>(true, SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, settingName), "Setting retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+        return sessionService.retrieveGuild(sessionIdentifier, guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(guildOptional -> {
+            if (guildOptional.isEmpty()) {
+                return new GenericObjectResponse<>(false, null, "Guild doesn't exist.");
+            }
+
+            return SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, settingName)
+                    .map(setting -> setting.map(x -> new GenericObjectResponse<>(true, x, null))
+                            .orElseGet(() -> new GenericObjectResponse<>(false, null, "Setting not found!"))).block();
+        });
     }
 
     //endregion
@@ -87,18 +103,27 @@ public class SettingsController {
      * @return Generic Object Response with the updated Setting.
      */
     @PostMapping(value = "/{settingName}/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<Setting> updateSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+    public Mono<GenericObjectResponse<Setting>> updateSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") long guildId,
                                          @PathVariable(name = "settingName") String settingName,
                                          @RequestBody GenericValueRequest request) {
-        try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            Setting setting = SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, settingName);
-            setting.setValue(request.value());
-            return new GenericObjectResponse<>(true, SQLSession.getSqlConnector().getSqlWorker().updateEntity(setting), "Setting updated!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+        return sessionService.retrieveGuild(sessionIdentifier, guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(guildOptional -> {
+            if (guildOptional.isEmpty()) {
+                return new GenericObjectResponse<>(false, null, "Guild doesn't exist.");
+            }
+
+            return SQLSession.getSqlConnector().getSqlWorker().getSetting(guildId, settingName)
+                    .publishOn(Schedulers.boundedElastic())
+                    .mapNotNull(settingOptional -> {
+                        if (settingOptional.isEmpty()) {
+                            return new GenericObjectResponse<Setting>(false, null, "Setting doesn't exist.");
+                        }
+
+                        Setting setting = settingOptional.get();
+                        setting.setValue(request.value());
+                        return SQLSession.getSqlConnector().getSqlWorker().updateEntity(setting).map(x -> new GenericObjectResponse<>(true, x, "Setting updated!")).block();
+                    }).block();
+        });
     }
 
     //endregion
@@ -113,19 +138,19 @@ public class SettingsController {
      * @return Generic Response with the result.
      */
     @GetMapping(value = "/{settingName}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse deleteSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
+    public Mono<GenericResponse> deleteSetting(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier,
                                          @PathVariable(name = "guildId") long guildId,
                                          @PathVariable(name = "settingName") String settingName) {
-        try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+        return sessionService.retrieveGuild(sessionIdentifier, guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(guildOptional -> {
+            if (guildOptional.isEmpty()) {
+                return new GenericResponse(false, "Guild doesn't exist.");
+            }
+
             Setting setting = SettingsManager.getDefault(settingName);
             setting.setGuildId(guildId);
 
-            SQLSession.getSqlConnector().getSqlWorker().setSetting(setting);
-            return new GenericResponse(true,"Setting deleted!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+            return SQLSession.getSqlConnector().getSqlWorker().updateEntity(setting).map(x -> new GenericResponse(true, "Setting deleted!")).block();
+        });
     }
 
     //endregion

@@ -15,6 +15,7 @@ import de.presti.ree6.backend.utils.data.container.role.RoleLevelContainer;
 import de.presti.ree6.backend.utils.data.container.user.UserContainer;
 import de.presti.ree6.backend.utils.data.container.user.UserLevelContainer;
 import de.presti.ree6.sql.SQLSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -23,11 +24,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @RestController
 @RequestMapping("/guilds")
 public class GuildController {
@@ -44,21 +48,17 @@ public class GuildController {
     //region Guild Retrieve
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<GuildContainer>> retrieveGuilds(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
-        try {
-            return new GenericObjectResponse<>(true, sessionService.retrieveGuilds(sessionIdentifier), "Guilds retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<GuildContainer>>> retrieveGuilds(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
+        return sessionService.retrieveGuilds(sessionIdentifier)
+                .map(x -> x.map(y -> new GenericObjectResponse<>(true, y, "Guilds retrieve!"))
+                        .orElse(new GenericObjectResponse<>(false, null, "Could not retrieve guilds!")));
     }
 
     @GetMapping(value = "/{guildId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<GuildContainer> retrieveGuild(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, sessionService.retrieveGuild(sessionIdentifier, guildId, true, true), "Guild retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<GuildContainer>> retrieveGuild(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, true, true)
+                .map(x -> x.map(y -> new GenericObjectResponse<>(true, y, "Guild retrieved!"))
+                        .orElse(new GenericObjectResponse<>(false, null, "Could not retrieve guild!")));
     }
 
     //endregion
@@ -66,21 +66,17 @@ public class GuildController {
     //region Guild Channel and Role
 
     @GetMapping(value = "/{guildId}/channels", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<ChannelContainer>> retrieveGuildChannels(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, sessionService.retrieveGuild(sessionIdentifier, guildId, true).getChannels(), "Channels retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<ChannelContainer>>> retrieveGuildChannels(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, true, true)
+                .map(x -> x.map(y -> new GenericObjectResponse<>(true, y.getChannels(), "Channels retrieved!"))
+                        .orElse(new GenericObjectResponse<>(false, null, "Could not retrieve channels!")));
     }
 
     @GetMapping(value = "/{guildId}/roles", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<RoleContainer>> retrieveGuildRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, sessionService.retrieveGuild(sessionIdentifier, guildId, false, true).getRoles(), "Roles retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<RoleContainer>>> retrieveGuildRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, true, true)
+                .map(x -> x.map(y -> new GenericObjectResponse<>(true, y.getRoles(), "Roles retrieved!"))
+                        .orElse(new GenericObjectResponse<>(false, null, "Could not retrieve roles!")));
     }
 
     //endregion
@@ -88,42 +84,34 @@ public class GuildController {
     //region Guild Blacklist
 
     @GetMapping(value = "/{guildId}/blacklist", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<String>> retrieveGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-            List<String> blacklist = SQLSession.getSqlConnector().getSqlWorker().getChatProtectorWords(guildId);
-            return new GenericObjectResponse<>(true, blacklist, "Blacklist retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, Collections.emptyList(), e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<String>>> retrieveGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId)
+                .mapNotNull(x -> x.map(y -> SQLSession.getSqlConnector().getSqlWorker().getChatProtectorWords(guildId)
+                                .map(z -> new GenericObjectResponse<>(true, z, "Blacklist retrieved!")).block())
+                        .orElse(new GenericObjectResponse<>(false, null, "Could not retrieve blacklist!")));
     }
 
     @PostMapping(value = "/{guildId}/blacklist/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-
-            SQLSession.getSqlConnector().getSqlWorker().removeChatProtectorWord(guildId, request.value());
-            return new GenericResponse(true, "Blacklist removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId)
+                .map(x -> x.map(y -> {
+                    SQLSession.getSqlConnector().getSqlWorker().removeChatProtectorWord(guildId, request.value());
+                    return new GenericResponse(true, "Blacklist removed!");
+                }).orElse(new GenericResponse(false, "Could not remove!")));
     }
 
     @PostMapping(value = "/{guildId}/blacklist/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
-
-            if (!SQLSession.getSqlConnector().getSqlWorker().isChatProtectorSetup(guildId, request.value())) {
-                SQLSession.getSqlConnector().getSqlWorker().addChatProtectorWord(guildId, request.value());
-                return new GenericResponse(true, "Blacklist added!");
-            } else {
-                return new GenericResponse(false, "Word already blacklisted!");
-            }
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addGuildBlacklist(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId)
+                .map(x -> x.map(y -> SQLSession.getSqlConnector().getSqlWorker().isChatProtectorSetup(guildId, request.value())
+                        .map(z -> {
+                            if (!z) {
+                                SQLSession.getSqlConnector().getSqlWorker().addChatProtectorWord(guildId, request.value());
+                                return new GenericResponse(true, "Blacklist added!");
+                            } else {
+                                return new GenericResponse(false, "Word already blacklisted!");
+                            }
+                        }).block()).orElse(new GenericResponse(false, "Could not add!")));
     }
 
     //endregion
@@ -131,56 +119,60 @@ public class GuildController {
     //region Guild AutoRole
 
     @GetMapping(value = "/{guildId}/autorole", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<RoleContainer>> retrieveGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
-            List<RoleContainer> autoRoles = SQLSession.getSqlConnector().getSqlWorker().getAutoRoles(guildId).stream().map(c -> guildContainer.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList();
-            return new GenericObjectResponse<>(true, autoRoles, "AutoRole retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, Collections.emptyList(), e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<RoleContainer>>> retrieveGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, true)
+                .map(x -> x.map(y -> SQLSession.getSqlConnector().getSqlWorker().getAutoRoles(guildId)
+                        .map(z -> new GenericObjectResponse<>(true, z.stream()
+                                .map(c -> y.getRoleById(c.getRoleId())).filter(Objects::nonNull).toList(), "AutoRole retrieved!"))
+                        .block()).orElse(new GenericObjectResponse<>(false, Collections.emptyList(), "Couldnt retrieve!")));
     }
 
     @PostMapping(value = "/{guildId}/autorole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId);
+    public Mono<GenericResponse> removeGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId)
+                .map(x -> x.map(y -> {
+                    try {
+                        long roleId = ConverterUtil.convertStringToLong(request.value());
 
-            long roleId = ConverterUtil.convertStringToLong(request.value());
+                        if (roleId == -1) {
+                            return new GenericResponse(false, "Role not found!");
+                        }
 
-            if (roleId == -1) {
-                return new GenericResponse(false, "Role not found!");
-            }
-
-            SQLSession.getSqlConnector().getSqlWorker().removeAutoRole(guildId, roleId);
-            return new GenericResponse(true, "AutoRole removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+                        SQLSession.getSqlConnector().getSqlWorker().removeAutoRole(guildId, roleId);
+                        return new GenericResponse(true, "AutoRole removed!");
+                    } catch (Exception e) {
+                        return new GenericResponse(false, e.getMessage());
+                    }
+                }).orElse(new GenericResponse(false, "Could not remove!")));
     }
 
     @PostMapping(value = "/{guildId}/autorole/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            GuildContainer guildContainer = sessionService.retrieveGuild(sessionIdentifier, guildId, false, true);
+    public Mono<GenericResponse> addGuildAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return sessionService.retrieveGuild(sessionIdentifier, guildId, false, true)
+                .map(x -> x.map(y -> {
+                    try {
+                        long roleId = ConverterUtil.convertStringToLong(request.value());
 
-            long roleId = ConverterUtil.convertStringToLong(request.value());
+                        if (roleId == -1) {
+                            return new GenericResponse(false, "Role not found!");
+                        }
 
-            if (roleId == -1) {
-                return new GenericResponse(false, "Role not found!");
-            }
+                        if (y.getRoleById(roleId) == null) throw new IllegalAccessException("Role not found!");
 
-            if (guildContainer.getRoleById(roleId) == null) throw new IllegalAccessException("Role not found!");
-
-            if (!SQLSession.getSqlConnector().getSqlWorker().isAutoRoleSetup(guildId, roleId)) {
-                SQLSession.getSqlConnector().getSqlWorker().addAutoRole(guildId, roleId);
-                return new GenericResponse(true, "AutoRole added!");
-            } else {
-                return new GenericResponse(false, "Role is already in AutoRole!");
-            }
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+                        return SQLSession.getSqlConnector().getSqlWorker().isAutoRoleSetup(guildId, roleId)
+                                .map(z -> {
+                                    if (!z) {
+                                        SQLSession.getSqlConnector().getSqlWorker().addAutoRole(guildId, roleId);
+                                        return new GenericResponse(true, "AutoRole added!");
+                                    } else {
+                                        return new GenericResponse(false, "Role is already in AutoRole!");
+                                    }
+                                })
+                                .block();
+                    } catch (Exception e) {
+                        return new GenericResponse(false, e.getMessage());
+                    }
+                }).orElse(new GenericResponse(false, "Could not remove!")));
     }
 
     //endregion
@@ -188,39 +180,41 @@ public class GuildController {
     //region Guild Leaderboard
 
     @GetMapping(value = "/{guildId}/leaderboard/voice", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<LeaderboardContainer> retrieveLeaderboardVoice(@PathVariable(name = "guildId") long guildId) {
-        try {
-            // Call this to check if the guild exists. If not, exception is thrown.
-            GuildContainer guildContainer = sessionService.retrieveGuild(guildId);
+    public Mono<GenericObjectResponse<LeaderboardContainer>> retrieveLeaderboardVoice(@PathVariable(name = "guildId") long guildId) {
+        return sessionService.retrieveGuild(guildId)
+                .map(x -> x.map(y -> {
+                            GuildContainer guildContainer = x.get();
 
-            LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
+                            return SQLSession.getSqlConnector().getSqlWorker().getTopVoice(guildId, Data.getLeaderboardTop())
+                                    .map(z -> {
+                                        LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
 
-            leaderboardContainer.setVoiceLeaderboard(SQLSession.getSqlConnector().getSqlWorker().getTopVoice(guildId, Data.getLeaderboardTop()).stream().map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
+                                        leaderboardContainer.setChatLeaderboard(z.stream().map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
 
-            leaderboardContainer.setGuildId(guildContainer.getId());
-
-            return new GenericObjectResponse<>(true, leaderboardContainer, "Leaderboard retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+                                        leaderboardContainer.setGuildId(guildContainer.getId());
+                                        return new GenericObjectResponse<>(true, leaderboardContainer, "Leaderboard retrieved!");
+                                    }).block();
+                        })
+                        .orElse(new GenericObjectResponse<>(false, null, "Could not retrieve!")));
     }
 
     @GetMapping(value = "/{guildId}/leaderboard/chat", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<LeaderboardContainer> retrieveLeaderboardChat(@PathVariable(name = "guildId") long guildId) {
-        try {
-            // Call this to check if the guild exists. If not, exception is thrown.
-            GuildContainer guildContainer = sessionService.retrieveGuild(guildId);
+    public Mono<GenericObjectResponse<LeaderboardContainer>> retrieveLeaderboardChat(@PathVariable(name = "guildId") long guildId) {
+        return sessionService.retrieveGuild(guildId)
+                .map(x -> x.map(y -> {
+                            GuildContainer guildContainer = x.get();
 
-            LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
+                            return SQLSession.getSqlConnector().getSqlWorker().getTopChat(guildId, Data.getLeaderboardTop())
+                                    .map(z -> {
+                                        LeaderboardContainer leaderboardContainer = new LeaderboardContainer();
 
-            leaderboardContainer.setChatLeaderboard(SQLSession.getSqlConnector().getSqlWorker().getTopChat(guildId, Data.getLeaderboardTop()).stream().map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
+                                        leaderboardContainer.setChatLeaderboard(z.stream().map(c -> new UserLevelContainer(c, new UserContainer(BotWorker.getShardManager().retrieveUserById(c.getUserId()).complete()))).toList());
 
-            leaderboardContainer.setGuildId(guildContainer.getId());
-
-            return new GenericObjectResponse<>(true, leaderboardContainer, "Leaderboard retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+                                        leaderboardContainer.setGuildId(guildContainer.getId());
+                                        return new GenericObjectResponse<>(true, leaderboardContainer, "Leaderboard retrieved!");
+                                    }).block();
+                        })
+                        .orElse(new GenericObjectResponse<>(false, null, "Could not retrieve!")));
     }
 
     //endregion
@@ -228,12 +222,9 @@ public class GuildController {
     // region Guild Stats
 
     @GetMapping(value = "/{guildId}/stats", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<GuildStatsContainer> retrieveStats(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getStats(sessionIdentifier, guildId), "Stats retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<GuildStatsContainer>> retrieveStats(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getStats(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Retrieved" : "Failed to retrieve!"));
     }
 
     //endregion
@@ -241,33 +232,27 @@ public class GuildController {
     // region Guild Chat Autorole
 
     @GetMapping(value = "/{guildId}/chatrole", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<RoleLevelContainer>> retrieveChatRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getChatAutoRoles(sessionIdentifier, guildId), "Chat Autorole retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<RoleLevelContainer>>> retrieveChatRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getChatAutoRoles(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(Collections.emptyList()), x.isPresent() ? "Retrieved!" : "Could not retrieve!"));
     }
 
     @PostMapping(value = "/{guildId}/chatrole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeChatAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest valueRequest) {
+    public Mono<GenericResponse> removeChatAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest valueRequest) {
         try {
             long level = ConverterUtil.convertStringToLong(valueRequest.value());
-            guildService.removeChatAutoRole(sessionIdentifier, guildId, level);
-            return new GenericResponse(true, "Chat Auto-role removed!");
+
+            return guildService.removeChatAutoRole(sessionIdentifier, guildId, level)
+                    .map(x -> new GenericResponse(x, x ? "Removed!" : "Failed to remove!"));
         } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
+            return Mono.just(new GenericResponse(false, e.getMessage()));
         }
     }
 
     @PostMapping(value = "/{guildId}/chatrole/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addChatAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody LevelAutoRoleRequest levelAutoRoleRequest) {
-        try {
-            guildService.addChatAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.role(), levelAutoRoleRequest.level());
-            return new GenericResponse(true, "Chat Auto-role added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addChatAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody LevelAutoRoleRequest levelAutoRoleRequest) {
+        return guildService.addChatAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.role(), levelAutoRoleRequest.level())
+                .map(x -> new GenericResponse(x, x ? "Added!" : "Failed to add!"));
     }
 
     //endregion
@@ -275,33 +260,27 @@ public class GuildController {
     // region Guild Voice Autorole
 
     @GetMapping(value = "/{guildId}/voicerole", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<RoleLevelContainer>> retrieveVoiceRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getVoiceAutoRoles(sessionIdentifier, guildId), "Voice Autorole retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<RoleLevelContainer>>> retrieveVoiceRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getVoiceAutoRoles(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(Collections.emptyList()), x.isPresent() ? "Retrieved!" : "Could not retrieve!"));
     }
 
     @PostMapping(value = "/{guildId}/voicerole/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeVoiceAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest valueRequest) {
+    public Mono<GenericResponse> removeVoiceAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest valueRequest) {
         try {
             long level = ConverterUtil.convertStringToLong(valueRequest.value());
-            guildService.removeVoiceAutoRole(sessionIdentifier, guildId, level);
-            return new GenericResponse(true, "Voice Auto-role removed!");
+
+            return guildService.removeVoiceAutoRole(sessionIdentifier, guildId, level)
+                    .map(x -> new GenericResponse(x, x ? "Removed!" : "Failed to remove!"));
         } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
+            return Mono.just(new GenericResponse(false, e.getMessage()));
         }
     }
 
     @PostMapping(value = "/{guildId}/voicerole/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addVoiceAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody LevelAutoRoleRequest levelAutoRoleRequest) {
-        try {
-            guildService.addVoiceAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.role(), levelAutoRoleRequest.level());
-            return new GenericResponse(true, "Voice Auto-role added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addVoiceAutoRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody LevelAutoRoleRequest levelAutoRoleRequest) {
+        return guildService.addVoiceAutoRole(sessionIdentifier, guildId, levelAutoRoleRequest.role(), levelAutoRoleRequest.level())
+                .map(x -> new GenericResponse(x, x ? "Added!" : "Failed to add!"));
     }
 
     //endregion
@@ -309,23 +288,24 @@ public class GuildController {
     //region Recording
 
     @GetMapping(value = "/recording", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<RecordContainer> retrieveRecording(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "recordId") String recordId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getRecordingContainer(sessionIdentifier, recordId), "Recording retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<RecordContainer>> retrieveRecording(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "recordId") String recordId) {
+        return guildService.getRecordingContainer(sessionIdentifier, recordId)
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Retrieved" : "Failed to retrieve!"));
     }
 
     @GetMapping(value = "/recording/download", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Resource> downloadRecording(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "recordId") String recordId) {
-        try {
-
-            ByteArrayResource resource = new ByteArrayResource(guildService.getRecordingBytes(sessionIdentifier, recordId));
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).contentLength(resource.contentLength()).header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename("recording.wav").build().toString()).body(resource);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public Mono<ResponseEntity<Resource>> downloadRecording(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "recordId") String recordId) {
+        return guildService.getRecordingBytes(sessionIdentifier, recordId)
+                .map(x -> x.map(y -> {
+                    Resource resource = new ByteArrayResource(y);
+                    try {
+                        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).contentLength(resource.contentLength()).header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename("recording.wav").build().toString()).body(resource);
+                    } catch (IOException e) {
+                        resource = null;
+                        log.error("Failed to download recording", e);
+                        return ResponseEntity.badRequest().body(resource);
+                    }
+                }).orElse(ResponseEntity.badRequest().body(null)));
     }
 
     //endregion
@@ -333,32 +313,21 @@ public class GuildController {
     //region Guild Welcome Channel
 
     @GetMapping(value = "/{guildId}/welcome", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<ChannelContainer> retrieveWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getWelcomeChannel(sessionIdentifier, guildId), "Welcome channel retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<ChannelContainer>> retrieveWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getWelcomeChannel(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Retrieved" : "Failed to retrieve!"));
     }
 
     @PostMapping(value = "/{guildId}/welcome/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(guildService.removeWelcomeChannel(sessionIdentifier, guildId));
-            return new GenericResponse(true, "Welcome channel removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.removeWelcomeChannel(sessionIdentifier, guildId)
+                .map(x -> new GenericResponse(x.isPresent(), x.isPresent() ? "Removed!" : "Failed to remove!"));
     }
 
     @PostMapping(value = "/{guildId}/welcome/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            guildService.updateWelcomeChannel(sessionIdentifier, guildId, request.value());
-            return new GenericResponse(true, "Welcome channel added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addWelcomeChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return guildService.updateWelcomeChannel(sessionIdentifier, guildId, request.value())
+                .map(x -> new GenericResponse(x, x ? "Updated!" : "Failed to update!"));
     }
 
     //endregion
@@ -366,32 +335,21 @@ public class GuildController {
     //region Guild Log Channel
 
     @GetMapping(value = "/{guildId}/log", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<ChannelContainer> retrieveLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getLogChannel(sessionIdentifier, guildId), "Log channel retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<ChannelContainer>> retrieveLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getLogChannel(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Retrieved" : "Failed to retrieve!"));
     }
 
     @PostMapping(value = "/{guildId}/log/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(guildService.removeLogChannel(sessionIdentifier, guildId));
-            return new GenericResponse(true, "Log channel removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.removeLogChannel(sessionIdentifier, guildId)
+                .map(x -> new GenericResponse(x.isPresent(), x.isPresent() ? "Removed!" : "Failed to remove!"));
     }
 
     @PostMapping(value = "/{guildId}/log/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            guildService.updateLogChannel(sessionIdentifier, guildId, request.value());
-            return new GenericResponse(true, "Log channel added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addLogChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return guildService.updateLogChannel(sessionIdentifier, guildId, request.value())
+                .map(x -> new GenericResponse(x, x ? "Updated!" : "Failed to update!"));
     }
 
     //endregion
@@ -401,32 +359,23 @@ public class GuildController {
     //region Reddit Notifier
 
     @GetMapping(value = "/{guildId}/reddit", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<NotifierContainer>> retrieveRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getRedditNotifier(sessionIdentifier, guildId), "Reddit Notifiers retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<NotifierContainer>>> retrieveRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getRedditNotifier(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(true, x, "Notifier received!"));
     }
 
     @PostMapping(value = "/{guildId}/reddit/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            guildService.removeRedditNotifier(sessionIdentifier, guildId, request.value());
-            return new GenericResponse(true, "Reddit Notifier removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return guildService.removeRedditNotifier(sessionIdentifier, guildId, request.value())
+                .map(x -> x ? new GenericResponse(true, "Notifier remove!") :
+                        new GenericResponse(false, "Couldn't remove Notifier!"));
     }
 
     @PostMapping(value = "/{guildId}/reddit/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericNotifierRequest notifierRequestObject) {
-        try {
-            guildService.addRedditNotifier(sessionIdentifier, guildId, notifierRequestObject);
-            return new GenericResponse(true, "Reddit Notifier added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addRedditNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericNotifierRequest notifierRequestObject) {
+        return guildService.addRedditNotifier(sessionIdentifier, guildId, notifierRequestObject)
+                .map(x -> x ? new GenericResponse(true, "Notifier added!") :
+                        new GenericResponse(false, "Couldn't add Notifier!"));
     }
 
     //endregion
@@ -434,32 +383,23 @@ public class GuildController {
     //region Twitch Notifier
 
     @GetMapping(value = "/{guildId}/twitch", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<NotifierContainer>> retrieveTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getTwitchNotifier(sessionIdentifier, guildId), "Twitch Notifiers retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<NotifierContainer>>> retrieveTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getTwitchNotifier(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(true, x, "Notifier received!"));
     }
 
     @PostMapping(value = "/{guildId}/twitch/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            guildService.removeTwitchNotifier(sessionIdentifier, guildId, request.value());
-            return new GenericResponse(true, "Twitch Notifier removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return guildService.removeTwitchNotifier(sessionIdentifier, guildId, request.value())
+                .map(x -> x ? new GenericResponse(true, "Notifier remove!") :
+                        new GenericResponse(false, "Couldn't remove Notifier!"));
     }
 
     @PostMapping(value = "/{guildId}/twitch/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericNotifierRequest notifierRequestObject) {
-        try {
-            guildService.addTwitchNotifier(sessionIdentifier, guildId, notifierRequestObject);
-            return new GenericResponse(true, "Twitch Notifier added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addTwitchNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericNotifierRequest notifierRequestObject) {
+        return guildService.addTwitchNotifier(sessionIdentifier, guildId, notifierRequestObject)
+                .map(x -> x ? new GenericResponse(true, "Notifier added!") :
+                        new GenericResponse(false, "Couldn't add Notifier!"));
     }
 
 
@@ -468,32 +408,23 @@ public class GuildController {
     //region Twitter Notifier
 
     @GetMapping(value = "/{guildId}/twitter", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<NotifierContainer>> retrieveTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getTwitterNotifier(sessionIdentifier, guildId), "Twitter Notifiers retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<NotifierContainer>>> retrieveTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getTwitterNotifier(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(true, x, "Notifier received!"));
     }
 
     @PostMapping(value = "/{guildId}/twitter/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            guildService.removeTwitterNotifier(sessionIdentifier, guildId, request.value());
-            return new GenericResponse(true, "Twitter Notifier removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return guildService.removeTwitterNotifier(sessionIdentifier, guildId, request.value())
+                .map(x -> x ? new GenericResponse(true, "Notifier remove!") :
+                        new GenericResponse(false, "Couldn't remove Notifier!"));
     }
 
     @PostMapping(value = "/{guildId}/twitter/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericNotifierRequest notifierRequestObject) {
-        try {
-            guildService.addTwitterNotifier(sessionIdentifier, guildId, notifierRequestObject);
-            return new GenericResponse(true, "Twitter Notifier added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addTwitterNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericNotifierRequest notifierRequestObject) {
+        return guildService.addTwitterNotifier(sessionIdentifier, guildId, notifierRequestObject)
+                .map(x -> x ? new GenericResponse(true, "Notifier added!") :
+                        new GenericResponse(false, "Couldn't add Notifier!"));
     }
 
     //endregion
@@ -501,32 +432,23 @@ public class GuildController {
     //region YouTube Notifier
 
     @GetMapping(value = "/{guildId}/youtube", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<NotifierContainer>> retrieveYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getYouTubeNotifier(sessionIdentifier, guildId), "Youtube Notifiers retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<NotifierContainer>>> retrieveYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getYouTubeNotifier(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(true, x, "Notifier received!"));
     }
 
     @PostMapping(value = "/{guildId}/youtube/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            guildService.removeYouTubeNotifier(sessionIdentifier, guildId, request.value());
-            return new GenericResponse(true, "Youtube Notifier removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return guildService.removeYouTubeNotifier(sessionIdentifier, guildId, request.value())
+                .map(x -> x ? new GenericResponse(true, "YouTube Notifier remove!") :
+                        new GenericResponse(false, "Couldn't remove YouTube Notifier!"));
     }
 
     @PostMapping(value = "/{guildId}/youtube/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericNotifierRequest notifierRequestObject) {
-        try {
-            guildService.addYouTubeNotifier(sessionIdentifier, guildId, notifierRequestObject);
-            return new GenericResponse(true, "Youtube Notifier added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addYoutubeNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericNotifierRequest notifierRequestObject) {
+        return guildService.addYouTubeNotifier(sessionIdentifier, guildId, notifierRequestObject)
+                .map(x -> x ? new GenericResponse(true, "Notifier added!") :
+                        new GenericResponse(false, "Couldn't add Notifier!"));
     }
 
     //endregion
@@ -534,32 +456,23 @@ public class GuildController {
     //region Instagram Notifier
 
     @GetMapping(value = "/{guildId}/instagram", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<NotifierContainer>> retrieveInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getInstagramNotifier(sessionIdentifier, guildId), "Instagram Notifiers retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<NotifierContainer>>> retrieveInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getInstagramNotifier(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(true, x, "Notifier received!"));
     }
 
     @PostMapping(value = "/{guildId}/instagram/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            guildService.removeInstagramNotifier(sessionIdentifier, guildId, request.value());
-            return new GenericResponse(true, "Instagram Notifier removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return guildService.removeInstagramNotifier(sessionIdentifier, guildId, request.value())
+                .map(x -> x ? new GenericResponse(true, "Instagram Notifier remove!") :
+                        new GenericResponse(false, "Couldn't remove Instagram Notifier!"));
     }
 
     @PostMapping(value = "/{guildId}/instagram/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericNotifierRequest notifierRequestObject) {
-        try {
-            guildService.addInstagramNotifier(sessionIdentifier, guildId, notifierRequestObject);
-            return new GenericResponse(true, "Instagram Notifier added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addInstagramNotifier(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericNotifierRequest notifierRequestObject) {
+        return guildService.addInstagramNotifier(sessionIdentifier, guildId, notifierRequestObject)
+                .map(x -> x ? new GenericResponse(true, "Notifier added!") :
+                        new GenericResponse(false, "Couldn't add Notifier!"));
     }
 
     //endregion
@@ -569,40 +482,32 @@ public class GuildController {
     //region Temporal Voice Channels
 
     @GetMapping(value = "/{guildId}/temporalvoice", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<ChannelContainer> retrieveTemporalVoice(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getTemporalVoice(sessionIdentifier, guildId), "TemporalVoice channel retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<ChannelContainer>> retrieveTemporalVoice(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getTemporalVoice(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Retrieved" : "Failed to retrieve!"));
     }
 
 
     @PostMapping(value = "/{guildId}/temporalvoice/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeTemporalVoiceChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            guildService.removeTemporalVoice(sessionIdentifier, guildId);
-            return new GenericResponse(true, "TemporalVoice channel removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeTemporalVoiceChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.removeTemporalVoice(sessionIdentifier, guildId)
+                .map(x -> new GenericResponse(x, x ? "Removed!" : "Failed to remove!"));
     }
 
 
     @PostMapping(value = "/{guildId}/temporalvoice/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addTemporalVoiceChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+    public Mono<GenericResponse> addTemporalVoiceChannel(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
         try {
-
             long channelId = ConverterUtil.convertStringToLong(request.value());
 
             if (channelId == -1) {
-                return new GenericResponse(false, "Channel not found!");
+                return Mono.just(new GenericResponse(false, "Channel not found!"));
             }
 
-            guildService.updateTemporalVoice(sessionIdentifier, guildId, channelId);
-            return new GenericResponse(true, "TemporalVoice channel added!");
+            return guildService.updateTemporalVoice(sessionIdentifier, guildId, channelId)
+                    .map(x -> new GenericResponse(x, x ? "Added!" : "Failed to add!"));
         } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
+            return Mono.just(new GenericResponse(false, e.getMessage()));
         }
     }
 
@@ -611,21 +516,15 @@ public class GuildController {
     //region Opt-Out
 
     @GetMapping(value = "/{guildId}/opt-out/check", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse checkOptOut(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericResponse(true, guildService.checkOptOut(sessionIdentifier, guildId));
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> checkOptOut(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.checkOptOut(sessionIdentifier, guildId)
+                .map(x -> new GenericResponse(x.isPresent(), x.orElse("Error")));
     }
 
     @GetMapping(value = "/{guildId}/opt-out", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse optOut(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericResponse(true, guildService.optOut(sessionIdentifier, guildId));
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> optOut(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.optOut(sessionIdentifier, guildId)
+                .map(x -> new GenericResponse(x.isPresent(), x.orElse("Error")));
     }
 
     //endregion
@@ -633,32 +532,21 @@ public class GuildController {
     //region Tickets
 
     @GetMapping(value = "/{guildId}/tickets", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<TicketContainer> retrieveTicket(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getTicket(sessionIdentifier, guildId), "Tickets retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<TicketContainer>> retrieveTicket(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getTicket(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Retrieved" : "Failed to retrieve!"));
     }
 
     @PostMapping(value = "/{guildId}/tickets/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeTicket(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            guildService.removeTicket(sessionIdentifier, guildId);
-            return new GenericResponse(true, "Tickets removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeTicket(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.removeTicket(sessionIdentifier, guildId)
+                .map(x -> new GenericResponse(x, x ? "Removed!" : "Failed to remove"));
     }
 
     @PostMapping(value = "/{guildId}/tickets/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addTicket(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody TicketsRequest request) {
-        try {
-            guildService.updateTicket(sessionIdentifier, guildId, request.channelId(), request.logChannelId());
-            return new GenericResponse(true, "Tickets added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addTicket(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody TicketsRequest request) {
+        return guildService.updateTicket(sessionIdentifier, guildId, request.channelId(), request.logChannelId())
+                .map(x -> new GenericResponse(x, x ? "Updated!" : "Failed to update"));
     }
 
     //endregion
@@ -666,37 +554,30 @@ public class GuildController {
     //region Suggestion
 
     @GetMapping(value = "/{guildId}/suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<ChannelContainer> retrieveSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getSuggestion(sessionIdentifier, guildId), "Suggestions retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<ChannelContainer>> retrieveSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getSuggestion(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Retrieved" : "Failed to retrieve!"));
     }
 
     @PostMapping(value = "/{guildId}/suggestions/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            guildService.removeSuggestion(sessionIdentifier, guildId);
-            return new GenericResponse(true, "Suggestions removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.removeSuggestion(sessionIdentifier, guildId)
+                .map(x -> new GenericResponse(x, x ? "Removed!" : "Failed to remove"));
     }
 
     @PostMapping(value = "/{guildId}/suggestions/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+    public Mono<GenericResponse> addSuggestion(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
         try {
             long channelId = ConverterUtil.convertStringToLong(request.value());
 
             if (channelId == -1) {
-                return new GenericResponse(false, "Channel not found!");
+                return Mono.just(new GenericResponse(false, "Channel not found!"));
             }
 
-            guildService.updateSuggestion(sessionIdentifier, guildId, channelId);
-            return new GenericResponse(true, "Suggestions added!");
+            return guildService.updateSuggestion(sessionIdentifier, guildId, channelId)
+                    .map(x -> new GenericResponse(x, x ? "Added!" : "Failed to add!"));
         } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
+            return Mono.just(new GenericResponse(false, e.getMessage()));
         }
     }
 
@@ -705,80 +586,53 @@ public class GuildController {
     //region Warnings
 
     @GetMapping(value = "/{guildId}/warnings", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<WarningContainer>> retrieveWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getWarnings(sessionIdentifier, guildId), "Warnings retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<WarningContainer>>> retrieveWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getWarnings(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(true, x, "Retrieved!"));
     }
 
     @PostMapping(value = "/{guildId}/warnings/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<WarningContainer> addWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody WarningsRequest request) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.addWarnings(sessionIdentifier, guildId, request.userId(), request.warnings()), "Warnings added!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<WarningContainer>> addWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody WarningsRequest request) {
+        return guildService.addWarnings(sessionIdentifier, guildId, request.userId(), request.warnings())
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Added" : "Failed to add"));
     }
 
     @PostMapping(value = "/{guildId}/warnings/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<WarningContainer> removeWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody WarningsRequest request) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.removeWarnings(sessionIdentifier, guildId, request.userId(), request.warnings()), "Warnings removed!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<WarningContainer>> removeWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody WarningsRequest request) {
+        return guildService.removeWarnings(sessionIdentifier, guildId, request.userId(), request.warnings())
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Removed" : "Failed to remove"));
     }
 
     @PostMapping(value = "/{guildId}/warnings/clear", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse clearWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            guildService.clearWarnings(sessionIdentifier, guildId);
-            return new GenericResponse(true, "Warnings cleared!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> clearWarnings(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.clearWarnings(sessionIdentifier, guildId)
+                .map(x -> new GenericResponse(x, x ? "Cleared!" : "Failed to clear"));
     }
 
     //region Punishments
 
     @GetMapping(value = "/{guildId}/warnings/punishments", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<PunishmentContainer>> retrievePunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getPunishments(sessionIdentifier, guildId), "Punishments retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<PunishmentContainer>>> retrievePunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getPunishments(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(true, x, "Retrieved!"));
     }
 
     @PostMapping(value = "/{guildId}/warnings/punishments/clear", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse clearPunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            guildService.clearPunishments(sessionIdentifier, guildId);
-            return new GenericResponse(true, "Punishments cleared!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> clearPunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.clearPunishments(sessionIdentifier, guildId)
+                .map(x -> new GenericResponse(x, x ? "Cleared!" : "Failed to clear"));
     }
 
     @PostMapping(value = "/{guildId}/warnings/punishments/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<PunishmentContainer> addPunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody PunishmentsRequest request) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.addPunishments(sessionIdentifier, guildId, request.neededWarnings(), request.action(), request.timeoutTime(), request.roleId()), "Punishments added!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<PunishmentContainer>> addPunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody PunishmentsRequest request) {
+        return guildService.addPunishments(sessionIdentifier, guildId, request.neededWarnings(), request.action(), request.timeoutTime(), request.roleId())
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Added!" : "Failed to add!"));
     }
 
     @PostMapping(value = "/{guildId}/warnings/punishments/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removePunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            guildService.removePunishments(sessionIdentifier, guildId, request.value());
-            return new GenericResponse(true, "Punishments removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removePunishments(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return guildService.removePunishments(sessionIdentifier, guildId, request.value())
+                .map(x -> new GenericResponse(x, x ? "Removed!" : "Failed to remove"));
     }
 
     //endregion
@@ -788,33 +642,23 @@ public class GuildController {
     //region Custom commands
 
     @GetMapping(value = "/{guildId}/commands", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<CustomCommandContainer>> retrieveCustomCommands(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.getCustomCommand(sessionIdentifier, guildId), "CustomCommand retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<CustomCommandContainer>>> retrieveCustomCommands(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.getCustomCommand(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(true, x, "Retrieved!"));
     }
 
 
     @PostMapping(value = "/{guildId}/commands/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<CustomCommandContainer> addCustomCommand(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody CustomCommandRequest request) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.addCustomCommand(sessionIdentifier, guildId, request.name(), request.channelId(), request.message(), request.embedJson()), "CustomCommand added!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<CustomCommandContainer>> addCustomCommand(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody CustomCommandRequest request) {
+        return guildService.addCustomCommand(sessionIdentifier, guildId, request.name(), request.channelId(), request.message(), request.embedJson())
+                .map(x -> new GenericObjectResponse<>(x.isPresent(), x.orElse(null), x.isPresent() ? "Retrieved!" : "Could not retrieve!"));
     }
 
 
     @PostMapping(value = "/{guildId}/commands/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeCustomCommand(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
-        try {
-            guildService.removeCustomCommand(sessionIdentifier, guildId, request.value());
-            return new GenericResponse(true, "CustomCommand removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeCustomCommand(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody GenericValueRequest request) {
+        return guildService.removeCustomCommand(sessionIdentifier, guildId, request.value())
+                .map(x -> x ? new GenericResponse(true, "Removed!") : new GenericResponse(false, "Failed to remove!"));
     }
 
     //endregion
@@ -822,32 +666,21 @@ public class GuildController {
     //region Reaction Roles
 
     @GetMapping(value = "/{guildId}/reactionroles", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<List<MessageReactionRoleContainer>> retrieveReactionRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
-        try {
-            return new GenericObjectResponse<>(true, guildService.retrieveReactionRoles(sessionIdentifier, guildId), "ReactionRoles retrieved!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<List<MessageReactionRoleContainer>>> retrieveReactionRoles(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId) {
+        return guildService.retrieveReactionRoles(sessionIdentifier, guildId)
+                .map(x -> new GenericObjectResponse<>(true, x, "Retrieved!"));
     }
 
     @PostMapping(value = "/{guildId}/reactionroles/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse addReactionRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody ReactionRoleRequest request) {
-        try {
-            guildService.addReactionRole(sessionIdentifier, guildId, request.emojiId(), request.formattedEmoji(), request.channelId(), request.messageId(), request.roleId());
-            return new GenericResponse(true, "ReactionRole added!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> addReactionRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody ReactionRoleRequest request) {
+        return guildService.addReactionRole(sessionIdentifier, guildId, request.emojiId(), request.formattedEmoji(), request.channelId(), request.messageId(), request.roleId())
+                .map(x -> x ? new GenericResponse(true, "Added!") : new GenericResponse(false, "Failed to add!"));
     }
 
     @PostMapping(value = "/{guildId}/reactionroles/remove", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse removeReactionRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody ReactionRoleDeleteRequest request) {
-        try {
-            guildService.removeReactionRole(sessionIdentifier, guildId, request.emojiId(), request.messageId());
-            return new GenericResponse(true, "ReactionRole removed!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+    public Mono<GenericResponse> removeReactionRole(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @PathVariable(name = "guildId") long guildId, @RequestBody ReactionRoleDeleteRequest request) {
+        return guildService.removeReactionRole(sessionIdentifier, guildId, request.emojiId(), request.messageId())
+                .map(x -> x ? new GenericResponse(true, "Removed!") : new GenericResponse(false, "Failed to remove!"));
     }
 
     //endregion

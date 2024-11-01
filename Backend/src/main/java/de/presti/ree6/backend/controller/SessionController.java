@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -47,12 +48,10 @@ public class SessionController {
      * @return Generic Object Response with the Session.
      */
     @GetMapping(value = "/check", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<SessionContainer> checkSession(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
-        try {
-            return new GenericObjectResponse<>(true, sessionService.retrieveSession(sessionIdentifier), "Session valid!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<SessionContainer>> checkSession(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier) {
+        return sessionService.retrieveSession(sessionIdentifier)
+                .map(x -> x.map(sessionContainer -> new GenericObjectResponse<>(true, sessionContainer, "Session valid!"))
+                        .orElseGet(() -> new GenericObjectResponse<>(false, null, "Session not found!")));
     }
 
     //endregion
@@ -66,12 +65,10 @@ public class SessionController {
      * @return Generic Object Response with the Session.
      */
     @GetMapping(value = "/discord", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericObjectResponse<SessionContainer> completeSession(@RequestParam(name = "code") String code, @RequestParam(name = "state") String state) {
-        try {
-            return new GenericObjectResponse<>(true, sessionService.createSession(code, state), "Session created!");
-        } catch (Exception e) {
-            return new GenericObjectResponse<>(false, null, e.getMessage());
-        }
+    public Mono<GenericObjectResponse<SessionContainer>> completeSession(@RequestParam(name = "code") String code, @RequestParam(name = "state") String state) {
+        return sessionService.createSession(code, state)
+                .map(x -> x.map(sessionContainer -> new GenericObjectResponse<>(true, sessionContainer, "Session created"))
+                        .orElseGet(() -> new GenericObjectResponse<>(false, null, "Session creation failed!")));
     }
 
     /**
@@ -117,26 +114,27 @@ public class SessionController {
      * @return Generic Object Response with the Session.
      */
     @GetMapping(value = "/twitch", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GenericResponse authenticateTwitch(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "code") String code) {
-        try {
-            SessionContainer sessionContainer = sessionService.retrieveSession(sessionIdentifier);
+    public Mono<GenericResponse> authenticateTwitch(@RequestHeader(name = "X-Session-Authenticator") String sessionIdentifier, @RequestParam(name = "code") String code) {
+        return sessionService.retrieveSession(sessionIdentifier).map(sessionContainer -> {
+            if (sessionContainer.isEmpty()) {
+                return new GenericResponse(false, "Session not found!");
+            }
+
             OAuth2Credential oAuth2Credential;
 
             try {
                 // Try building the credentials.
                 oAuth2Credential = Server.getInstance().getTwitchIdentityProvider().getCredentialByCode(code);
             } catch (Exception e) {
-                throw new IllegalAccessException("Invalid code!");
+                return new GenericResponse(false, "Invalid Twitch Code!");
             }
 
             // Add the credential to the credential manager.
-            Server.getInstance().getCredentialManager().addCredential("twitch", CustomOAuth2Util.convert(sessionContainer.getOAuthUser().getIdLong(), oAuth2Credential));
+            Server.getInstance().getCredentialManager().addCredential("twitch", CustomOAuth2Util.convert(sessionContainer.get().getOAuthUser().getIdLong(), oAuth2Credential));
             Server.getInstance().getCredentialManager().save();
 
             return new GenericResponse(true, "Twitch authenticated!");
-        } catch (Exception e) {
-            return new GenericResponse(false, e.getMessage());
-        }
+        });
     }
 
     //endregion

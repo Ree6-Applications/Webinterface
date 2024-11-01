@@ -82,7 +82,7 @@ public class Server {
         instance = this;
 
         String tempVersion = getInstance().getClass().getPackage().getImplementationVersion();
-        backendVersion = tempVersion == null ? "4.0.11" : tempVersion;
+        backendVersion = tempVersion == null ? "5.0.0" : tempVersion;
         load(args);
     }
 
@@ -178,32 +178,33 @@ public class Server {
         Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
 
         ThreadUtil.createNewThread(x -> {
-            List<Recording> recordings = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Recording(), "FROM Recording", null);
-
-            if (recordings != null && !recordings.isEmpty()) {
-                for (Recording recording : recordings) {
-                    if (recording.getCreation() < System.currentTimeMillis() - Duration.ofDays(1).toMillis()) {
-                        SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
+            SQLSession.getSqlConnector().getSqlWorker().getEntityList(new Recording(), "FROM Recording", null).subscribe(recordings -> {
+                if (recordings != null && !recordings.isEmpty()) {
+                    for (Recording recording : recordings) {
+                        if (recording.getCreation() < System.currentTimeMillis() - Duration.ofDays(1).toMillis()) {
+                            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording).block();
+                        }
                     }
                 }
-            }
-
-            List<TwitchIntegration> twitchIntegrations = SQLSession.getSqlConnector().getSqlWorker().getEntityList(new TwitchIntegration(), "FROM TwitchIntegration", null);
-            twitchIntegrations.forEach(twitchIntegration -> {
-                if (twitchIntegration.getLastUpdated().getTime() + (twitchIntegration.getExpiresIn() * 1000L) - Duration.ofMinutes(10).toMillis() <= System.currentTimeMillis()) {
-                    Optional<OAuth2Credential> cred = twitchIdentityProvider.refreshCredential(CustomOAuth2Util.convertToOriginal(twitchIntegration));
-
-                    credentialManager.getCredentials().removeIf(credential -> {
-                        if (credential instanceof CustomOAuth2Credential customOAuth2CredentialLocal) {
-                            return customOAuth2CredentialLocal.getDiscordId() == twitchIntegration.getUserId();
-                        }
-                        return false;
-                    });
-
-                    cred.ifPresent(oAuth2Credential -> credentialManager.addCredential("twitch", CustomOAuth2Util.convert(twitchIntegration.getUserId(), oAuth2Credential)));
-                }
             });
-            credentialManager.save();
+
+            SQLSession.getSqlConnector().getSqlWorker().getEntityList(new TwitchIntegration(), "FROM TwitchIntegration", null).subscribe(twitchIntegrations -> {
+                twitchIntegrations.forEach(twitchIntegration -> {
+                    if (twitchIntegration.getLastUpdated().getTime() + (twitchIntegration.getExpiresIn() * 1000L) - Duration.ofMinutes(10).toMillis() <= System.currentTimeMillis()) {
+                        Optional<OAuth2Credential> cred = twitchIdentityProvider.refreshCredential(CustomOAuth2Util.convertToOriginal(twitchIntegration));
+
+                        credentialManager.getCredentials().removeIf(credential -> {
+                            if (credential instanceof CustomOAuth2Credential customOAuth2CredentialLocal) {
+                                return customOAuth2CredentialLocal.getDiscordId() == twitchIntegration.getUserId();
+                            }
+                            return false;
+                        });
+
+                        cred.ifPresent(oAuth2Credential -> credentialManager.addCredential("twitch", CustomOAuth2Util.convert(twitchIntegration.getUserId(), oAuth2Credential)));
+                    }
+                });
+                credentialManager.save();
+            });
         }, throwable -> log.error("Failed running Data clear Thread", throwable), Duration.ofMinutes(5), true, false);
     }
 

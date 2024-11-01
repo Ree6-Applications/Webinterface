@@ -12,6 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TicketContainer {
 
+    public static TicketContainer DEFAULT = new TicketContainer(null, null, 0, null, "", "");
+
     public ChannelContainer channel;
 
     public ChannelContainer category;

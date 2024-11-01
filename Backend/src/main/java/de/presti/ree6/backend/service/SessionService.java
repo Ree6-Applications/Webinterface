@@ -9,17 +9,21 @@ import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.utils.RandomUtils;
 import de.presti.ree6.backend.utils.data.container.guild.GuildContainer;
 import de.presti.ree6.backend.utils.data.container.SessionContainer;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service meant to handle Sessions.
  */
+@Slf4j
 @Service
 public class SessionService {
 
@@ -28,48 +32,16 @@ public class SessionService {
      *
      * @param identifier Identifier to identify the Session.
      * @return Session Container with the Session.
-     * @throws IllegalAccessException If the Session could not be found.
      */
-    public SessionContainer retrieveSession(String identifier) throws IllegalAccessException {
-        try {
-            // Try retrieving the Session from the Identifier.
-            Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(identifier);
+    public Mono<Optional<SessionContainer>> retrieveSession(String identifier) {
+        return Mono.fromSupplier(() -> {
+            try {
+                // Try retrieving the Session from the Identifier.
+                Session session = Server.getInstance().getOAuth2Client().getSessionController().getSession(identifier);
 
-            if (session == null) {
-                throw new IllegalAccessException("Session not found!");
-            }
-
-            // Try retrieving the User from the Session.
-            OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
-
-            if (oAuth2User == null) {
-                throw new IllegalAccessException("User not found!");
-            }
-
-            return new SessionContainer("", session, oAuth2User);
-        } catch (Exception ignore) {
-            throw new IllegalAccessException("Session not found!");
-        }
-    }
-
-    /**
-     * Create a new Session.
-     *
-     * @param code  Code to create the Session.
-     * @param state State to create the Session.
-     * @return Session Container with the Session.
-     * @throws IllegalAccessException If the Session could not be created.
-     */
-    public SessionContainer createSession(String code, String state) throws IllegalAccessException {
-        // Generate a secure Base64 String for the Identifier.
-        String identifier = RandomUtils.getRandomBase64String(128);
-
-        try {
-            // Try creating a Session.
-            Session session = Server.getInstance().getOAuth2Client().startSession(code, state, identifier, Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN).complete();
-
-            // If the given data was valid and a Session has been created redirect to the panel Site. If not redirect to error.
-            if (session != null) {
+                if (session == null) {
+                    throw new IllegalAccessException("Session not found!");
+                }
 
                 // Try retrieving the User from the Session.
                 OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
@@ -78,14 +50,50 @@ public class SessionService {
                     throw new IllegalAccessException("User not found!");
                 }
 
-                return new SessionContainer(identifier, session, Server.getInstance().getOAuth2Client().getUser(session).complete());
-            } else {
-                throw new IllegalStateException("Session creation failed!");
+                return Optional.of(new SessionContainer("", session, oAuth2User));
+            } catch (Exception ex) {
+                log.debug(ex.getMessage(), ex);
+                return Optional.empty();
             }
+        });
+    }
 
-        } catch (Exception exception) {
-            throw new IllegalStateException(exception.getMessage());
-        }
+    /**
+     * Create a new Session.
+     *
+     * @param code  Code to create the Session.
+     * @param state State to create the Session.
+     * @return Session Container with the Session.
+     */
+    public Mono<Optional<SessionContainer>> createSession(String code, String state) {
+        return Mono.fromSupplier(() -> {
+            // Generate a secure Base64 String for the Identifier.
+            String identifier = RandomUtils.getRandomBase64String(128);
+
+            try {
+                // Try creating a Session.
+                Session session = Server.getInstance().getOAuth2Client().startSession(code, state, identifier, Scope.GUILDS, Scope.IDENTIFY, Scope.GUILDS_JOIN).complete();
+
+                // If the given data was valid and a Session has been created redirect to the panel Site. If not redirect to error.
+                if (session != null) {
+
+                    // Try retrieving the User from the Session.
+                    OAuth2User oAuth2User = Server.getInstance().getOAuth2Client().getUser(session).complete();
+
+                    if (oAuth2User == null) {
+                        throw new IllegalAccessException("User not found!");
+                    }
+
+                    return Optional.of(new SessionContainer(identifier, session, Server.getInstance().getOAuth2Client().getUser(session).complete()));
+                } else {
+                    throw new IllegalStateException("Session creation failed!");
+                }
+
+            } catch (Exception ex) {
+                log.debug(ex.getMessage(), ex);
+                return Optional.empty();
+            }
+        });
     }
 
     /**
@@ -94,9 +102,8 @@ public class SessionService {
      * @param identifier Identifier to identify the Session.
      * @param guildId    Guild ID to identify the Guild.
      * @return Guild Container with the Guild.
-     * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(String identifier, long guildId) throws IllegalAccessException {
+    public Mono<Optional<GuildContainer>> retrieveGuild(String identifier, long guildId) {
         return retrieveGuild(identifier, guildId, false);
     }
 
@@ -107,9 +114,8 @@ public class SessionService {
      * @param guildId          Guild ID to identify the Guild.
      * @param retrieveChannels If the Channels should be retrieved.
      * @return Guild Container with the Guild.
-     * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(String identifier, long guildId, boolean retrieveChannels) throws IllegalAccessException {
+    public Mono<Optional<GuildContainer>> retrieveGuild(String identifier, long guildId, boolean retrieveChannels) {
         return retrieveGuild(identifier, guildId, retrieveChannels, false);
     }
 
@@ -121,9 +127,8 @@ public class SessionService {
      * @param retrieveChannels If the Channels should be retrieved.
      * @param retrieveRoles    If the Roles should be retrieved.
      * @return Guild Container with the Guild.
-     * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(String identifier, long guildId, boolean retrieveChannels, boolean retrieveRoles) throws IllegalAccessException {
+    public Mono<Optional<GuildContainer>> retrieveGuild(String identifier, long guildId, boolean retrieveChannels, boolean retrieveRoles) {
         return retrieveGuild(identifier, guildId, retrieveChannels, retrieveRoles, true);
     }
 
@@ -136,41 +141,47 @@ public class SessionService {
      * @param retrieveRoles    If the Roles should be retrieved.
      * @param permissionCheck  If the Permission should be checked.
      * @return Guild Container with the Guild.
-     * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(String identifier, long guildId, boolean retrieveChannels, boolean retrieveRoles, boolean permissionCheck) throws IllegalAccessException {
-        SessionContainer sessionContainer = retrieveSession(identifier);
-
-        OAuth2Guild oAuth2Guild = null;
-        try {
-            oAuth2Guild = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete()
-                    .stream().filter(c -> c.getIdLong() == guildId && c.hasPermission(Permission.ADMINISTRATOR)).findFirst().orElse(null);
-        } catch (Exception ignore) {
-        }
-
-        // Retrieve the Guild by its giving ID.
-        Guild guild = BotWorker.getShardManager().getGuildById(guildId);
-
-        // If the Guild couldn't be loaded, redirect to Error page.
-        if (guild == null) {
-            if (oAuth2Guild != null) {
-                return new GuildContainer(oAuth2Guild);
-            } else {
-                throw new IllegalAccessException("Guild not found!");
+    public Mono<Optional<GuildContainer>> retrieveGuild(String identifier, long guildId, boolean retrieveChannels, boolean retrieveRoles, boolean permissionCheck) {
+        return retrieveSession(identifier).map(sessionOptional -> {
+            if (sessionOptional.isEmpty()) {
+                return Optional.empty();
             }
-        }
 
-        Member member = guild.retrieveMemberById(sessionContainer.getUser().getId()).complete();
-        if (permissionCheck) {
-            if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) {
-                throw new IllegalAccessException("Not enough permissions!");
+            SessionContainer sessionContainer = sessionOptional.get();
+
+            OAuth2Guild oAuth2Guild = null;
+            try {
+                oAuth2Guild = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete()
+                        .stream().filter(c -> c.getIdLong() == guildId && c.hasPermission(Permission.ADMINISTRATOR)).findFirst().orElse(null);
+            } catch (Exception ignore) {
             }
-        }
 
-        GuildContainer guildContainer = new GuildContainer(guild, retrieveChannels, retrieveRoles);
-        guildContainer.setAdmin(member.hasPermission(Permission.ADMINISTRATOR));
+            // Retrieve the Guild by its giving ID.
+            Guild guild = BotWorker.getShardManager().getGuildById(guildId);
 
-        return guildContainer;
+            // If the Guild couldn't be loaded, redirect to Error page.
+            if (guild == null) {
+                if (oAuth2Guild != null) {
+                    return Optional.of(new GuildContainer(oAuth2Guild));
+                } else {
+                    log.warn("Could not find guild with id {}", guildId);
+                    return Optional.empty();
+                }
+            }
+
+            Member member = guild.retrieveMemberById(sessionContainer.getUser().getId()).complete();
+            if (permissionCheck) {
+                if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) {
+                    log.warn("User {} has not enough permission for {}", sessionContainer.getUser().getId(), guildId);
+                    return Optional.empty();
+                }
+            }
+
+            GuildContainer guildContainer = new GuildContainer(guild, retrieveChannels, retrieveRoles);
+            guildContainer.setAdmin(member.hasPermission(Permission.ADMINISTRATOR));
+            return Optional.of(guildContainer);
+        });
     }
 
     /**
@@ -178,9 +189,8 @@ public class SessionService {
      *
      * @param guildId Guild ID to identify the Guild.
      * @return Guild Container with the Guild.
-     * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(long guildId) throws IllegalAccessException {
+    public Mono<Optional<GuildContainer>> retrieveGuild(long guildId) {
         return retrieveGuild(guildId, false);
     }
 
@@ -190,17 +200,20 @@ public class SessionService {
      * @param guildId          Guild ID to identify the Guild.
      * @param retrieveChannels If the Channels should be retrieved.
      * @return Guild Container with the Guild.
-     * @throws IllegalAccessException If the Guild could not be found.
      */
-    public GuildContainer retrieveGuild(long guildId, boolean retrieveChannels) throws IllegalAccessException {
+    public Mono<Optional<GuildContainer>> retrieveGuild(long guildId, boolean retrieveChannels) {
+        return Mono.fromSupplier(() -> {
+            // Retrieve the Guild by its giving ID.
+            Guild guild = BotWorker.getShardManager().getGuildById(guildId);
 
-        // Retrieve the Guild by its giving ID.
-        Guild guild = BotWorker.getShardManager().getGuildById(guildId);
+            // If the Guild couldn't be loaded, redirect to Error page.
+            if (guild == null) {
+                log.warn("Could not find guild with id {}", guildId);
+                return Optional.empty();
+            }
 
-        // If the Guild couldn't be loaded, redirect to Error page.
-        if (guild == null) throw new IllegalAccessException("Guild not found!");
-
-        return new GuildContainer(guild, retrieveChannels);
+            return Optional.of(new GuildContainer(guild, retrieveChannels));
+        });
     }
 
     /**
@@ -208,9 +221,8 @@ public class SessionService {
      *
      * @param identifier Identifier to identify the Session.
      * @return List of Guild Containers with the Guilds.
-     * @throws IllegalAccessException If the Guilds could not be found.
      */
-    public List<GuildContainer> retrieveGuilds(String identifier) throws IllegalAccessException {
+    public Mono<Optional<List<GuildContainer>>> retrieveGuilds(String identifier) {
         return retrieveGuilds(identifier, false);
     }
 
@@ -220,20 +232,27 @@ public class SessionService {
      * @param identifier       Identifier to identify the Session.
      * @param permissionFilter If the Guilds should be filtered by the Permission.
      * @return List of Guild Containers with the Guilds.
-     * @throws IllegalAccessException If the Guilds could not be found.
      */
-    public List<GuildContainer> retrieveGuilds(String identifier, boolean permissionFilter) throws IllegalAccessException {
-        SessionContainer sessionContainer = retrieveSession(identifier);
-        List<OAuth2Guild> guilds = Collections.emptyList();
+    public Mono<Optional<List<GuildContainer>>> retrieveGuilds(String identifier, boolean permissionFilter) {
+        return retrieveSession(identifier).map(sessionOptional -> {
+           if (sessionOptional.isEmpty()) {
+               return Optional.empty();
+           }
 
-        try {
-            guilds = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete();
+           SessionContainer sessionContainer = sessionOptional.get();
+            List<OAuth2Guild> guilds = Collections.emptyList();
 
-            if (permissionFilter)
-                guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
-        } catch (Exception ignore) {
-        }
+            try {
+                guilds = Server.getInstance().getOAuth2Client().getGuilds(sessionContainer.getSession()).complete();
 
-        return guilds.stream().map(GuildContainer::new).toList();
+                if (permissionFilter)
+                    guilds.removeIf(oAuth2Guild -> !oAuth2Guild.hasPermission(Permission.ADMINISTRATOR));
+            } catch (Exception ignore) {
+            }
+
+            if (guilds == null) return Optional.empty();
+
+            return Optional.of(guilds.stream().map(GuildContainer::new).toList());
+        });
     }
 }

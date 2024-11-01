@@ -12,7 +12,7 @@
 
     <groupId>de.presti.ree6</groupId>
     <artifactId>Webinterface-Backend</artifactId>
-    <version>4.0.17</version>
+    <version>5.0.0</version>
     <name>Webinterface-Backend</name>
     <description>The Backend for the Webinterface</description>
 
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>de.ree6</groupId>
             <artifactId>Ree6-SQL</artifactId>
-            <version>da620ec7a5</version>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- Discord -->
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-spring-boot-starter-jakarta</artifactId>
-            <version>7.14.0</version>
+            <version>7.15.0</version>
         </dependency>
 
         <!-- Utilities -->
