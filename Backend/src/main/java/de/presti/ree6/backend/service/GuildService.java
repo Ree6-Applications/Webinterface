@@ -83,14 +83,14 @@ public class GuildService {
         ChannelContainer errorReturnValue = null;
         return sessionService.retrieveGuild(sessionIdentifier, guildId, true).publishOn(Schedulers.boundedElastic()).mapNotNull(guildOptional -> {
             if (guildOptional.isEmpty()) {
-                return Optional.ofNullable(errorReturnValue);
+                return Optional.empty();
             }
 
             GuildContainer guildContainer = guildOptional.get();
 
             return SQLSession.getSqlConnector().getSqlWorker().getLogWebhook(guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(webhookLogOptional -> {
                 if (webhookLogOptional.isEmpty()) {
-                    return Optional.ofNullable(errorReturnValue);
+                    return Optional.ofNullable(ChannelContainer.DEFAULT);
                 }
 
                 WebhookLog webhook = webhookLogOptional.get();
@@ -169,14 +169,14 @@ public class GuildService {
         ChannelContainer errorReturnValue = null;
         return sessionService.retrieveGuild(sessionIdentifier, guildId, true).publishOn(Schedulers.boundedElastic()).mapNotNull(guildOptional -> {
             if (guildOptional.isEmpty()) {
-                return Optional.ofNullable(errorReturnValue);
+                return Optional.empty();
             }
 
             GuildContainer guildContainer = guildOptional.get();
 
             return SQLSession.getSqlConnector().getSqlWorker().getWelcomeWebhook(guildId).publishOn(Schedulers.boundedElastic()).mapNotNull(webhookLogOptional -> {
                 if (webhookLogOptional.isEmpty()) {
-                    return Optional.ofNullable(errorReturnValue);
+                    return Optional.ofNullable(ChannelContainer.DEFAULT);
                 }
 
                 WebhookWelcome webhook = webhookLogOptional.get();
@@ -676,7 +676,7 @@ public class GuildService {
                     .getEntity(new TemporalVoicechannel(), "FROM TemporalVoicechannel WHERE guildChannelId.guildId=:gid", Map.of("gid", guildId))
                     .map(temporalVoicechannelOptional -> temporalVoicechannelOptional
                             .map(temporalVoicechannel -> guildContainerOptional.get().getChannelById(temporalVoicechannel.getVoiceChannelId()))
-                            .or(Optional::empty)).block();
+                            .or(() -> Optional.ofNullable(ChannelContainer.DEFAULT))).block();
         });
     }
 
@@ -765,12 +765,11 @@ public class GuildService {
     //region Ticket
 
     public Mono<Optional<TicketContainer>> getTicket(String sessionIdentifier, long guildId) {
-        TicketContainer errorReturnValue = null;
         return sessionService.retrieveGuild(sessionIdentifier, guildId, true, false)
                 .publishOn(Schedulers.boundedElastic())
                 .mapNotNull(guildContainerOptional -> {
                     if (guildContainerOptional.isEmpty()) {
-                        return Optional.ofNullable(errorReturnValue);
+                        return Optional.empty();
                     }
 
                     GuildContainer guildContainer = guildContainerOptional.get();
@@ -778,7 +777,7 @@ public class GuildService {
                     return SQLSession.getSqlConnector().getSqlWorker().getEntity(new Tickets(), "FROM Tickets WHERE guildId=:gid", Map.of("gid", guildId))
                             .map(ticketOptional -> {
                                 if (ticketOptional.isEmpty()) {
-                                    return Optional.ofNullable(errorReturnValue);
+                                    return Optional.ofNullable(TicketContainer.DEFAULT);
                                 }
 
                                 Tickets tickets = ticketOptional.get();
@@ -932,7 +931,7 @@ public class GuildService {
                     return SQLSession.getSqlConnector().getSqlWorker().getEntity(new Suggestions(),
                                     "FROM Suggestions WHERE guildChannelId.guildId = :id", Map.of("id", guildId))
                             .map(suggestionOptional -> suggestionOptional
-                                    .map(x -> guildContainer.getChannelById(suggestionOptional.get().getChannelId())).or(Optional::empty))
+                                    .map(x -> guildContainer.getChannelById(suggestionOptional.get().getChannelId())).or(() -> Optional.of(ChannelContainer.DEFAULT)))
                             .block();
                 });
     }

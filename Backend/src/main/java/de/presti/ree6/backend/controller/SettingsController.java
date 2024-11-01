@@ -55,7 +55,16 @@ public class SettingsController {
            }
 
            return SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guildId)
-                   .map(settings -> new GenericObjectResponse<>(true, settings, null)).block();
+                   .map(settings -> {
+                       if (settings.isEmpty()) {
+                           return new GenericObjectResponse<>(false,
+                                   SettingsManager.getSettings().stream()
+                                           .map(x -> new Setting(guildId, x.getName(), x.getDisplayName(), x.getValue())).toList(),
+                                   null);
+                       }
+
+                       return new GenericObjectResponse<>(true, settings, null);
+                   }).block();
         });
     }
 

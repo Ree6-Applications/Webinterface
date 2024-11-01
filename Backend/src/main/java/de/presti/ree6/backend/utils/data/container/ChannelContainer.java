@@ -27,6 +27,8 @@ public class ChannelContainer {
     String name;
     ChannelType type;
 
+    public static ChannelContainer DEFAULT = new ChannelContainer(-1, -1, "None", ChannelType.TEXT);
+
     public ChannelContainer(StandardGuildMessageChannel guildChannel) {
         this.id = guildChannel.getIdLong();
         this.guildId = guildChannel.getGuild().getIdLong();
