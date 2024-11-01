@@ -1,30 +1,17 @@
 <script lang="ts">
-    import { createBubbler } from 'svelte/legacy';
-
-    const bubble = createBubbler();
     import LoadingIndicator from "../loadingIndicator.svelte";
     import { setting, updateSetting } from "$lib/scripts/settings";
     import { currentServer } from "$lib/scripts/servers";
     import InfoPopup from "../infoPopup.svelte";
 
-    interface Props {
-        title: string;
-        icon: string;
-        description: string;
-        settingName: string;
-        formattingDirectives?: string | undefined;
-    }
+    export let title: string;
+    export let icon: string;
+    export let description: string;
+    export let settingName: string;
+    export let formattingDirectives: string | undefined = undefined;
 
-    let {
-        title,
-        icon,
-        description,
-        settingName,
-        formattingDirectives = undefined
-    }: Props = $props();
-
-    let editing = $state(false);
-    let showFormatting = $state(false);
+    let editing = false;
+    let showFormatting = false;
     let current = setting(settingName);
     let store = current.value;
 
@@ -62,22 +49,22 @@
                 {/each}
             </div>
             {:else}
-            <textarea bind:value={$store} placeholder="Any word"></textarea>
+            <textarea bind:value={$store} placeholder="Any word" />
             {/if}
 
-            <div onclick={() => {
+            <div on:click={() => {
                 if(!editing) {
                     editing = true
                 } else {
                     updateSetting(settingName, $currentServer.id + "", $store)
                     editing = false
                 }
-            }} onkeydown={bubble('keydown')} class="button icon-button">
+            }} on:keydown class="button icon-button">
                 <span class="material-icons icon-small icon-primary">{editing ? "check" : "edit"}</span>
             </div>
 
             {#if formattingDirectives}
-            <div onclick={() => showFormatting = true} onkeydown={bubble('keydown')} class="button icon-button">
+            <div on:click={() => showFormatting = true} on:keydown class="button icon-button">
                 <span class="material-icons icon-small icon-primary">info</span>
             </div>
             {/if}

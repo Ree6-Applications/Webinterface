@@ -1,17 +1,10 @@
 <script lang="ts">
-    import { createBubbler } from 'svelte/legacy';
-
-    const bubble = createBubbler();
     import type { Role } from "$lib/scripts/servers";
     import RolePicker from "../rolePicker.svelte";
 
-    interface Props {
-        current?: Role | null;
-        callback: (value: Role | null) => void;
-        picking?: boolean;
-    }
-
-    let { current = $bindable(null), callback, picking = $bindable(false) }: Props = $props();
+    export let current: Role | null = null;
+    export let callback: (value: Role | null) => void;
+    export let picking = false;
 
 </script>
 
@@ -23,9 +16,9 @@
 }} />
 {/if}
 
-<div class="chip chip-hover clickable" onclick={() => {
+<div class="chip chip-hover clickable" on:click={() => {
     picking = true;
-}} onkeydown={bubble('keydown')}>
+}} on:keydown>
     {#if current != null}
     <span class="material-icons" style={"color: #" + current.color.toString(16) + ";"}>military_tech</span>
     <p class="text-small">{current?.name}</p>

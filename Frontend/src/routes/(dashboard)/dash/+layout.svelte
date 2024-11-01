@@ -7,13 +7,8 @@
     import { fade } from "svelte/transition";
     import { goto } from "$app/navigation";
     import ServerSelector from "./serverSelector.svelte";
-    interface Props {
-        children?: import('svelte').Snippet;
-    }
 
-    let { children }: Props = $props();
-
-    let expandedSidebar = $state(false);
+    let expandedSidebar = false;
 
     onMount(async () => {
         await loadServers()
@@ -55,7 +50,7 @@
     
         {#if !$serversLoading}
         <div in:fade class="content">
-            {@render children?.()}
+            <slot />
             <div class="spacer"></div>
         </div>
         {/if}

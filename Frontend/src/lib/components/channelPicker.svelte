@@ -1,26 +1,13 @@
 <script lang="ts">
-    import { createBubbler } from 'svelte/legacy';
-
-    const bubble = createBubbler();
     import { currentChannels, type Channel } from "$lib/scripts/servers";
     import { onDestroy, onMount } from "svelte";
     import { fade, scale } from "svelte/transition";
 
-    interface Props {
-        current: Channel;
-        message: string;
-        type?: string;
-        zIndex?: number;
-        callback: (id: Channel | undefined) => void;
-    }
-
-    let {
-        current,
-        message,
-        type = "TEXT",
-        zIndex = 100,
-        callback
-    }: Props = $props();
+    export let current: Channel;
+    export let message: string;
+    export let type: string = "TEXT";
+    export let zIndex: number = 100;
+    export let callback: (id: Channel | undefined) => void;
 
     let channels: Channel[] = []
     let sub = currentChannels.subscribe((entities) => {
@@ -43,23 +30,23 @@
 
         <div class="header">
             <h2>{message}</h2>
-            <span onclick={close} onkeydown={bubble('keydown')} class="material-icons icon-medium clickable hover-primary">close</span>
+            <span on:click={close} on:keydown class="material-icons icon-medium clickable hover-primary">close</span>
         </div>
 
         <div class="content">
             <div class="channels">
                 {#each channels as channel}
-                <div onclick={() => callback(channel)} onkeydown={bubble('keydown')} 
+                <div on:click={() => callback(channel)} on:keydown 
                     class="channel clickable {current.id == channel.id ? 'selected' : ''}">
                     <span class="material-icons icon-primary icon-small">{channel.type == "TEXT" ? "tag" : channel.type == "CATEGORY" ? "folder" : "graphic_eq"}</span>
                     <div class="name">{channel.name}</div>
                 </div>
                 {/each}
-                <div onclick={() => callback({
+                <div on:click={() => callback({
                     id: "-1",
                     name: "hi",
                     type: "TEXT"
-                })} onkeydown={bubble('keydown')} 
+                })} on:keydown 
                     class="channel clickable {current.id == null ? 'selected' : ''}">
                     <span class="material-icons icon-primary icon-small">close</span>
                     <div class="name">None</div>

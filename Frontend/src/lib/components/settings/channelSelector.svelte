@@ -1,39 +1,25 @@
 <script lang="ts">
-    import { createBubbler } from 'svelte/legacy';
-
-    const bubble = createBubbler();
     import { onMount } from "svelte";
     import LoadingIndicator from "../loadingIndicator.svelte";
     import { get, post, post_js } from "$lib/scripts/constants";
     import type { Channel } from "$lib/scripts/servers";
     import ChannelPicker from "../channelPicker.svelte";
 
-    interface Props {
-        title: string;
-        windowTitle?: string;
-        icon: string;
-        type?: string;
-        description: string;
-        endpoint: string;
-    }
+    export let title: string;
+    export let windowTitle: string = "Select a channel.";
+    export let icon: string;
+    export let type: string = "TEXT";
+    export let description: string;
+    export let endpoint: string;
 
-    let {
-        title,
-        windowTitle = "Select a channel.",
-        icon,
-        type = "TEXT",
-        description,
-        endpoint
-    }: Props = $props();
-
-    let channelPicker = $state(false);
-    let loading = $state(false);
-    let error = $state(false);
-    let current: Channel = $state({
+    let channelPicker = false;
+    let loading = false;
+    let error = false;
+    let current: Channel = {
         id: ":loading",
         name: "Loading...",
         type: type
-    })
+    }
 
     onMount(async () => {
         loading = true;
@@ -131,7 +117,7 @@
             </div>
             {/if}
 
-            <div onclick={() => channelPicker = true} onkeydown={bubble('keydown')} class="button icon-button">
+            <div on:click={() => channelPicker = true} on:keydown class="button icon-button">
                 <span class="material-icons icon-small icon-primary">edit</span>
             </div>
         </div>

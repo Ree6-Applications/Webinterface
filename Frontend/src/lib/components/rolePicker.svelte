@@ -1,25 +1,12 @@
 <script lang="ts">
-    import { createBubbler } from 'svelte/legacy';
-
-    const bubble = createBubbler();
     import { currentRoles, type Role } from "$lib/scripts/servers";
     import { fade, scale } from "svelte/transition";
 
-    interface Props {
-        current: Role | null;
-        message: string;
-        zIndex?: number;
-        nullable?: boolean;
-        callback: (role: Role | null) => void;
-    }
-
-    let {
-        current,
-        message,
-        zIndex = 100,
-        nullable = false,
-        callback
-    }: Props = $props();
+    export let current: Role | null;
+    export let message: string;
+    export let zIndex: number = 100;
+    export let nullable: boolean = false;
+    export let callback: (role: Role | null) => void;
 
     function close() {
         callback(current);
@@ -32,20 +19,20 @@
 
         <div class="header">
             <h2>{message}</h2>
-            <span onclick={close} onkeydown={bubble('keydown')} class="material-icons icon-medium clickable hover-primary">close</span>
+            <span on:click={close} on:keydown class="material-icons icon-medium clickable hover-primary">close</span>
         </div>
 
         <div class="content">
             <div class="channels">
                 {#each $currentRoles as role}
-                <div onclick={() => callback(role)} onkeydown={bubble('keydown')} 
+                <div on:click={() => callback(role)} on:keydown 
                     class="channel clickable {current == role ? 'selected' : ''}">
                     <span class="material-icons icon-small" style={"color: #" + role.color.toString(16) + ";"}>military_tech</span>
                     <div class="name">{role.name}</div>
                 </div>
                 {/each}
                 {#if nullable}
-                <div onclick={() => callback(null)} onkeydown={bubble('keydown')} 
+                <div on:click={() => callback(null)} on:keydown 
                     class="channel clickable {current == null ? 'selected' : ''}">
                     <span class="material-icons icon-small icon-primary">close</span>
                     <div class="name">Nothing</div>

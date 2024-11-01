@@ -1,31 +1,19 @@
 <script lang="ts">
-    import { createBubbler } from 'svelte/legacy';
-
-    const bubble = createBubbler();
     import { onMount } from "svelte";
     import LoadingIndicator from "../loadingIndicator.svelte";
     import { get, post_js } from "$lib/scripts/constants";
     import { slide } from "svelte/transition";
 
-    interface Props {
-        icon: string;
-        title: string;
-        description: string;
-        endpoint: string;
-    }
+    export let icon: string;
+    export let title: string;
+    export let description: string;
+    export let endpoint: string;
 
-    let {
-        icon,
-        title,
-        description,
-        endpoint
-    }: Props = $props();
-
-    let strings: string[] = $state([]);
-    let stringLoading: string | null = $state(null);
-    let error = $state(false);
-    let loading = $state(true);
-    let toAdd = $state("");
+    let strings: string[] = [];
+    let stringLoading: string | null = null;
+    let error = false;
+    let loading = true;
+    let toAdd = "";
 
     onMount(async () => {
 
@@ -103,7 +91,7 @@
 
             <input placeholder="Any word" bind:value={toAdd} />
 
-            <div onclick={() => addString(toAdd)} onkeydown={bubble('keydown')} class="button icon-button">
+            <div on:click={() => addString(toAdd)} on:keydown class="button icon-button">
                 <span class="material-icons icon-small icon-primary">add</span>
             </div>
         </div>
@@ -118,7 +106,7 @@
             <p class="text-small">{string}</p>
 
             {#if stringLoading != string}
-            <span onclick={async () => {
+            <span on:click={async () => {
                 if(stringLoading != null) return;
                 stringLoading = string;
 
@@ -140,7 +128,7 @@
 
                 stringLoading = null;
 
-            }} onkeydown={bubble('keydown')} class="material-icons icon-primary clickable chip-button">close</span>
+            }} on:keydown class="material-icons icon-primary clickable chip-button">close</span>
             {:else}
             <LoadingIndicator size="1.5rem" />
             {/if}

@@ -1,7 +1,4 @@
 <script lang="ts">
-    import { createBubbler } from 'svelte/legacy';
-
-    const bubble = createBubbler();
     import { browser } from "$app/environment";
     import { page } from "$app/stores";
     import InfoPopup from "$lib/components/infoPopup.svelte";
@@ -10,13 +7,13 @@
     import { onMount } from "svelte";
     import { fly, scale } from "svelte/transition";
 
-    let loading = $state(true);
-    let found = $state(true);
+    let loading = true;
+    let found = true;
     
-    let popup = $state(false);
-    let popupMessage = $state("");
+    let popup = false;
+    let popupMessage = "";
 
-    let recording: any = $state({});
+    let recording: any = {};
 
     onMount(async () => {
 
@@ -91,7 +88,7 @@
             </div>
 
             <div class="buttons">
-                <div class="button" onclick={async () => {
+                <div class="button" on:click={async () => {
                     const res = await get("/guilds/recording/download?recordId=" + $page.url.searchParams.get("id"));
                     const blob = await res.blob();
 
@@ -101,7 +98,7 @@
                     link.download = "recording.wav";
                     link.click();
 
-                }} onkeydown={bubble('keydown')}>
+                }} on:keydown>
                     <span class="material-icons icon-medium icon-primary clickable">download</span>
                     <p class="text-medium">Download</p>
                 </div>

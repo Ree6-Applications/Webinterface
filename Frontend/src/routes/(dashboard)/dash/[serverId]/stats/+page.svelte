@@ -69,11 +69,11 @@
 <div class="actions">
 
     {#each actions as action}
-    <div class="action" onclick={() => {
+    <div class="action" on:click={() => {
 
         // Go to link
         goto("/dash/" + $page.params["serverId"] + action.link)
-    }} onkeydown={() => {}}>
+    }} on:keydown={() => {}}>
         <div class="content">
             <span class="material-icons icon-primary icon-large">{action.icon}</span>
             <div class="text">

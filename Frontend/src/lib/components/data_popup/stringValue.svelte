@@ -1,39 +1,27 @@
 <script lang="ts">
-    import { createBubbler } from 'svelte/legacy';
 
-    const bubble = createBubbler();
-
-    interface Props {
-        current?: string | null;
-        callback: (value: string | null) => void;
-        unit?: string;
-        picking?: boolean;
-    }
-
-    let {
-        current = $bindable(null),
-        callback,
-        unit = "",
-        picking = $bindable(false)
-    }: Props = $props();
+    export let current: string | null = null;
+    export let callback: (value: string | null) => void;
+    export let unit = "";
+    export let picking = false;
 
 </script>
 
 {#if picking}
 <div class="flex">
     <input bind:value={current} placeholder="Anything" />
-    <span class="material-icons button icon-primary icon-button better-hover" onclick={() => {
+    <span class="material-icons button icon-primary icon-button better-hover" on:click={() => {
         picking = false;
         if(current == "") {
             current = null;
         }
         callback(current);
-    }} onkeydown={bubble('keydown')}>check</span>
+    }} on:keydown>check</span>
 </div>
 {:else}
-<div class="chip chip-hover clickable" onclick={() => {
+<div class="chip chip-hover clickable" on:click={() => {
     picking = true;
-}} onkeydown={bubble('keydown')}>
+}} on:keydown>
     {#if current == null}
     <span class="material-icons icon-primary">close</span>
     <p class="text-small">Nothing</p>

@@ -1,7 +1,4 @@
 <script lang="ts">
-    import { createBubbler } from 'svelte/legacy';
-
-    const bubble = createBubbler();
     import { page } from "$app/stores";
     import ConfirmPopup from "$lib/components/confirmPopup.svelte";
     import LoadingIndicator from "$lib/components/loadingIndicator.svelte";
@@ -9,15 +6,15 @@
     import { onMount } from "svelte";
     import { slide } from "svelte/transition";
 
-    let loading = $state(true)
-    let error = $state(false)
+    let loading = true
+    let error = false
 
-    let confirm = $state(false)
-    let confirmMessage = $state(""), confirmTitle = $state("")
-    let currentAction = $state("")
-    let currentTarget = $state("")
-    let warnings: any[] = $state([])
-    let setCallback: Function = $state(() => {})
+    let confirm = false
+    let confirmMessage = "", confirmTitle = ""
+    let currentAction = ""
+    let currentTarget = ""
+    let warnings: any[] = []
+    let setCallback: Function = () => {}
 
     onMount(async () => {
         const json = await get_js("/guilds/" + $page.params.serverId + "/warnings")
@@ -159,7 +156,7 @@
         <div class="button-bar ns">
 
             {#if warnings.length > 0}
-            <div class="button" onclick={() => clearWarnings()} onkeydown={() => {}}>
+            <div class="button" on:click={() => clearWarnings()} on:keydown={() => {}}>
                 <span class="material-icons icon-small icon-primary">delete</span>
                 <p class="text-small">Delete all</p>
             </div>
@@ -184,17 +181,17 @@
             <div class="hr-v"></div>
 
             {#if !currentTarget.includes(warning.user.id)}
-            <span class="material-icons icon-small icon-primary clickable" onclick={() => addWarning(warning.user.id, () => {
+            <span class="material-icons icon-small icon-primary clickable" on:click={() => addWarning(warning.user.id, () => {
                 warning.warnings = (parseInt(warning.warnings) + 1).toString()
-            })} onkeydown={bubble('keydown')}>add</span>
+            })} on:keydown>add</span>
             <p class="text-small">{warning.warnings}</p>
-            <span class="material-icons icon-small icon-primary clickable" onclick={() => removeWarning(warning.user.id, () => {
+            <span class="material-icons icon-small icon-primary clickable" on:click={() => removeWarning(warning.user.id, () => {
                 warning.warnings = (parseInt(warning.warnings) - 1).toString()
-            })} onkeydown={bubble('keydown')}>remove</span>
+            })} on:keydown>remove</span>
             <div class="hr-v"></div>
-            <span class="material-icons icon-small icon-primary clickable" onclick={() => clearWarningsOfUser(warning.user.id, () => {
+            <span class="material-icons icon-small icon-primary clickable" on:click={() => clearWarningsOfUser(warning.user.id, () => {
                 warnings = warnings.filter((w) => w.user.id != warning.user.id)
-            })} onkeydown={bubble('keydown')}>delete</span>
+            })} on:keydown>delete</span>
             {:else}
             <LoadingIndicator size="25" />
             {/if}
