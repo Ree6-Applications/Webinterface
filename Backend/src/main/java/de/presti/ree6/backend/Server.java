@@ -182,7 +182,7 @@ public class Server {
                 if (recordings != null && !recordings.isEmpty()) {
                     for (Recording recording : recordings) {
                         if (recording.getCreation() < System.currentTimeMillis() - Duration.ofDays(1).toMillis()) {
-                            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording);
+                            SQLSession.getSqlConnector().getSqlWorker().deleteEntity(recording).block();
                         }
                     }
                 }

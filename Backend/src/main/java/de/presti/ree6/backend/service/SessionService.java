@@ -52,7 +52,7 @@ public class SessionService {
 
                 return Optional.of(new SessionContainer("", session, oAuth2User));
             } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
+                log.debug(ex.getMessage(), ex);
                 return Optional.empty();
             }
         });
@@ -90,7 +90,7 @@ public class SessionService {
                 }
 
             } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
+                log.debug(ex.getMessage(), ex);
                 return Optional.empty();
             }
         });
