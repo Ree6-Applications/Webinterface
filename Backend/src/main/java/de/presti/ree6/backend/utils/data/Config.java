@@ -21,6 +21,26 @@ public class Config {
      */
     private YamlFile yamlFile;
 
+
+    /**
+     * The Config Location.
+     */
+    private String configFileLocation = "config.yml";
+
+    /**
+     * Create an Instance of the Config.
+     */
+    public Config() {
+    }
+
+    /**
+     * Create an Instance of the Config.
+     * @param configFileLocation the Config Location.
+     */
+    public Config(String configFileLocation) {
+        this.configFileLocation = configFileLocation;
+    }
+
     /**
      * Initialize the Configuration.
      */
@@ -230,7 +250,7 @@ public class Config {
      * @return The Configuration File as {@link File}.
      */
     public File getFile() {
-        return new File("config.yml");
+        return new File(configFileLocation);
     }
 
 }

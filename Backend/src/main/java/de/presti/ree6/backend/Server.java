@@ -10,6 +10,7 @@ import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.jagrosh.jdautilities.oauth2.OAuth2Client;
 import de.presti.ree6.backend.bot.BotWorker;
 import de.presti.ree6.backend.bot.version.BotVersion;
+import de.presti.ree6.backend.utils.OptionParser;
 import de.presti.ree6.backend.utils.data.*;
 import de.presti.ree6.sql.DatabaseTyp;
 import de.presti.ree6.sql.SQLSession;
@@ -22,8 +23,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -94,8 +93,10 @@ public class Server {
     public void load(String[] args) {
         log.info("Starting Backend {}", backendVersion);
 
+        OptionParser options = new OptionParser(args, true);
+
         // Create Config Instance.
-        config = new Config();
+        config = new Config(options.getValueOrDefault("config", "config.yml"));
 
         // Initialize the Config.
         config.init();
@@ -138,15 +139,13 @@ public class Server {
 
         // Create a new JDA Session.
         try {
-            List<String> argList = Arrays.stream(args).map(String::toLowerCase).toList();
-
             int shards = instance.config.getConfiguration().getInt("discord.bot.client.shards", 1);
 
             BotVersion version = BotVersion.RELEASE;
 
-            if (argList.contains("--dev")) {
+            if (options.isEnabled("dev")) {
                 version = BotVersion.DEVELOPMENT_BUILD;
-            } else if (argList.contains("--beta")) {
+            } else if (options.isEnabled("beta")) {
                 version = BotVersion.BETA_BUILD;
             }
 
