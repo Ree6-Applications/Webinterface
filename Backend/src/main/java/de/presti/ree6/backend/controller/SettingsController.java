@@ -54,17 +54,8 @@ public class SettingsController {
                return new GenericObjectResponse<>(false, Collections.emptyList(), "Guild doesn't exist.");
            }
 
-           return SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guildId)
-                   .map(settings -> {
-                       if (settings.isEmpty()) {
-                           return new GenericObjectResponse<>(false,
-                                   SettingsManager.getSettings().stream()
-                                           .map(x -> new Setting(guildId, x.getName(), x.getDisplayName(), x.getValue())).toList(),
-                                   null);
-                       }
-
-                       return new GenericObjectResponse<>(true, settings, null);
-                   }).block();
+           return SQLSession.getSqlConnector().getSqlWorker().getAllSettings(guildId, true)
+                   .map(settings -> new GenericObjectResponse<>(true, settings, null)).block();
         });
     }
 
