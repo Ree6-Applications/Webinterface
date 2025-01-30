@@ -12,7 +12,7 @@
 
     <groupId>de.presti.ree6</groupId>
     <artifactId>Webinterface-Backend</artifactId>
-    <version>5.0.2</version>
+    <version>5.0.3</version>
     <name>Webinterface-Backend</name>
     <description>The Backend for the Webinterface</description>
 
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-spring-boot-starter-jakarta</artifactId>
-            <version>8.0.0</version>
+            <version>7.21.0</version>
         </dependency>
 
         <!-- Utilities -->
