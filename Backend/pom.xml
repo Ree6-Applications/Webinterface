@@ -88,7 +88,7 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-spring-boot-starter-jakarta</artifactId>
-            <version>7.21.0</version>
+            <version>8.0.0</version>
         </dependency>
 
         <!-- Utilities -->
