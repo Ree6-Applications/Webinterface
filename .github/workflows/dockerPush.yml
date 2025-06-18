@@ -41,7 +41,7 @@ jobs:
           images: ree6/backend
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6.13.0
+        uses: docker/build-push-action@v6.18.0
         with:
           platforms: linux/amd64,linux/arm64
           context: Backend/
@@ -77,7 +77,7 @@ jobs:
           images: ree6/frontend
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6.13.0
+        uses: docker/build-push-action@v6.18.0
         with:
           platforms: linux/amd64,linux/arm64
           context: Frontend/docker
